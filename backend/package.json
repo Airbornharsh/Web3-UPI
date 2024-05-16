@@ -3,14 +3,26 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "tsc -b",
+    "start": "node dist/index.js",
+    "prisma": "npx prisma"
+  },
   "dependencies": {
     "@prisma/client": "5.14.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
-    "prisma": "^5.14.0"
+    "@types/jsonwebtoken": "^9.0.6",
+    "prisma": "^5.14.0",
+    "typescript": "^5.4.5"
   }
 }
