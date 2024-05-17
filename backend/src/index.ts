@@ -73,6 +73,30 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get(":upiId", async (req, res) => {
+  try {
+    const prisma = new PrismaClient();
+    const { upiId } = req.params;
+
+    const users = await prisma.user.findMany({
+      where: {
+        upiId: {
+          contains: upiId,
+        },
+      },
+    });
+
+    if (users.length === 0) {
+      return res.status(404).json({ message: "No users found" });
+    }
+
+    res.json({ users });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
 app.get(
   "/user/:upiId",
   (req, res, next) => {
