@@ -1,0 +1,20 @@
+{
+  "name": "web3-upi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/airbornharsh/Web3-UPI.git",
+  "author": "Harsh Keshri <harshkeshri1234567@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "npx concurrently \"yarn backend\" \"yarn frontend\"",
+    "backend": "cd backend && yarn dev",
+    "frontend": "cd frontend && yarn dev",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
+  },
+  "dependencies": {
+    "axios": "^1.6.8"
+  }
+}
