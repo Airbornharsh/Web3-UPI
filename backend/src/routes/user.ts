@@ -1,8 +1,8 @@
 import { Router } from 'express'
-import { authMiddleware } from '../middleware'
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { authMiddleware } from '../middleware'
 
 const userRouter = Router()
 
@@ -31,7 +31,7 @@ userRouter.post('/wallet-check', async (req, res) => {
     }
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: 'Something went wrong' })
+    return res.status(500).json({ message: 'Something went wrong' })
   }
 })
 
@@ -50,10 +50,6 @@ userRouter.post('/upi-check', async (req, res) => {
       return res.json({
         message: 'User Found',
         userExists: true,
-        user: {
-          name: user.name,
-          walletAddress: user.walletAddress,
-        },
       })
     } else {
       return res.json({ message: 'User not found', userExists: false })
@@ -91,11 +87,11 @@ userRouter.post('/create-user', async (req, res) => {
     })
 
     const token = jwt.sign(
-      { walletAddress, upiId },
+      { walletAddress, upiId, name: user.name },
       process.env.JWT_SECRET ?? '',
     )
 
-    res.json({
+    return res.json({
       user: {
         ...user,
         pin: undefined,
@@ -104,11 +100,11 @@ userRouter.post('/create-user', async (req, res) => {
     })
   } catch (e: any) {
     console.log(e)
-    res.status(500).json({ message: e.message })
+    return res.status(500).json({ message: e.message })
   }
 })
 
-userRouter.post('/login', async (req, res) => {
+userRouter.post('/sign-in', async (req, res) => {
   try {
     const prisma = new PrismaClient()
     const { walletAddress, pin } = req.body
@@ -123,39 +119,73 @@ userRouter.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' })
     }
 
-    res.json({ user })
+    const match = await bcrypt.compare(pin, user.pin)
+
+    if (!match) {
+      return res.status(401).json({ message: 'Invalid credentials' })
+    }
+
+    const token = jwt.sign(
+      { walletAddress: user.walletAddress, upiId: user.upiId, name: user.name },
+      process.env.JWT_SECRET ?? '',
+    )
+
+    return res.json({
+      user: {
+        ...user,
+        pin: undefined,
+      },
+      token,
+    })
   } catch (e) {
     console.log(e)
-    res.status(500).json({ message: 'Something went wrong' })
+    return res.status(500).json({ message: 'Something went wrong' })
   }
 })
 
-userRouter.get(
-  '/:upiId',
-  (req, res, next) => {
-    authMiddleware(req, res, next)
-  },
-  async (req, res) => {
-    try {
-      const prisma = new PrismaClient()
-      const { upiId } = req.params
+userRouter.get('/check-auth', authMiddleware, async (req, res) => {
+  try {
+    const user = res.locals.user
 
-      const user = await prisma.user.findFirst({
-        where: {
-          upiId,
-        },
-      })
-
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' })
-      }
-
-      res.json({ user })
-    } catch (e) {
-      console.log(e)
-      res.status(500).json({ message: 'Something went wrong' })
+    if (!user) {
+      return res.status(401).json({ message: 'Unauthorized' })
     }
-  },
-)
+
+    return res.json({
+      message: 'Valid User',
+      userValid: true,
+      user: {
+        walletAddress: user.walletAddress,
+        upiId: user.upiId,
+        name: user.name,
+      },
+    })
+  } catch (e) {
+    console.log(e)
+    return res.status(401).json({ message: 'Unauthorized', userValid: false })
+  }
+})
+
+userRouter.get('/:upiId', async (req, res) => {
+  try {
+    const prisma = new PrismaClient()
+    const { upiId } = req.params
+
+    const user = await prisma.user.findFirst({
+      where: {
+        upiId,
+      },
+    })
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    return res.json({ user })
+  } catch (e) {
+    console.log(e)
+    return res.status(500).json({ message: 'Something went wrong' })
+  }
+})
 
 export default userRouter

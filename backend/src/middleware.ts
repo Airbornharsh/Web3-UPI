@@ -8,11 +8,12 @@ export const authMiddleware = async (
 ) => {
   try {
     const token = req.headers.authorization?.split(' ')[1] ?? ''
-    const decoded = jwt.verify(token, process.env.JWT_SECRET ?? '')
-    // @ts-ignore
-    req.user = decoded
+    const JWT_SECRET = process.env.JWT_SECRET ?? ''
+    const decoded = jwt.verify(token, JWT_SECRET)
+    res.locals.user = decoded ?? null
+  } catch (e) {
+    console.log(e)
+  } finally {
     next()
-  } catch (error) {
-    res.status(401).json({ message: 'Unauthorized' })
   }
 }
