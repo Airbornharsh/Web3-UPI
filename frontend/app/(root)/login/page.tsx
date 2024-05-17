@@ -24,6 +24,14 @@ const Page = () => {
       console.log(response)
     } catch (e) {
       console.log(e)
+    } finally {
+      setFormData({
+        name: '',
+        walletAddress: '',
+        upiId: '',
+        pin: '',
+        confirmPin: '',
+      })
     }
   }
 

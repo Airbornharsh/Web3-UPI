@@ -8,6 +8,9 @@ import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { clusterApiUrl } from '@solana/web3.js'
 import { Appbar } from '@/components/Appbar'
+import { LoaderProvider } from '@/context/LoaderContext'
+import Loader from '@/components/Loader'
+import { AuthProvider } from '@/context/AuthContext'
 
 // Default styles that can be overridden by your app
 require('@solana/wallet-adapter-react-ui/styles.css')
@@ -28,8 +31,13 @@ export default function RootLayout({
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <Appbar />
-          {children}
+          <LoaderProvider>
+            <AuthProvider>
+              <Appbar />
+              {children}
+              <Loader />
+            </AuthProvider>
+          </LoaderProvider>
         </WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
