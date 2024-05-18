@@ -35,7 +35,9 @@ const AuthModal = () => {
       setFormData((f) => {
         return { ...f, walletAddress: publicKey?.toString() }
       })
+      walletCheckHandler({ preventDefault: () => {} })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey])
 
   const setError = (message: string) => {
