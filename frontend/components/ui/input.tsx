@@ -1,0 +1,29 @@
+import React from 'react'
+
+interface InputProps {
+  value: string
+  placeHolder: string
+  onChange: (val: any) => void
+  type?: string
+}
+
+export const Input: React.FC<InputProps> = ({
+  value,
+  placeHolder,
+  onChange,
+  type = 'text',
+}) => {
+  return (
+    <div className="flex justify-center">
+      <input
+        className="border-2 border-gray-400 max-w-56 w-[90vw] p-2"
+        value={value}
+        placeholder={placeHolder}
+        type={type}
+        onChange={(e) => {
+          onChange(e.target.value)
+        }}
+      />
+    </div>
+  )
+}

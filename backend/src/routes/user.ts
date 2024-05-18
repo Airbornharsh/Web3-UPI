@@ -1,14 +1,13 @@
 import { Router } from 'express'
-import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { authMiddleware } from '../middleware'
+import prisma from '../prisma'
 
 const userRouter = Router()
 
 userRouter.post('/wallet-check', async (req, res) => {
   try {
-    const prisma = new PrismaClient()
     const { walletAddress } = req.body
 
     const user = await prisma.user.findFirst({
@@ -37,7 +36,6 @@ userRouter.post('/wallet-check', async (req, res) => {
 
 userRouter.post('/upi-check', async (req, res) => {
   try {
-    const prisma = new PrismaClient()
     const { walletAddress, upiId } = req.body
 
     const user = await prisma.user.findFirst({
@@ -62,7 +60,6 @@ userRouter.post('/upi-check', async (req, res) => {
 
 userRouter.post('/create-user', async (req, res) => {
   try {
-    const prisma = new PrismaClient()
     const { name, walletAddress, upiId, pin } = req.body
 
     const tempUser = await prisma.user.findFirst({
@@ -106,7 +103,6 @@ userRouter.post('/create-user', async (req, res) => {
 
 userRouter.post('/sign-in', async (req, res) => {
   try {
-    const prisma = new PrismaClient()
     const { walletAddress, pin } = req.body
 
     const user = await prisma.user.findFirst({
@@ -168,7 +164,6 @@ userRouter.get('/check-auth', authMiddleware, async (req, res) => {
 
 userRouter.get('/:upiId', async (req, res) => {
   try {
-    const prisma = new PrismaClient()
     const { upiId } = req.params
 
     const user = await prisma.user.findFirst({

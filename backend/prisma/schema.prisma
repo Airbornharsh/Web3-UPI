@@ -16,6 +16,28 @@ model User {
   upiId         String   @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  senderTransaction   Transaction[] @relation("sender")
+  receiverTransaction Transaction[] @relation("receiver")
+}
+
+model Transaction {
+  id         Int      @id @default(autoincrement())
+  senderId   Int
+  recieverId Int
+  amount     Int
+  signature  String
+  Status     Status   @default(PENDING)
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("sender", fields: [senderId], references: [id])
+  receiver User @relation("receiver", fields: [recieverId], references: [id])
+}
+
+enum Status {
+  PENDING
+  COMPLETED
+  FAILED
 }
 
 datasource db {

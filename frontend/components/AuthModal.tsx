@@ -35,10 +35,16 @@ const AuthModal = () => {
       setFormData((f) => {
         return { ...f, walletAddress: publicKey?.toString() }
       })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicKey])
+
+  useEffect(() => {
+    if (formData.walletAddress) {
       walletCheckHandler({ preventDefault: () => {} })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [publicKey])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.walletAddress])
 
   const setError = (message: string) => {
     toast.error(message, {
@@ -213,6 +219,7 @@ const AuthModal = () => {
         name="pin"
         className="p-2 border border-slate-400 rounded border-opacity-50 outline-none focus:border-opacity-100"
         value={formData.pin}
+        autoFocus={true}
         onChange={(e) => {
           if (e.target.value.length > 6) {
             return

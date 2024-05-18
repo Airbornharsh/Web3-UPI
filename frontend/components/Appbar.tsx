@@ -14,7 +14,7 @@ import { Modal } from '@mui/material'
 import AuthModal from './AuthModal'
 
 export const Appbar = () => {
-  const { publicKey, signMessage,autoConnect } = useWallet()
+  const { publicKey, signMessage, autoConnect } = useWallet()
   const pathName = usePathname()
   const { user, isAuthenticated } = useAuth()
   const router = useRouter()
