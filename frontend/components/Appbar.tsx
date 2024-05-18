@@ -38,11 +38,13 @@ export const Appbar = () => {
     // signAndSend()
     if (!publicKey) {
       setOpenModal(false)
+      router.push('/')
     } else if (publicKey && !isAuthenticated) {
       setOpenModal(true)
     } else {
       setOpenModal(false)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, publicKey])
 
   useEffect(() => {

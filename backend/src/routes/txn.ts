@@ -25,6 +25,9 @@ txnRouter.get('/upiId', authMiddleware, async (req, res) => {
         upiId: {
           contains: upiId ? upiId.toString() : '',
         },
+        NOT: {
+          walletAddress: res.locals.user.walletAddress,
+        },
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -110,6 +113,7 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
       })
       return res.status(411).json({
         message: 'Transaction signature/amount incorrect',
+        success: false,
       })
     }
 
@@ -127,6 +131,7 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
       })
       return res.status(411).json({
         message: 'Transaction sent to wrong address',
+        success: false,
       })
     }
 
@@ -144,6 +149,7 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
       })
       return res.status(411).json({
         message: 'Transaction sent to wrong address',
+        success: false,
       })
     }
 
@@ -156,10 +162,12 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
       },
     })
 
-    res.json({ message: 'Transaction successful' })
+    return res.json({ message: 'Transaction successful', success: true })
   } catch (e) {
     console.log(e)
-    return res.status(500).json({ message: 'Something went wrong' })
+    return res
+      .status(500)
+      .json({ message: 'Something went wrong', success: false })
   }
 })
 

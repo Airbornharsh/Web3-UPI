@@ -5,6 +5,7 @@ interface InputProps {
   placeHolder: string
   onChange: (val: any) => void
   type?: string
+  className?: string
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -12,18 +13,17 @@ export const Input: React.FC<InputProps> = ({
   placeHolder,
   onChange,
   type = 'text',
+  className = '',
 }) => {
   return (
-    <div className="flex justify-center">
-      <input
-        className="border-2 border-gray-400 max-w-56 w-[90vw] p-2"
-        value={value}
-        placeholder={placeHolder}
-        type={type}
-        onChange={(e) => {
-          onChange(e.target.value)
-        }}
-      />
-    </div>
+    <input
+      className={`border-2 border-gray-400 max-w-56 w-[90vw] p-2 ${className}`}
+      value={value}
+      placeholder={placeHolder}
+      type={type}
+      onChange={(e) => {
+        onChange(e.target.value)
+      }}
+    />
   )
 }

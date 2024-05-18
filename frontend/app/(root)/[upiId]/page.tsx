@@ -61,6 +61,12 @@ const Page: React.FC<{
     })
   }
 
+  const setMessage = (message: string) => {
+    toast.success(message, {
+      autoClose: 2000,
+    })
+  }
+
   const sendHandler = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
     setIsLoading(true)
@@ -109,6 +115,13 @@ const Page: React.FC<{
         },
       )
       console.log(response.data)
+      const responseData = response.data
+      if (responseData.success) {
+        setMessage('Transaction successful')
+        setAmount(0)
+      } else {
+        setError('Transaction failed')
+      }
     } catch (e) {
       console.log(e)
     } finally {
@@ -128,11 +141,17 @@ const Page: React.FC<{
               {upiDetails.walletAddress?.toString().slice(-6)}
             </h2>
             <h3 className="text-sm">UpiId: {upiDetails.upiId}</h3>
-            <Input
-              value={amount.toString()}
-              placeHolder="Amount"
-              onChange={setAmount}
-            />
+            <div className="relative h-10">
+              <Input
+                value={amount.toString()}
+                placeHolder="Amount"
+                onChange={setAmount}
+                className="h-10"
+              />
+              <span className="bg-gray-200 absolute right-0 top-0 h-10 w-12 flex justify-center items-center">
+                SOL
+              </span>
+            </div>
             <button
               className="bg-blue-500 text-white p-2 rounded"
               onClick={sendHandler}
