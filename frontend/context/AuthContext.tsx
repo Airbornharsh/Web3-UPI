@@ -55,7 +55,6 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
 
   const checkAuth = async () => {
     setIsLoading(true)
-    setIsAuthChecked(false)
     try {
       const response = await axios.get(`${BACKEND_URL}/v1/user/check-auth`, {
         headers: {
