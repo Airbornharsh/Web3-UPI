@@ -1,4 +1,3 @@
-'use client'
 import { useLoader } from '@/context/LoaderContext'
 import { CircularProgress, Modal } from '@mui/material'
 import React from 'react'

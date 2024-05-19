@@ -1,4 +1,3 @@
-'use client'
 import CustomWalletMultiButton from './wallet/CustomWalletMultiButton'
 
 const ConnectWalletFirst = () => {

@@ -1,4 +1,3 @@
-'use client'
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 import CustomWalletDisconnectButton from '../wallet/CustomWalletDisconnectButton'
 import CustomWalletMultiButton from '../wallet/CustomWalletMultiButton'

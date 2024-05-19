@@ -1,4 +1,3 @@
-'use client'
 import { User } from '@/utils/types'
 import { useEffect, useState } from 'react'
 import { Input } from '../ui/input'
