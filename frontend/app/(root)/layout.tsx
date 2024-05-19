@@ -37,7 +37,7 @@ export default function RootLayout({
           <LoaderProvider>
             <AuthProvider>
               <Appbar />
-              {children}
+              <Children>{children}</Children>
               <Loader />
             </AuthProvider>
           </LoaderProvider>
