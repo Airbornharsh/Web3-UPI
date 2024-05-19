@@ -8,33 +8,37 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import axios from 'axios'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import { useSearchParams } from 'next/navigation'
 
-const Page: React.FC<{
-  params: {
-    upiId: string
-  }
-}> = ({ params }) => {
+const Page = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PayPage />
+    </Suspense>
+  )
+}
+
+const PayPage = () => {
+  const searchParams = useSearchParams()
   const { publicKey, wallet, sendTransaction } = useWallet()
   const { connection } = useConnection()
   const [upiDetails, setUpiDetails] = useState<User | null>(null)
   const [amount, setAmount] = useState<number>(0)
   const { setIsLoading } = useLoader()
   const { token, updateBalance } = useAuth()
+  const upiId = searchParams.get('upiId')
 
   const onLoad = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get(
-        `${BACKEND_URL}/v1/user/${params.upiId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await axios.get(`${BACKEND_URL}/v1/user/${upiId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      )
+      })
       const responseData = response.data
       if (responseData.user) {
         setUpiDetails(responseData.user)
@@ -50,7 +54,7 @@ const Page: React.FC<{
   useEffect(() => {
     onLoad()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.upiId])
+  }, [upiId])
 
   const setError = (message: string) => {
     toast.error(message, {
