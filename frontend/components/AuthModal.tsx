@@ -117,6 +117,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
       const token = response.data.token
       localStorage.setItem('token', token)
       setToken(token)
+      router.push(pathName)
     } catch (e) {
       console.log(e)
     } finally {
@@ -135,6 +136,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
       const token = response.data.token
       localStorage.setItem('token', token)
       setToken(token)
+      router.push(pathName)
     } catch (e) {
       console.log(e)
     } finally {
