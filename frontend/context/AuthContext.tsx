@@ -23,7 +23,6 @@ interface AuthContextProps {
   setUser: (user: User) => void
   balance: number
   updateBalance: () => void
-  isAuthChecked: boolean
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -50,7 +49,6 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>()
   const [balance, setBalance] = useState<number>(0)
-  const [isAuthChecked, setIsAuthChecked] = useState(false)
   const { setIsLoading } = useLoader()
 
   const checkAuth = async () => {
@@ -77,7 +75,6 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       setIsAuthenticated(false)
     } finally {
       setIsLoading(false)
-      setIsAuthChecked(true)
     }
   }
 
@@ -134,11 +131,6 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey, isAuthenticated])
 
-  useEffect(() => {
-    const tempToken = localStorage.getItem('token')
-    setToken(tempToken || '')
-  }, [])
-
   // useEffect(() => {
   //   setInterval(() => {
   //     updateBalance()
@@ -154,7 +146,6 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     setUser,
     balance,
     updateBalance,
-    isAuthChecked,
   }
 
   return (

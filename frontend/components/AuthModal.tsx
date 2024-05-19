@@ -11,11 +11,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 
-interface AuthModalProps {
-  setOpenModal: (open: boolean) => void
-}
-
-const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
+const AuthModal = () => {
   const { publicKey } = useWallet()
   const { setToken } = useAuth()
   const [formData, setFormData] = useState<{
@@ -122,7 +118,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
       console.log(e)
     } finally {
       setIsLoading(false)
-      setOpenModal(false)
     }
   }
 
@@ -147,7 +142,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
         pin: '',
       })
       setIsLoading(false)
-      setOpenModal(false)
     }
   }
 

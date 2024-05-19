@@ -13,7 +13,7 @@ const date = new Date()
 
 export const Appbar = () => {
   const { publicKey, signMessage } = useWallet()
-  const { isAuthenticated, isAuthChecked } = useAuth()
+  const { isAuthenticated, balance, updateBalance } = useAuth()
   const [openModal, setOpenModal] = useState(false)
 
   async function signAndSend() {
@@ -34,14 +34,11 @@ export const Appbar = () => {
     // signAndSend()
     if (!publicKey) {
       setOpenModal(false)
+      localStorage.removeItem('token')
+    } else if (publicKey && !isAuthenticated) {
+      setOpenModal(true)
     } else {
-      if (isAuthChecked) {
-        if (!isAuthenticated) {
-          setOpenModal(true)
-        }
-      } else {
-        setOpenModal(false)
-      }
+      setOpenModal(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, publicKey])
@@ -62,7 +59,7 @@ export const Appbar = () => {
         </>
       }
       <Modal open={openModal}>
-        <AuthModal setOpenModal={setOpenModal} />
+        <AuthModal />
       </Modal>
     </div>
   )
