@@ -33,15 +33,7 @@ txnRouter.get('/upiId', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: 'No users found' })
     }
 
-    const modifiedUsers = users.map((user) => {
-      return {
-        id: user.id,
-        walletAddress: user.walletAddress,
-        upiId: user.upiId,
-      }
-    })
-
-    res.json({ message: 'User List', users: modifiedUsers })
+    res.json({ message: 'User List', users })
   } catch (e) {
     console.log(e)
     return res.status(500).json({ message: 'Something went wrong' })
