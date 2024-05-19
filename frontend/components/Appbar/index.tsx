@@ -50,7 +50,7 @@ export const Appbar = () => {
       <div className="flex justify-center pl-4 pt-3 text-2xl">WPI</div>
       {
         <>
-          <BigScreenMenu />
+          {/* <BigScreenMenu /> */}
           <SmallScreenMenu />
         </>
       }
