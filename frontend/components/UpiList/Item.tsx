@@ -1,3 +1,4 @@
+'use client'
 import { User } from '@/utils/types'
 import { useRouter } from 'next/navigation'
 import React from 'react'

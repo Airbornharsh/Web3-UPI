@@ -1,3 +1,4 @@
+'use client'
 import { WalletDisconnectButton } from '@solana/wallet-adapter-react-ui'
 
 const CustomWalletDisconnectButton = () => {
