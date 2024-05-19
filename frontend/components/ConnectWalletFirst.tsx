@@ -1,10 +1,10 @@
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import CustomWalletMultiButton from './wallet/CustomWalletMultiButton'
 
 const ConnectWalletFirst = () => {
   return (
     <div className="flex h-32 flex-col items-center justify-center gap-1">
       <h1>Connect Wallet First</h1>
-      <WalletMultiButton />
+      <CustomWalletMultiButton />
     </div>
   )
 }

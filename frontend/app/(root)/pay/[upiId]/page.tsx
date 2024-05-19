@@ -158,7 +158,7 @@ const Page: React.FC<{
                 onChange={setAmount}
                 className="h-10"
               />
-              <span className="absolute right-0 top-0 flex h-10 w-12 items-center justify-center bg-gray-200">
+              <span className="absolute right-0 top-0 flex h-10 w-12 items-center justify-center border-[0.01rem] border-l-0 border-cyan-400 bg-gray-200">
                 SOL
               </span>
             </div>

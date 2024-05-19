@@ -1,8 +1,4 @@
 'use client'
-import {
-  WalletDisconnectButton,
-  WalletMultiButton,
-} from '@solana/wallet-adapter-react-ui'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
@@ -11,6 +7,8 @@ import { useAuth } from '@/context/AuthContext'
 import { Modal } from '@mui/material'
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 import AuthModal from './AuthModal'
+import CustomWalletDisconnectButton from './wallet/CustomWalletDisconnectButton'
+import CustomWalletMultiButton from './wallet/CustomWalletMultiButton'
 
 export const Appbar = () => {
   const { publicKey, signMessage } = useWallet()
@@ -71,7 +69,11 @@ export const Appbar = () => {
           ) : null}
         </div>
         <div>
-          {publicKey ? <WalletDisconnectButton /> : <WalletMultiButton />}
+          {publicKey ? (
+            <CustomWalletDisconnectButton />
+          ) : (
+            <CustomWalletMultiButton />
+          )}
         </div>
       </div>
       <Modal open={openModal}>
