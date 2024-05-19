@@ -56,12 +56,19 @@ export const Appbar = () => {
       <div className="flex justify-center pl-4 pt-3 text-2xl">WPI</div>
       <div className="">{user ? <p>{user.name}</p> : 'Connect First'}</div>
       <div className="flex items-center gap-2 pb-2 pr-4 text-xl">
-        {publicKey && (
-          <div className="text-sm">
-            {publicKey?.toString().slice(0, 6)}...
-            {publicKey?.toString().slice(-6)}
-          </div>
-        )}
+        <div className="flex flex-col">
+          {user ? (
+            <>
+              <span className="text-xs">Upi: {user.upiId}</span>
+            </>
+          ) : null}
+          {publicKey && (
+            <span className="text-sm">
+              {publicKey?.toString().slice(0, 6)}...
+              {publicKey?.toString().slice(-6)}
+            </span>
+          )}
+        </div>
         <div>
           {publicKey ? <WalletDisconnectButton /> : <WalletMultiButton />}
         </div>
