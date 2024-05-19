@@ -47,7 +47,9 @@ export const Appbar = () => {
 
   return (
     <div className="flex h-16 items-center justify-between border-b pb-2 pt-2">
-      <div className="flex justify-center pl-4 pt-3 text-2xl">WPI</div>
+      <div className="flex justify-center pl-4 pt-3 text-2xl">
+        WPI{BACKEND_URL}
+      </div>
       {
         <>
           {/* <BigScreenMenu /> */}
