@@ -7,7 +7,7 @@ const Loader = () => {
 
   return (
     <Modal open={isLoading}>
-      <div className="h-screen w-screen flex justify-center items-center">
+      <div className="flex h-screen w-screen items-center justify-center">
         <CircularProgress />
       </div>
     </Modal>

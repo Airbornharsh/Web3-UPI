@@ -2,7 +2,7 @@ import UpiList from './UpiList'
 
 export const Hero = () => {
   return (
-    <div className="text-black pt-10 flex justify-center flex-col items-center gap-2">
+    <div className="flex flex-col items-center justify-center gap-2 pt-10 text-black">
       <UpiList />
     </div>
   )

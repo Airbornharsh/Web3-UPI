@@ -17,7 +17,7 @@ export const Input: React.FC<InputProps> = ({
 }) => {
   return (
     <input
-      className={`border-2 border-gray-400 max-w-56 w-[90vw] p-2 ${className}`}
+      className={`w-[90vw] max-w-56 border-2 border-gray-400 p-2 ${className}`}
       value={value}
       placeholder={placeHolder}
       type={type}

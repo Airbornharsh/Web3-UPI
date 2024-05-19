@@ -151,12 +151,12 @@ const AuthModal = () => {
       <input
         type="text"
         name="name"
-        className="p-2 border border-slate-400 rounded border-opacity-50 outline-none focus:border-opacity-100 bg-gray-200"
+        className="rounded border border-slate-400 border-opacity-50 bg-gray-200 p-2 outline-none focus:border-opacity-100"
         disabled={true}
         value={formData.walletAddress}
       />
       <button
-        className="bg-blue-500 text-white p-2 rounded"
+        className="rounded bg-blue-500 p-2 text-white"
         onClick={walletCheckHandler}
         disabled={!formData.walletAddress}
       >
@@ -171,7 +171,7 @@ const AuthModal = () => {
       <input
         type="text"
         name="upiId"
-        className="p-2 border border-slate-400 rounded border-opacity-50 outline-none focus:border-opacity-100"
+        className="rounded border border-slate-400 border-opacity-50 p-2 outline-none focus:border-opacity-100"
         value={formData.upiId}
         onChange={(e) => {
           setFormData((f) => {
@@ -180,7 +180,7 @@ const AuthModal = () => {
         }}
       />
       <button
-        className="bg-blue-500 text-white p-2 rounded"
+        className="rounded bg-blue-500 p-2 text-white"
         onClick={upiCheckHandler}
         disabled={!formData.upiId}
       >
@@ -195,7 +195,7 @@ const AuthModal = () => {
       <input
         type="text"
         name="name"
-        className="p-2 border border-slate-400 rounded border-opacity-50 outline-none focus:border-opacity-100"
+        className="rounded border border-slate-400 border-opacity-50 p-2 outline-none focus:border-opacity-100"
         value={formData.name}
         onChange={(e) => {
           setFormData((f) => {
@@ -204,7 +204,7 @@ const AuthModal = () => {
         }}
       />
       <button
-        className="bg-blue-500 text-white p-2 rounded"
+        className="rounded bg-blue-500 p-2 text-white"
         onClick={() => setStep(4)}
         disabled={!formData.name}
       >
@@ -219,7 +219,7 @@ const AuthModal = () => {
       <input
         type={isWallet ? 'password' : 'text'}
         name="pin"
-        className="p-2 border border-slate-400 rounded border-opacity-50 outline-none focus:border-opacity-100"
+        className="rounded border border-slate-400 border-opacity-50 p-2 outline-none focus:border-opacity-100"
         value={formData.pin}
         autoFocus={true}
         onChange={(e) => {
@@ -235,7 +235,7 @@ const AuthModal = () => {
         }}
       />
       <button
-        className="bg-blue-500 text-white p-2 rounded"
+        className="rounded bg-blue-500 p-2 text-white"
         onClick={isWallet ? signInHandler : signUpHandler}
         disabled={!formData.pin}
       >
@@ -260,8 +260,8 @@ const AuthModal = () => {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen w-screen">
-      <form className="w-[90vw] max-w-[25rem] bg-gray-100 px-6 py-4 rounded-lg">
+    <div className="flex h-screen w-screen items-center justify-center">
+      <form className="w-[90vw] max-w-[25rem] rounded-lg bg-gray-100 px-6 py-4">
         {Object.keys(formData).map((key) => {
           if (step === 4) {
             if (key === 'pin') return null
@@ -284,7 +284,7 @@ const AuthModal = () => {
               <input
                 type="text"
                 name={key}
-                className="p-2 border border-slate-400 rounded border-opacity-50 outline-none focus:border-opacity-100 bg-gray-200"
+                className="rounded border border-slate-400 border-opacity-50 bg-gray-200 p-2 outline-none focus:border-opacity-100"
                 value={formData[key]}
                 disabled={true}
                 onChange={(e) => {

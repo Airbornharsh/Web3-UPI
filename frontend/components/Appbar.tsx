@@ -52,10 +52,10 @@ export const Appbar = () => {
   }, [isAuthenticated])
 
   return (
-    <div className="flex justify-between border-b pb-2 pt-2 h-16 items-center">
-      <div className="text-2xl pl-4 flex justify-center pt-3">WPI</div>
+    <div className="flex h-16 items-center justify-between border-b pb-2 pt-2">
+      <div className="flex justify-center pl-4 pt-3 text-2xl">WPI</div>
       <div className="">{user ? <p>{user.name}</p> : 'Connect First'}</div>
-      <div className="text-xl pr-4 pb-2 flex items-center gap-2">
+      <div className="flex items-center gap-2 pb-2 pr-4 text-xl">
         {publicKey && (
           <div className="text-sm">
             {publicKey?.toString().slice(0, 6)}...
