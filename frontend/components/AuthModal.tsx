@@ -221,7 +221,6 @@ const AuthModal = () => {
         name="pin"
         className="rounded border border-slate-400 border-opacity-50 p-2 outline-none focus:border-opacity-100"
         value={formData.pin}
-        autoFocus={true}
         onChange={(e) => {
           if (e.target.value.length > 6) {
             return
