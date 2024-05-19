@@ -82,9 +82,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   }
 
   useEffect(() => {
-    if (token) {
-      checkAuth()
-    }
+    checkAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
 
