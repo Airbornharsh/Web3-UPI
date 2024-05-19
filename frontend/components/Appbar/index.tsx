@@ -9,8 +9,6 @@ import AuthModal from '../AuthModal'
 import BigScreenMenu from './BigScreenMenu'
 import SmallScreenMenu from './SmallScreenMenu'
 
-const date = new Date()
-
 export const Appbar = () => {
   const { publicKey, signMessage } = useWallet()
   const { isAuthenticated, balance, updateBalance } = useAuth()
@@ -49,9 +47,7 @@ export const Appbar = () => {
 
   return (
     <div className="flex h-16 items-center justify-between border-b pb-2 pt-2">
-      <div className="flex justify-center pl-4 pt-3 text-2xl">
-        WPI{date.toString()}
-      </div>
+      <div className="flex justify-center pl-4 pt-3 text-2xl">WPI</div>
       {
         <>
           {/* <BigScreenMenu /> */}
