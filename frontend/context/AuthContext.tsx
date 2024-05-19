@@ -116,8 +116,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     setIsLoading(true)
     try {
       if (!publicKey) {
-        setBalance(0)
-        return
+        throw new Error('Public key not found')
       }
       const response = await connection.getBalance(publicKey)
       if (response) {
