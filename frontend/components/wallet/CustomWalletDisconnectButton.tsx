@@ -1,4 +1,4 @@
-import { WalletDisconnectButton } from "@solana/wallet-adapter-react-ui"
+import { WalletDisconnectButton } from '@solana/wallet-adapter-react-ui'
 
 const CustomWalletDisconnectButton = () => {
   return (

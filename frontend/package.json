@@ -16,6 +16,7 @@
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.91.8",
     "axios": "^1.6.8",
+    "hamburger-react": "^2.5.1",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
