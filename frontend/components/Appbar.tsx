@@ -54,7 +54,6 @@ export const Appbar = () => {
   return (
     <div className="flex h-16 items-center justify-between border-b pb-2 pt-2">
       <div className="flex justify-center pl-4 pt-3 text-2xl">WPI</div>
-      <div className="">{user ? <p>{user.name}</p> : 'Connect First'}</div>
       <div className="flex items-center gap-2 pb-2 pr-4 text-xl">
         <div className="flex flex-col">
           {user ? (
