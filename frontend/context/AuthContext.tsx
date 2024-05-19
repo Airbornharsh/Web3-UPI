@@ -9,8 +9,11 @@ import React, {
 import { User } from '@/utils/types'
 import { useLoader } from './LoaderContext'
 import axios from 'axios'
-import { BACKEND_URL } from '@/utils/config'
+import { BACKEND_URL, BASE_LAMPORTS, RPC_URL } from '@/utils/config'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { Connection } from '@solana/web3.js'
+
+const connection = new Connection(RPC_URL)
 
 interface AuthContextProps {
   token: string
@@ -18,6 +21,8 @@ interface AuthContextProps {
   isAuthenticated: boolean
   user: User | null
   setUser: (user: User) => void
+  balance: number
+  updateBalance: () => void
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -43,6 +48,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   const [token, setToken] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>()
+  const [balance, setBalance] = useState<number>(0)
   const { setIsLoading } = useLoader()
 
   const checkAuth = async () => {
@@ -99,12 +105,43 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     }
   }, [isAuthenticated])
 
+  const updateBalance = async () => {
+    setIsLoading(true)
+    try {
+      if (!publicKey || !isAuthenticated) {
+        throw new Error('Public key not found')
+      }
+      const response = await connection.getBalance(publicKey)
+      if (response) {
+        setBalance(response / BASE_LAMPORTS)
+      }
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    updateBalance()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publicKey, isAuthenticated])
+
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     updateBalance()
+  //   }, 5000)
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
+
   const contextValue: AuthContextProps = {
     token,
     setToken,
     isAuthenticated,
     user: user || null,
     setUser,
+    balance,
+    updateBalance,
   }
 
   return (

@@ -1,6 +1,5 @@
 'use client'
 import {
-  BaseWalletConnectButton,
   WalletDisconnectButton,
   WalletMultiButton,
 } from '@solana/wallet-adapter-react-ui'
@@ -8,16 +7,14 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { BACKEND_URL } from '@/utils/config'
-import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { Modal } from '@mui/material'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
 import AuthModal from './AuthModal'
 
 export const Appbar = () => {
   const { publicKey, signMessage } = useWallet()
-  const pathName = usePathname()
-  const { user, isAuthenticated } = useAuth()
-  const router = useRouter()
+  const { isAuthenticated, balance, updateBalance } = useAuth()
   const [openModal, setOpenModal] = useState(false)
 
   async function signAndSend() {
@@ -56,17 +53,22 @@ export const Appbar = () => {
       <div className="flex justify-center pl-4 pt-3 text-2xl">WPI</div>
       <div className="flex items-center gap-2 pb-2 pr-4 text-xl">
         <div className="flex flex-col">
-          {user ? (
-            <>
-              <span className="text-xs">Upi: {user.upiId}</span>
-            </>
-          ) : null}
           {publicKey && (
             <span className="text-sm">
               {publicKey?.toString().slice(0, 6)}...
               {publicKey?.toString().slice(-6)}
             </span>
           )}
+          {balance ? (
+            <>
+              <span className="flex items-center text-xs">
+                <span>{balance} SOL</span>
+                <span className="cursor-pointer" onClick={updateBalance}>
+                  <AutorenewIcon className="scale-75" />
+                </span>
+              </span>
+            </>
+          ) : null}
         </div>
         <div>
           {publicKey ? <WalletDisconnectButton /> : <WalletMultiButton />}

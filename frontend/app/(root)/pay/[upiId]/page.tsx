@@ -2,15 +2,10 @@
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/context/AuthContext'
 import { useLoader } from '@/context/LoaderContext'
-import { BACKEND_URL, NETWORK } from '@/utils/config'
+import { BACKEND_URL, BASE_LAMPORTS, NETWORK } from '@/utils/config'
 import { User } from '@/utils/types'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import {
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import axios from 'axios'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
@@ -27,7 +22,7 @@ const Page: React.FC<{
   const [upiDetails, setUpiDetails] = useState<User | null>(null)
   const [amount, setAmount] = useState<number>(0)
   const { setIsLoading } = useLoader()
-  const { token } = useAuth()
+  const { token, updateBalance } = useAuth()
 
   const onLoad = async () => {
     setIsLoading(true)
@@ -81,7 +76,11 @@ const Page: React.FC<{
         setError('Invalid UPI ID')
         return
       }
-      const lamports = 1000000000 * amount
+      const lamports = BASE_LAMPORTS * amount
+      if (lamports <= 0) {
+        setError('Invalid amount')
+        return
+      }
       const txn = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: publicKey!,
@@ -128,6 +127,7 @@ const Page: React.FC<{
       console.log(e)
     } finally {
       setIsLoading(false)
+      updateBalance()
     }
   }
 

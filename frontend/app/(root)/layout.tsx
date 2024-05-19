@@ -28,6 +28,7 @@ export default function RootLayout({
   // You can also provide a custom RPC endpoint.
   const endpoint = RPC_URL ?? ''
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const wallets = useMemo(() => [], [network])
 
   return (
