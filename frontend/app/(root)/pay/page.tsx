@@ -8,12 +8,20 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import axios from 'axios'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { useSearchParams } from 'next/navigation'
 
 const Page = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PayPage />
+    </Suspense>
+  )
+}
+
+const PayPage = () => {
   const searchParams = useSearchParams()
   const { publicKey, wallet, sendTransaction } = useWallet()
   const { connection } = useConnection()
@@ -26,14 +34,11 @@ const Page = () => {
   const onLoad = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get(
-        `${BACKEND_URL}/v1/user/${upiId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await axios.get(`${BACKEND_URL}/v1/user/${upiId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      )
+      })
       const responseData = response.data
       if (responseData.user) {
         setUpiDetails(responseData.user)
