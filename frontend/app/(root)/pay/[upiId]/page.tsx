@@ -2,7 +2,7 @@
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/context/AuthContext'
 import { useLoader } from '@/context/LoaderContext'
-import { BACKEND_URL } from '@/utils/config'
+import { BACKEND_URL, NETWORK } from '@/utils/config'
 import { User } from '@/utils/types'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import {
@@ -12,8 +12,10 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import axios from 'axios'
+import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 
 const Page: React.FC<{
   params: {
@@ -131,15 +133,23 @@ const Page: React.FC<{
 
   return (
     <main>
-      <div className="text-black pt-10 flex justify-center flex-col items-center gap-2">
-        <h1 className="text-xl font-semibold">Scan and Pay</h1>
+      <div className="flex flex-col items-center justify-center gap-2 pt-10 text-black">
         {upiDetails && (
           <form className="flex flex-col gap-2">
             <h1 className="">{upiDetails.name}</h1>
-            <h2 className="text-sm">
-              Address: {upiDetails.walletAddress?.toString().slice(0, 6)}...
-              {upiDetails.walletAddress?.toString().slice(-6)}
-            </h2>
+            <span className="flex items-center">
+              <h2 className="text-sm">
+                Address: {upiDetails.walletAddress?.toString().slice(0, 6)}...
+                {upiDetails.walletAddress?.toString().slice(-6)}
+              </h2>
+              <Link
+                href={`https://explorer.solana.com/address/${upiDetails.walletAddress}${NETWORK === 'devnet' ? '?cluster=devnet' : ''}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <OpenInNewIcon className="scale-75" />
+              </Link>
+            </span>
             <h3 className="text-sm">UpiId: {upiDetails.upiId}</h3>
             <div className="relative h-10">
               <Input
@@ -148,12 +158,12 @@ const Page: React.FC<{
                 onChange={setAmount}
                 className="h-10"
               />
-              <span className="bg-gray-200 absolute right-0 top-0 h-10 w-12 flex justify-center items-center">
+              <span className="absolute right-0 top-0 flex h-10 w-12 items-center justify-center bg-gray-200">
                 SOL
               </span>
             </div>
             <button
-              className="bg-blue-500 text-white p-2 rounded"
+              className="rounded bg-blue-500 p-2 text-white"
               onClick={sendHandler}
               disabled={!amount}
             >

@@ -24,7 +24,7 @@ interface LoaderContextProviderProps {
 export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
   children,
 }) => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const contextValue: LoaderContextProps = {
     isLoading,

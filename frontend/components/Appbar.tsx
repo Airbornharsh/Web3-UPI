@@ -14,7 +14,7 @@ import { Modal } from '@mui/material'
 import AuthModal from './AuthModal'
 
 export const Appbar = () => {
-  const { publicKey, signMessage, autoConnect } = useWallet()
+  const { publicKey, signMessage } = useWallet()
   const pathName = usePathname()
   const { user, isAuthenticated } = useAuth()
   const router = useRouter()
@@ -38,13 +38,13 @@ export const Appbar = () => {
     // signAndSend()
     if (!publicKey) {
       setOpenModal(false)
-      router.push('/')
+      localStorage.removeItem('token')
     } else if (publicKey && !isAuthenticated) {
       setOpenModal(true)
     } else {
       setOpenModal(false)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, publicKey])
 
   useEffect(() => {

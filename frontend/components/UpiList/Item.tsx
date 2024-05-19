@@ -11,9 +11,9 @@ const Item: React.FC<ItemProps> = ({ user, index }) => {
   const router = useRouter()
   return (
     <div
-      className={`flex flex-col px-2 py-1 ${index % 2 === 0 ? 'bg-white' : 'bg-slate-100'}`}
+      className={`flex flex-col px-2 py-1 cursor-pointer ${index % 2 === 0 ? 'bg-white' : 'bg-slate-100'} hover:bg-slate-200`}
       onClick={() => {
-        router.push(`/${user.upiId}`)
+        router.push(`/pay/${user.upiId}`)
       }}
     >
       <h1 className="">{user.name}</h1>

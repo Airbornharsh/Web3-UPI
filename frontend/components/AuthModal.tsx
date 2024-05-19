@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 
 const AuthModal = () => {
   const { publicKey } = useWallet()
@@ -29,6 +30,7 @@ const AuthModal = () => {
   const [isWallet, setIsWallet] = useState(false)
   const { setIsLoading } = useLoader()
   const router = useRouter()
+  const pathName = usePathname()
 
   useEffect(() => {
     if (publicKey) {
@@ -111,7 +113,7 @@ const AuthModal = () => {
       const token = response.data.token
       localStorage.setItem('token', token)
       setToken(token)
-      router.push('/')
+      router.push(pathName)
     } catch (e) {
       console.log(e)
     } finally {
@@ -129,7 +131,7 @@ const AuthModal = () => {
       const token = response.data.token
       localStorage.setItem('token', token)
       setToken(token)
-      router.push('/')
+      router.push(pathName)
     } catch (e) {
       console.log(e)
     } finally {
