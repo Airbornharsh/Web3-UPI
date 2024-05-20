@@ -6,7 +6,7 @@ import React, {
   ReactNode,
   useEffect,
 } from 'react'
-import { User } from '@/utils/types'
+import { AuthFormData, User } from '@/utils/types'
 import { useLoader } from './LoaderContext'
 import axios from 'axios'
 import { BACKEND_URL, BASE_LAMPORTS, RPC_URL } from '@/utils/config'
@@ -23,6 +23,8 @@ interface AuthContextProps {
   setUser: (user: User) => void
   balance: number
   updateBalance: () => void
+  signIn: (formData: AuthFormData) => Promise<boolean>
+  signUp: (formData: AuthFormData) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -118,6 +120,49 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [])
 
+  const signIn = async (formData: AuthFormData) => {
+    setIsLoading(true)
+    try {
+      const response = await axios.post(`${BACKEND_URL}/v1/user/sign-in`, {
+        walletAddress: formData.walletAddress,
+        pin: formData.pin,
+      })
+      const responseData = response.data
+      if (responseData.userExists) {
+        const token = responseData.token
+        localStorage.setItem('token', token)
+        setToken(token)
+        return true
+      } else {
+        return false
+      }
+    } catch (e) {
+      console.log(e)
+      return false
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const signUp = async (formData: AuthFormData) => {
+    setIsLoading(true)
+    try {
+      const response = await axios.post(`${BACKEND_URL}/v1/user/create-user`, {
+        name: formData.name,
+        walletAddress: formData.walletAddress,
+        upiId: formData.upiId,
+        pin: formData.pin,
+      })
+      const token = response.data.token
+      localStorage.setItem('token', token)
+      setToken(token)
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const contextValue: AuthContextProps = {
     token,
     setToken,
@@ -126,6 +171,8 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     setUser,
     balance,
     updateBalance,
+    signIn,
+    signUp,
   }
 
   return (

@@ -5,15 +5,12 @@ import React, {
   ReactNode,
   useEffect,
 } from 'react'
-import { useLoader } from './LoaderContext'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
 import { BASE_LAMPORTS } from '@/utils/config'
-
-enum WalletType {
-  CUSTOM = 'custom',
-  DEFAULT = 'default',
-}
+import { WalletType } from '@/utils/enum'
+import base58 from 'bs58'
+import { decryptMessage, encryptMessage } from '@/utils/encrypt'
 
 interface CustomWalletContextProps {
   publicKey: string
@@ -22,6 +19,11 @@ interface CustomWalletContextProps {
   sendToken: (recieverAddress: string, lamports: number) => Promise<string>
   balance: number
   updateBalance: () => void
+  encodePrivateKey: (privateKey: string, pin: string) => string | null
+  decodePrivateKey: (pin: string) => Keypair | null
+  getPublicKeyFromPrivateKey: (privateKey: string) => string | null
+  disconnectPrivatWallet: () => void
+  encodedPrivateKey: string
 }
 
 const CustomWalletContext = createContext<CustomWalletContextProps | undefined>(
@@ -49,8 +51,7 @@ export const CustomWalletProvider: React.FC<
 > = ({ children }) => {
   const { connection } = useConnection()
   const { publicKey, wallet, sendTransaction } = useWallet()
-  const { setIsLoading } = useLoader()
-  const [privateKey, setPrivateKey] = useState<string>('')
+  const [encodedPrivateKey, setEncodedPrivateKey] = useState<string>('')
   const [storedPublicKey, setStoredPublicKey] = useState<string>(
     publicKey ? publicKey.toString() : '',
   )
@@ -62,13 +63,16 @@ export const CustomWalletProvider: React.FC<
   useEffect(() => {
     const storedPrivateKey = localStorage.getItem('privateKey')
     if (storedPrivateKey) {
-      setPrivateKey(storedPrivateKey)
+      setEncodedPrivateKey(storedPrivateKey)
     }
   }, [])
 
   useEffect(() => {
     if (publicKey) {
       setStoredPublicKey(publicKey.toString())
+      setWalletType(WalletType.DEFAULT)
+    } else {
+      setWalletType(WalletType.CUSTOM)
     }
   }, [publicKey])
 
@@ -76,8 +80,47 @@ export const CustomWalletProvider: React.FC<
     setWalletType(type)
   }
 
-  const sendToken = async (recieverAddress: string, lamports: number) => {
-    setIsLoading(true)
+  const getPublicKeyFromPrivateKey = (privateKey: string) => {
+    try {
+      const wallet = Keypair.fromSecretKey(base58.decode(privateKey))
+      return wallet.publicKey.toString()
+    } catch (e) {
+      console.log(e)
+      return null
+    }
+  }
+
+  const encodePrivateKey = (privateKey: string, pin: string) => {
+    try {
+      const wallet = Keypair.fromSecretKey(base58.decode(privateKey))
+      setStoredPublicKey(wallet.publicKey.toString())
+      const encodedPrivateKey = encryptMessage(privateKey, pin)
+      setEncodedPrivateKey(encodedPrivateKey)
+      localStorage.setItem('privateKey', encodedPrivateKey)
+      return wallet.publicKey.toString()
+    } catch (e) {
+      console.log(e)
+      return null
+    }
+  }
+
+  const decodePrivateKey = (pin: string) => {
+    try {
+      const decodedPrivateKey = decryptMessage(encodedPrivateKey, pin)
+      const wallet = Keypair.fromSecretKey(base58.decode(decodedPrivateKey))
+      setStoredPublicKey(wallet.publicKey.toString())
+      return wallet
+    } catch (e) {
+      console.log(e)
+      return null
+    }
+  }
+
+  const sendToken = async (
+    recieverAddress: string,
+    lamports: number,
+    pin?: string,
+  ) => {
     let signature = ''
     try {
       const txn = new Transaction().add(
@@ -102,13 +145,11 @@ export const CustomWalletProvider: React.FC<
     } catch (e) {
       console.log(e)
     } finally {
-      setIsLoading(false)
       return signature
     }
   }
 
   const updateBalance = async () => {
-    setIsLoading(true)
     try {
       if (!publicKey) {
         throw new Error('Public key not found')
@@ -120,9 +161,13 @@ export const CustomWalletProvider: React.FC<
     } catch (e) {
       console.log(e)
       setBalance(0)
-    } finally {
-      setIsLoading(false)
     }
+  }
+
+  const disconnectPrivatWallet = () => {
+    localStorage.removeItem('privateKey')
+    setEncodedPrivateKey('')
+    setStoredPublicKey('')
   }
 
   const contextValue: CustomWalletContextProps = {
@@ -132,6 +177,11 @@ export const CustomWalletProvider: React.FC<
     sendToken,
     balance,
     updateBalance,
+    encodePrivateKey,
+    decodePrivateKey,
+    getPublicKeyFromPrivateKey,
+    disconnectPrivatWallet,
+    encodedPrivateKey,
   }
 
   return (

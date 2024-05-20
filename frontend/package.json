@@ -9,16 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.18",
+    "@mui/material": "^5.15.18",
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-react-ui": "^0.9.35",
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.91.8",
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@mui/material": "^5.15.18",
     "axios": "^1.6.8",
+    "bs58": "^5.0.0",
+    "crypto-js": "^4.2.0",
     "hamburger-react": "^2.5.1",
     "next": "14.2.3",
     "react": "^18",
@@ -26,6 +28,7 @@
     "react-toastify": "^10.0.5"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

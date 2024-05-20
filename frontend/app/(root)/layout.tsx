@@ -6,13 +6,21 @@ import {
 } from '@solana/wallet-adapter-react'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
+import {
+  LedgerWalletAdapter,
+  PhantomWalletAdapter,
+  TorusWalletAdapter,
+} from '@solana/wallet-adapter-wallets'
 import { Appbar } from '@/components/Appbar'
 import { LoaderProvider } from '@/context/LoaderContext'
 import Loader from '@/components/Loader'
 import { AuthProvider } from '@/context/AuthContext'
 import ConnectWalletFirst from '@/components/ConnectWalletFirst'
 import { RPC_URL } from '@/utils/config'
-import { CustomWalletProvider, useCustomWallet } from '@/context/CustomWalletContext'
+import {
+  CustomWalletProvider,
+  useCustomWallet,
+} from '@/context/CustomWalletContext'
 
 // Default styles that can be overridden by your app
 require('@solana/wallet-adapter-react-ui/styles.css')
@@ -28,13 +36,21 @@ export default function RootLayout({
   const endpoint = RPC_URL ?? ''
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const wallets = useMemo(() => [], [network])
+  const wallets = useMemo(
+    () => [
+      new PhantomWalletAdapter(),
+      new TorusWalletAdapter(),
+      new LedgerWalletAdapter(),
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [network],
+  )
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <LoaderProvider>
+    <LoaderProvider>
+      <ConnectionProvider endpoint={endpoint}>
+        <WalletProvider wallets={wallets} autoConnect>
+          <WalletModalProvider>
             <CustomWalletProvider>
               <AuthProvider>
                 <Appbar />
@@ -42,10 +58,10 @@ export default function RootLayout({
                 <Loader />
               </AuthProvider>
             </CustomWalletProvider>
-          </LoaderProvider>
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+          </WalletModalProvider>
+        </WalletProvider>
+      </ConnectionProvider>
+    </LoaderProvider>
   )
 }
 

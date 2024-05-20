@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react'
 interface LoaderContextProps {
   isLoading: boolean
   setIsLoading: (loading: boolean) => void
+  privateKey: string
+  setPrivateKey: (privateKey: string) => void
 }
 
 const LoaderContext = createContext<LoaderContextProps | undefined>(undefined)
@@ -25,10 +27,13 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
   children,
 }) => {
   const [isLoading, setIsLoading] = useState(true)
+  const [privateKey, setPrivateKey] = useState<string>('')
 
   const contextValue: LoaderContextProps = {
     isLoading,
     setIsLoading,
+    privateKey,
+    setPrivateKey,
   }
 
   return (

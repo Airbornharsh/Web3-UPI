@@ -5,15 +5,20 @@ import axios from 'axios'
 import { BACKEND_URL } from '@/utils/config'
 import { useAuth } from '@/context/AuthContext'
 import { Modal } from '@mui/material'
-import AuthModal from '../AuthModal'
+import AuthModal from '../ui/modals/AuthModal'
 import BigScreenMenu from './BigScreenMenu'
 import SmallScreenMenu from './SmallScreenMenu'
 import { useCustomWallet } from '@/context/CustomWalletContext'
+import { WalletType } from '@/utils/enum'
+import PrivateAuthModal from '../ui/modals/PrivateAuthModal'
+import { useLoader } from '@/context/LoaderContext'
 
 export const Appbar = () => {
-  const { publicKey } = useCustomWallet()
+  const { setIsLoading } = useLoader()
+  const { publicKey, encodedPrivateKey, walletType } = useCustomWallet()
   const { isAuthenticated } = useAuth()
   const [openModal, setOpenModal] = useState(false)
+  const [hasPrivateKey, setHasPrivateKey] = useState(false)
 
   // async function signAndSend() {
   //   if (!publicKey) {
@@ -33,7 +38,7 @@ export const Appbar = () => {
     // signAndSend()
     if (!publicKey) {
       setOpenModal(false)
-      localStorage.removeItem('token')
+      setIsLoading(false)
     } else if (publicKey && !isAuthenticated) {
       setOpenModal(true)
     } else {
@@ -43,8 +48,18 @@ export const Appbar = () => {
   }, [isAuthenticated, publicKey])
 
   useEffect(() => {
+    if (
+      walletType === WalletType.CUSTOM &&
+      encodedPrivateKey &&
+      !isAuthenticated
+    ) {
+      setOpenModal(true)
+      setHasPrivateKey(true)
+    } else {
+      setOpenModal(false)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated])
+  }, [isAuthenticated, encodedPrivateKey])
 
   return (
     <div className="flex h-16 items-center justify-between border-b pb-2 pt-2">
@@ -55,8 +70,17 @@ export const Appbar = () => {
           <SmallScreenMenu />
         </>
       }
-      <Modal open={openModal}>
-        <AuthModal />
+      <Modal
+        open={openModal}
+        onClose={() => {
+          setOpenModal(false)
+        }}
+      >
+        {walletType === WalletType.DEFAULT ? (
+          <AuthModal />
+        ) : (
+          <PrivateAuthModal havePrivateKey={true} />
+        )}
       </Modal>
     </div>
   )
