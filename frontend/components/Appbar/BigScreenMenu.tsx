@@ -1,11 +1,11 @@
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 import CustomWalletDisconnectButton from '../wallet/CustomWalletDisconnectButton'
 import CustomWalletMultiButton from '../wallet/CustomWalletMultiButton'
-import { useWallet } from '@solana/wallet-adapter-react'
 import { useAuth } from '@/context/AuthContext'
+import { useCustomWallet } from '@/context/CustomWalletContext'
 
 const BigScreenMenu = () => {
-  const { publicKey } = useWallet()
+  const { publicKey } = useCustomWallet()
   const { balance, updateBalance } = useAuth()
 
   return (

@@ -10,8 +10,8 @@ import { User } from '@/utils/types'
 import { useLoader } from './LoaderContext'
 import axios from 'axios'
 import { BACKEND_URL, BASE_LAMPORTS, RPC_URL } from '@/utils/config'
-import { useWallet } from '@solana/wallet-adapter-react'
 import { Connection } from '@solana/web3.js'
+import { useCustomWallet } from './CustomWalletContext'
 
 const connection = new Connection(RPC_URL)
 
@@ -44,11 +44,10 @@ interface AuthContextProviderProps {
 export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   children,
 }) => {
-  const { publicKey } = useWallet()
+  const { publicKey, balance, updateBalance } = useCustomWallet()
   const [token, setToken] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>()
-  const [balance, setBalance] = useState<number>(0)
   const { setIsLoading } = useLoader()
 
   const checkAuth = async () => {
@@ -106,24 +105,6 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       setUser(null)
     }
   }, [isAuthenticated])
-
-  const updateBalance = async () => {
-    setIsLoading(true)
-    try {
-      if (!publicKey) {
-        throw new Error('Public key not found')
-      }
-      const response = await connection.getBalance(publicKey)
-      if (response) {
-        setBalance(response / BASE_LAMPORTS)
-      }
-    } catch (e) {
-      console.log(e)
-      setBalance(0)
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   useEffect(() => {
     updateBalance()

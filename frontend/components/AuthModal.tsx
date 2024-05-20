@@ -1,7 +1,6 @@
 'use client'
 import { useLoader } from '@/context/LoaderContext'
 import { BACKEND_URL } from '@/utils/config'
-import { useWallet } from '@solana/wallet-adapter-react'
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify'
 import { useEffect, useState } from 'react'
@@ -10,9 +9,10 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
+import { useCustomWallet } from '@/context/CustomWalletContext'
 
 const AuthModal = () => {
-  const { publicKey } = useWallet()
+  const { publicKey } = useCustomWallet()
   const { setToken } = useAuth()
   const [formData, setFormData] = useState<{
     [key: string]: string

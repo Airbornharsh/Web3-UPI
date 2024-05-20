@@ -3,7 +3,6 @@ import React, { useMemo } from 'react'
 import {
   ConnectionProvider,
   WalletProvider,
-  useWallet,
 } from '@solana/wallet-adapter-react'
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
@@ -13,6 +12,7 @@ import Loader from '@/components/Loader'
 import { AuthProvider } from '@/context/AuthContext'
 import ConnectWalletFirst from '@/components/ConnectWalletFirst'
 import { RPC_URL } from '@/utils/config'
+import { CustomWalletProvider, useCustomWallet } from '@/context/CustomWalletContext'
 
 // Default styles that can be overridden by your app
 require('@solana/wallet-adapter-react-ui/styles.css')
@@ -35,11 +35,13 @@ export default function RootLayout({
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           <LoaderProvider>
-            <AuthProvider>
-              <Appbar />
-              <Children>{children}</Children>
-              <Loader />
-            </AuthProvider>
+            <CustomWalletProvider>
+              <AuthProvider>
+                <Appbar />
+                <Children>{children}</Children>
+                <Loader />
+              </AuthProvider>
+            </CustomWalletProvider>
           </LoaderProvider>
         </WalletModalProvider>
       </WalletProvider>
@@ -50,6 +52,6 @@ export default function RootLayout({
 const Children: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
-  const { publicKey } = useWallet()
+  const { publicKey } = useCustomWallet()
   return <>{publicKey ? children : <ConnectWalletFirst />}</>
 }

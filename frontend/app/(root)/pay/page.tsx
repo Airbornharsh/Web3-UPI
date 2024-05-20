@@ -12,6 +12,7 @@ import React, { Suspense, useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { useSearchParams } from 'next/navigation'
+import { useCustomWallet } from '@/context/CustomWalletContext'
 
 const Page = () => {
   return (
@@ -23,8 +24,7 @@ const Page = () => {
 
 const PayPage = () => {
   const searchParams = useSearchParams()
-  const { publicKey, wallet, sendTransaction } = useWallet()
-  const { connection } = useConnection()
+  const { sendToken } = useCustomWallet()
   const [upiDetails, setUpiDetails] = useState<User | null>(null)
   const [amount, setAmount] = useState<number>(0)
   const { setIsLoading } = useLoader()
@@ -72,10 +72,6 @@ const PayPage = () => {
     e.preventDefault()
     setIsLoading(true)
     try {
-      if (!wallet) {
-        setError('Wallet not connected')
-        return
-      }
       if (!upiDetails?.walletAddress || !upiDetails?.upiId) {
         setError('Invalid UPI ID')
         return
@@ -85,26 +81,7 @@ const PayPage = () => {
         setError('Invalid amount')
         return
       }
-      const txn = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey!,
-          toPubkey: new PublicKey(upiDetails.walletAddress),
-          lamports,
-        }),
-      )
-      const {
-        context: { slot: minContextSlot },
-        value: { blockhash, lastValidBlockHeight },
-      } = await connection.getLatestBlockhashAndContext()
-      const signature = await sendTransaction(txn, connection, {
-        minContextSlot,
-      })
-      console.log(signature)
-      await connection.confirmTransaction({
-        blockhash,
-        lastValidBlockHeight,
-        signature,
-      })
+      const signature = await sendToken(upiDetails.walletAddress, lamports)
       const response = await axios.post(
         `${BACKEND_URL}/v1/txn/send`,
         {

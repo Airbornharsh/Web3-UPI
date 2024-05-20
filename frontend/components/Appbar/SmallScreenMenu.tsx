@@ -1,13 +1,13 @@
 import AutorenewIcon from '@mui/icons-material/Autorenew'
 import CustomWalletDisconnectButton from '../wallet/CustomWalletDisconnectButton'
 import CustomWalletMultiButton from '../wallet/CustomWalletMultiButton'
-import { useWallet } from '@solana/wallet-adapter-react'
 import { useAuth } from '@/context/AuthContext'
 import { useState } from 'react'
 import Hamburger from 'hamburger-react'
+import { useCustomWallet } from '@/context/CustomWalletContext'
 
 const SmallScreenMenu = () => {
-  const { publicKey } = useWallet()
+  const { publicKey } = useCustomWallet()
   const { user, balance, updateBalance } = useAuth()
   const [open, setOpen] = useState(false)
 
