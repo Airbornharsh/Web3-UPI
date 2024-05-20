@@ -13,6 +13,7 @@ const PrivateWalletDisconnectButton = () => {
         border: 'none',
         cursor: 'pointer',
       }}
+      onClick={disconnectPrivatWallet}
     >
       Disconnect
     </div>

@@ -166,6 +166,7 @@ export const CustomWalletProvider: React.FC<
 
   const disconnectPrivatWallet = () => {
     localStorage.removeItem('privateKey')
+    localStorage.removeItem('token')
     setEncodedPrivateKey('')
     setStoredPublicKey('')
   }
