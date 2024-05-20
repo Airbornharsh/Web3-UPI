@@ -6,12 +6,13 @@ import { BACKEND_URL } from '@/utils/config'
 import { useAuth } from '@/context/AuthContext'
 import { Modal } from '@mui/material'
 import AuthModal from '../ui/modals/AuthModal'
-import BigScreenMenu from './BigScreenMenu'
+import GitHubIcon from '@mui/icons-material/GitHub'
 import SmallScreenMenu from './SmallScreenMenu'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { WalletType } from '@/utils/enum'
 import PrivateAuthModal from '../ui/modals/PrivateAuthModal'
 import { useLoader } from '@/context/LoaderContext'
+import Link from 'next/link'
 
 export const Appbar = () => {
   const { setIsLoading } = useLoader()
@@ -65,10 +66,14 @@ export const Appbar = () => {
     <div className="flex h-16 items-center justify-between border-b pb-2 pt-2">
       <div className="flex justify-center pl-4 pt-3 text-2xl">WPI</div>
       {
-        <>
+        <div className="flex items-center gap-1">
           {/* <BigScreenMenu /> */}
+          <Link href="https://github.com/airbornharsh/web3-upi" target="_blank">
+            <GitHubIcon className="cursor-pointer opacity-50 hover:opacity-100" />
+          </Link>
+
           <SmallScreenMenu />
-        </>
+        </div>
       }
       <Modal
         open={openModal}

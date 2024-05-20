@@ -151,10 +151,12 @@ export const CustomWalletProvider: React.FC<
 
   const updateBalance = async () => {
     try {
-      if (!publicKey) {
-        throw new Error('Public key not found')
+      if (!storedPublicKey) {
+        setBalance(0)
       }
-      const response = await connection.getBalance(publicKey)
+      const response = await connection.getBalance(
+        new PublicKey(storedPublicKey),
+      )
       if (response) {
         setBalance(response / BASE_LAMPORTS)
       }

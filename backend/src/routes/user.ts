@@ -112,7 +112,7 @@ userRouter.post('/sign-in', async (req, res) => {
     })
 
     if (!user) {
-      return res.json({ message: 'User Exists', userExists: false })
+      return res.json({ message: 'User Not Exists', userExists: false })
     }
 
     const match = await bcrypt.compare(pin, user.pin)

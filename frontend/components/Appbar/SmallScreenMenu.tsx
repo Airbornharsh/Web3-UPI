@@ -48,17 +48,15 @@ const SmallScreenMenu = () => {
                     </span>
                   )}
                 </div>
-                {balance ? (
-                  <div className="flex items-center text-sm font-semibold text-gray-700">
-                    <span>Bal: {balance} SOL</span>
-                    <span
-                      className="ml-2 cursor-pointer text-blue-500 hover:text-blue-700"
-                      onClick={updateBalance}
-                    >
-                      <AutorenewIcon className="scale-75" />
-                    </span>
-                  </div>
-                ) : null}
+                <div className="flex items-center text-sm font-semibold text-gray-700">
+                  <span>Bal: {balance} SOL</span>
+                  <span
+                    className="ml-2 cursor-pointer text-blue-500 hover:text-blue-700"
+                    onClick={updateBalance}
+                  >
+                    <AutorenewIcon className="scale-75" />
+                  </span>
+                </div>
               </div>
               <div className="mt-4 sm:mt-0">
                 {publicKey ? (
