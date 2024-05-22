@@ -34,7 +34,7 @@ const CustomWalletMultiButton = () => {
           setOpenModal(false)
         }}
       >
-        <PrivateAuthModal />
+        <PrivateAuthModal havePrivateKey={false} />
       </Modal>
     </div>
   )
