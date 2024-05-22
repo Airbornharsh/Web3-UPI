@@ -25,7 +25,7 @@ model Transaction {
   id         Int      @id @default(autoincrement())
   senderId   Int
   recieverId Int
-  amount     Int
+  amount     String
   signature  String
   Status     Status   @default(PENDING)
   createdAt  DateTime @default(now())

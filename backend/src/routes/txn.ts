@@ -84,7 +84,7 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
 
     const txn = await prisma.transaction.create({
       data: {
-        amount: lamports,
+        amount: lamports.toString(),
         senderId: sender.id,
         recieverId: receiver.id,
         signature,

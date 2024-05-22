@@ -112,7 +112,7 @@ userRouter.post('/sign-in', async (req, res) => {
     })
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' })
+      return res.json({ message: 'User Not Exists', userExists: false })
     }
 
     const match = await bcrypt.compare(pin, user.pin)
@@ -132,6 +132,7 @@ userRouter.post('/sign-in', async (req, res) => {
         pin: undefined,
       },
       token,
+      userExists: true,
     })
   } catch (e) {
     console.log(e)

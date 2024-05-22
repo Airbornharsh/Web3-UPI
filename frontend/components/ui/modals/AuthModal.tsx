@@ -1,26 +1,20 @@
 'use client'
 import { useLoader } from '@/context/LoaderContext'
 import { BACKEND_URL } from '@/utils/config'
-import { useWallet } from '@solana/wallet-adapter-react'
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify'
 import { useEffect, useState } from 'react'
 
 import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
-import { useRouter } from 'next/navigation'
-import { usePathname } from 'next/navigation'
+import { useCustomWallet } from '@/context/CustomWalletContext'
+import { AuthFormData } from '@/utils/types'
 
 const AuthModal = () => {
-  const { publicKey } = useWallet()
-  const { setToken } = useAuth()
-  const [formData, setFormData] = useState<{
-    [key: string]: string
-    name: string
-    walletAddress: string
-    upiId: string
-    pin: string
-  }>({
+  const { setErrorToastMessage } = useLoader()
+  const { publicKey } = useCustomWallet()
+  const { signIn, signUp } = useAuth()
+  const [formData, setFormData] = useState<AuthFormData>({
     name: '',
     walletAddress: '',
     upiId: '',
@@ -29,8 +23,6 @@ const AuthModal = () => {
   const [step, setStep] = useState(1)
   const [isWallet, setIsWallet] = useState(false)
   const { setIsLoading } = useLoader()
-  const router = useRouter()
-  const pathName = usePathname()
 
   useEffect(() => {
     if (publicKey) {
@@ -47,12 +39,6 @@ const AuthModal = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.walletAddress])
-
-  const setError = (message: string) => {
-    toast.error(message, {
-      autoClose: 2000,
-    })
-  }
 
   const walletCheckHandler = async (e: any) => {
     e.preventDefault()
@@ -91,7 +77,7 @@ const AuthModal = () => {
         upiId: formData.upiId,
       })
       if (response.data.userExists) {
-        setError('UPI Exists')
+        setErrorToastMessage('UPI Exists')
       } else {
         setStep(3)
       }
@@ -106,16 +92,8 @@ const AuthModal = () => {
     e.preventDefault()
     setIsLoading(true)
     try {
-      const response = await axios.post(`${BACKEND_URL}/v1/user/sign-in`, {
-        walletAddress: formData.walletAddress,
-        pin: formData.pin,
-      })
-      const token = response.data.token
-      localStorage.setItem('token', token)
-      setToken(token)
-      router.push(pathName)
+      await signIn(formData)
     } catch (e) {
-      console.log(e)
     } finally {
       setIsLoading(false)
     }
@@ -125,15 +103,8 @@ const AuthModal = () => {
     e.preventDefault()
     setIsLoading(true)
     try {
-      const response = await axios.post(`${BACKEND_URL}/v1/user/create-user`, {
-        ...formData,
-      })
-      const token = response.data.token
-      localStorage.setItem('token', token)
-      setToken(token)
-      router.push(pathName)
+      await signUp(formData)
     } catch (e) {
-      console.log(e)
     } finally {
       setFormData({
         name: '',
@@ -296,8 +267,6 @@ const AuthModal = () => {
           )
         })}
         <ul className="flex flex-col gap-2">{getFormUI()}</ul>
-        {/* {error && <div className="text-red-500 text-sm">{error}</div>} */}
-        <ToastContainer />
       </form>
     </div>
   )
