@@ -25,7 +25,12 @@ const Page = () => {
 
 const PayPage = () => {
   const searchParams = useSearchParams()
-  const { setOpenPin, setErrorToastMessage, setToastMessage } = useLoader()
+  const {
+    setOpenPin,
+    setErrorToastMessage,
+    setToastMessage,
+    setQrCodeScanOpen,
+  } = useLoader()
   const { sendToken, walletType } = useCustomWallet()
   const [upiDetails, setUpiDetails] = useState<User | null>(null)
   const [amount, setAmount] = useState<number>(0)
@@ -55,6 +60,7 @@ const PayPage = () => {
 
   useEffect(() => {
     onLoad()
+    setQrCodeScanOpen(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upiId])
 

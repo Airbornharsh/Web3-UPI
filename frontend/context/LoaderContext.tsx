@@ -1,5 +1,7 @@
 import LoaderModal from '@/components/ui/modals/LoaderModal'
 import PinModal from '@/components/ui/modals/PinModal'
+import QrCodeViewModal from '@/components/ui/modals/QrCodeViewModal'
+import QrScanModal from '@/components/ui/modals/QrScanModal'
 import React, { createContext, useContext, useState, ReactNode } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 
@@ -15,6 +17,10 @@ interface LoaderContextProps {
   setOpenPin: ({ open, fn }: { open: boolean; fn: Function }) => void
   setToastMessage: (message: string) => void
   setErrorToastMessage: (message: string) => void
+  qrCodeOpenData: string
+  setQrCodeOpenData: (data: string) => void
+  qrCodeScanOpen: boolean
+  setQrCodeScanOpen: (open: boolean) => void
 }
 
 const LoaderContext = createContext<LoaderContextProps | undefined>(undefined)
@@ -38,7 +44,6 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [privateKey, setPrivateKey] = useState<string>('')
-
   const [openPin, setOpenPin] = useState<{
     open: boolean
     fn: Function
@@ -46,6 +51,8 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
     open: false,
     fn: () => void 0,
   })
+  const [qrCodeOpenData, setQrCodeOpenData] = useState<string>('')
+  const [qrCodeScanOpen, setQrCodeScanOpen] = useState<boolean>(false)
 
   const setToastMessage = (message: string) => {
     toast.success(message, {
@@ -70,6 +77,10 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
     setOpenPin,
     setToastMessage,
     setErrorToastMessage,
+    qrCodeOpenData,
+    setQrCodeOpenData,
+    qrCodeScanOpen,
+    setQrCodeScanOpen,
   }
 
   return (
@@ -77,6 +88,8 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
       {children}
       <LoaderModal />
       <PinModal />
+      <QrScanModal />
+      <QrCodeViewModal />
       <ToastContainer />
     </LoaderContext.Provider>
   )

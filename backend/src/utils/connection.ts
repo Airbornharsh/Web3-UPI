@@ -6,7 +6,7 @@ const connection = new Connection(RPC_URL ?? '')
 async function getTransactionWithRetry(
   signature: string,
   options: { maxSupportedTransactionVersion: number },
-  maxRetries: number = 8
+  maxRetries: number = 8,
 ): Promise<VersionedTransactionResponse | null> {
   const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
   let attempt = 0

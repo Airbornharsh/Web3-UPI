@@ -7,8 +7,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "npx concurrently \"yarn backend\" \"yarn frontend\"",
+    "build": "npx concurrently \"yarn backend:build\" \"yarn frontend:build\"",
     "backend": "cd backend && yarn dev",
     "frontend": "cd frontend && yarn dev",
+    "backend:build": "cd backend && yarn build",
+    "frontend:build": "cd frontend && yarn build",
     "format": "prettier --write ."
   },
   "devDependencies": {
