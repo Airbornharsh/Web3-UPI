@@ -4,9 +4,13 @@ import CustomWalletMultiButton from '../wallet/CustomWalletMultiButton'
 import { useAuth } from '@/context/AuthContext'
 import { useState } from 'react'
 import Hamburger from 'hamburger-react'
+import { Button } from '@mui/material'
 import { useCustomWallet } from '@/context/CustomWalletContext'
+import { useLoader } from '@/context/LoaderContext'
+import { URL } from '@/utils/config'
 
 const SmallScreenMenu = () => {
+  const { setQrCodeOpenData } = useLoader()
   const { publicKey } = useCustomWallet()
   const { user, balance, updateBalance } = useAuth()
   const [open, setOpen] = useState(false)
@@ -66,6 +70,19 @@ const SmallScreenMenu = () => {
                 )}
               </div>
             </div>
+            <Button
+              onClick={() => {
+                setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
+              }}
+              style={{
+                backgroundColor: '#f0f0f0',
+                color: 'black',
+                padding: '10px 20px',
+                borderRadius: '10px',
+              }}
+            >
+              Show QR
+            </Button>
           </div>
         </div>
       </div>

@@ -6,3 +6,4 @@ export const NETWORK = process.env.NEXT_PUBLIC_NETWORK || 'devnet'
 export const BASE_LAMPORTS = process.env.NEXT_PUBLIC_BASE_LAMPORTS
   ? parseInt(process.env.NEXT_PUBLIC_BASE_LAMPORTS)
   : 1000000000
+export const URL = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
