@@ -1,8 +1,5 @@
 'use client'
 import { useLoader } from '@/context/LoaderContext'
-import { BACKEND_URL } from '@/utils/config'
-import axios from 'axios'
-import { ToastContainer, toast } from 'react-toastify'
 import { useEffect, useState } from 'react'
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -17,6 +14,7 @@ interface PrivateAuthModalProps {
 const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
   havePrivateKey,
 }) => {
+  const { setIsLoading, setErrorToastMessage } = useLoader()
   const {
     publicKey,
     encodePrivateKey,
@@ -33,7 +31,6 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
     privateKey: '',
   })
   const [step, setStep] = useState(1)
-  const { setIsLoading } = useLoader()
 
   useEffect(() => {
     if (havePrivateKey) {
@@ -52,12 +49,6 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publicKey])
 
-  const setError = (message: string) => {
-    toast.error(message, {
-      autoClose: 2000,
-    })
-  }
-
   const encodedPrivateKeyHandler = async (e: any) => {
     e.preventDefault()
     if (encodedPrivateKey) {
@@ -75,23 +66,23 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
           return
         }
       } else {
-        setError('Invalid PIN')
+        setErrorToastMessage('Invalid PIN')
       }
     } else {
-      setError('Invalid Private Key')
+      setErrorToastMessage('Invalid Private Key')
     }
   }
 
   const signInHandler = async (e: any) => {
     e.preventDefault()
     if (formData.pin.length !== 6 && formData.privateKey) {
-      setError('Invalid PIN or Private Key')
+      setErrorToastMessage('Invalid PIN or Private Key')
       return
     }
     try {
       const walletAddress = encodePrivateKey(formData.privateKey, formData.pin)
       if (!walletAddress) {
-        setError('Invalid Private Key')
+        setErrorToastMessage('Invalid Private Key')
         return
       }
       const response = await signIn({
@@ -304,7 +295,6 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
           )
         })}
         <ul className="flex flex-col gap-2">{getFormUI()}</ul>
-        <ToastContainer />
       </form>
     </div>
   )

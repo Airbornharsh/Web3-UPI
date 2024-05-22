@@ -16,7 +16,11 @@ interface CustomWalletContextProps {
   publicKey: string
   walletType: WalletType
   setWalletType: (type: WalletType) => void
-  sendToken: (recieverAddress: string, lamports: number) => Promise<string>
+  sendToken: (
+    recieverAddress: string,
+    lamports: number,
+    pin?: string,
+  ) => Promise<string>
   balance: number
   updateBalance: () => void
   encodePrivateKey: (privateKey: string, pin: string) => string | null
@@ -116,37 +120,59 @@ export const CustomWalletProvider: React.FC<
     }
   }
 
+  // TODO: Implement Pin ASK
   const sendToken = async (
     recieverAddress: string,
     lamports: number,
     pin?: string,
   ) => {
     let signature = ''
+    pin = pin || '999999'
     try {
-      const txn = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey!,
-          toPubkey: new PublicKey(recieverAddress),
-          lamports,
-        }),
-      )
-      const {
-        context: { slot: minContextSlot },
-        value: { blockhash, lastValidBlockHeight },
-      } = await connection.getLatestBlockhashAndContext()
-      signature = await sendTransaction(txn, connection, {
-        minContextSlot,
-      })
-      await connection.confirmTransaction({
-        blockhash,
-        lastValidBlockHeight,
-        signature,
-      })
+      if (walletType === WalletType.CUSTOM && !pin) {
+        throw new Error('Pin is required for custom wallet')
+      }
+      if (walletType === WalletType.CUSTOM && encodedPrivateKey && pin) {
+        const wallet = decodePrivateKey(pin)
+        if (!wallet) {
+          throw new Error('Invalid pin')
+        }
+        const transaction = new Transaction().add(
+          SystemProgram.transfer({
+            fromPubkey: wallet.publicKey,
+            toPubkey: new PublicKey(recieverAddress),
+            lamports,
+          }),
+        )
+        signature = await connection.sendTransaction(transaction, [wallet])
+      } else if (walletType === WalletType.DEFAULT) {
+        if (wallet) {
+          const txn = new Transaction().add(
+            SystemProgram.transfer({
+              fromPubkey: publicKey!,
+              toPubkey: new PublicKey(recieverAddress),
+              lamports,
+            }),
+          )
+          const {
+            context: { slot: minContextSlot },
+            value: { blockhash, lastValidBlockHeight },
+          } = await connection.getLatestBlockhashAndContext()
+          signature = await sendTransaction(txn, connection, {
+            minContextSlot,
+          })
+          await connection.confirmTransaction({
+            blockhash,
+            lastValidBlockHeight,
+            signature,
+          })
+        }
+      }
     } catch (e) {
       console.log(e)
     } finally {
-      return signature
     }
+    return signature
   }
 
   const updateBalance = async () => {

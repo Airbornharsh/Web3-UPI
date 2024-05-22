@@ -11,6 +11,7 @@ import { useCustomWallet } from '@/context/CustomWalletContext'
 import { AuthFormData } from '@/utils/types'
 
 const AuthModal = () => {
+  const { setErrorToastMessage } = useLoader()
   const { publicKey } = useCustomWallet()
   const { signIn, signUp } = useAuth()
   const [formData, setFormData] = useState<AuthFormData>({
@@ -38,12 +39,6 @@ const AuthModal = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.walletAddress])
-
-  const setError = (message: string) => {
-    toast.error(message, {
-      autoClose: 2000,
-    })
-  }
 
   const walletCheckHandler = async (e: any) => {
     e.preventDefault()
@@ -82,7 +77,7 @@ const AuthModal = () => {
         upiId: formData.upiId,
       })
       if (response.data.userExists) {
-        setError('UPI Exists')
+        setErrorToastMessage('UPI Exists')
       } else {
         setStep(3)
       }
@@ -272,8 +267,6 @@ const AuthModal = () => {
           )
         })}
         <ul className="flex flex-col gap-2">{getFormUI()}</ul>
-        {/* {error && <div className="text-red-500 text-sm">{error}</div>} */}
-        <ToastContainer />
       </form>
     </div>
   )

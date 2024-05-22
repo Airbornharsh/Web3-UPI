@@ -13,6 +13,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { useSearchParams } from 'next/navigation'
 import { useCustomWallet } from '@/context/CustomWalletContext'
+import { WalletType } from '@/utils/enum'
 
 const Page = () => {
   return (
@@ -24,7 +25,8 @@ const Page = () => {
 
 const PayPage = () => {
   const searchParams = useSearchParams()
-  const { sendToken } = useCustomWallet()
+  const { setOpenPin, setErrorToastMessage, setToastMessage } = useLoader()
+  const { sendToken, walletType } = useCustomWallet()
   const [upiDetails, setUpiDetails] = useState<User | null>(null)
   const [amount, setAmount] = useState<number>(0)
   const { setIsLoading } = useLoader()
@@ -56,32 +58,31 @@ const PayPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upiId])
 
-  const setError = (message: string) => {
-    toast.error(message, {
-      autoClose: 2000,
-    })
-  }
+  // const setError = (message: string) => {
+  //   toast.error(message, {
+  //     autoClose: 2000,
+  //   })
+  // }
 
-  const setMessage = (message: string) => {
-    toast.success(message, {
-      autoClose: 2000,
-    })
-  }
+  // const setMessage = (message: string) => {
+  //   toast.success(message, {
+  //     autoClose: 2000,
+  //   })
+  // }
 
-  const sendHandler = async (e: { preventDefault: () => void }) => {
-    e.preventDefault()
+  const sendHandler = async ({ pin }: { pin?: string }) => {
     setIsLoading(true)
     try {
       if (!upiDetails?.walletAddress || !upiDetails?.upiId) {
-        setError('Invalid UPI ID')
+        setErrorToastMessage('Invalid UPI ID')
         return
       }
       const lamports = BASE_LAMPORTS * amount
       if (lamports <= 0) {
-        setError('Invalid amount')
+        setErrorToastMessage('Invalid amount')
         return
       }
-      const signature = await sendToken(upiDetails.walletAddress, lamports)
+      const signature = await sendToken(upiDetails.walletAddress, lamports, pin)
       const response = await axios.post(
         `${BACKEND_URL}/v1/txn/send`,
         {
@@ -96,13 +97,12 @@ const PayPage = () => {
           },
         },
       )
-      console.log(response.data)
       const responseData = response.data
       if (responseData.success) {
-        setMessage('Transaction successful')
+        setToastMessage('Transaction successful')
         setAmount(0)
       } else {
-        setError('Transaction failed')
+        setErrorToastMessage('Transaction failed')
       }
     } catch (e) {
       console.log(e)
@@ -145,7 +145,24 @@ const PayPage = () => {
             </div>
             <button
               className="rounded bg-blue-500 p-2 text-white"
-              onClick={sendHandler}
+              onClick={(e) => {
+                e.preventDefault()
+                if (walletType === WalletType.DEFAULT) {
+                  sendHandler({
+                    pin: '',
+                  })
+                } else {
+                  setOpenPin({
+                    open: true,
+                    fn: (pin: string) => {
+                      console.log('Wallet Details', upiDetails)
+                      sendHandler({
+                        pin,
+                      })
+                    },
+                  })
+                }
+              }}
               disabled={!amount}
             >
               Pay
@@ -153,7 +170,6 @@ const PayPage = () => {
           </form>
         )}
       </div>
-      <ToastContainer />
     </main>
   )
 }

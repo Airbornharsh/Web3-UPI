@@ -13,7 +13,6 @@ import {
 } from '@solana/wallet-adapter-wallets'
 import { Appbar } from '@/components/Appbar'
 import { LoaderProvider } from '@/context/LoaderContext'
-import Loader from '@/components/Loader'
 import { AuthProvider } from '@/context/AuthContext'
 import ConnectWalletFirst from '@/components/ConnectWalletFirst'
 import { RPC_URL } from '@/utils/config'
@@ -55,7 +54,6 @@ export default function RootLayout({
               <AuthProvider>
                 <Appbar />
                 <Children>{children}</Children>
-                <Loader />
               </AuthProvider>
             </CustomWalletProvider>
           </WalletModalProvider>
