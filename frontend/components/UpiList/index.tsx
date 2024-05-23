@@ -36,7 +36,7 @@ const UpiList = () => {
 
   return (
     <div>
-      <div>
+      <div className="">
         <Input onChange={setUpiId} value={upiId} placeHolder={'Upi Id'} />
       </div>
       <div>

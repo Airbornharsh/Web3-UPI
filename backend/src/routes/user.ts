@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { authMiddleware } from '../middleware'
 import prisma from '../prisma'
+import { PublicKey } from '@solana/web3.js'
+import nacl from 'tweetnacl'
 
 const userRouter = Router()
 
@@ -60,7 +62,27 @@ userRouter.post('/upi-check', async (req, res) => {
 
 userRouter.post('/create-user', async (req, res) => {
   try {
-    const { name, walletAddress, upiId, pin } = req.body
+    const { name, walletAddress, upiId, pin, signature, walletType } = req.body
+
+    if (walletType === 'default') {
+      if (!signature) {
+        return res.status(400).json({ message: 'Invalid signature' })
+      }
+
+      const message = new TextEncoder().encode('Sign in request from WPI')
+
+      const result = nacl.sign.detached.verify(
+        message,
+        new Uint8Array(signature.data),
+        new PublicKey(walletAddress).toBytes(),
+      )
+
+      if (!result) {
+        return res.status(411).json({
+          message: 'Incorrect signature',
+        })
+      }
+    }
 
     const tempUser = await prisma.user.findFirst({
       where: {
@@ -103,7 +125,27 @@ userRouter.post('/create-user', async (req, res) => {
 
 userRouter.post('/sign-in', async (req, res) => {
   try {
-    const { walletAddress, pin } = req.body
+    const { walletAddress, pin, signature, walletType } = req.body
+
+    if (walletType === 'default') {
+      if (!signature) {
+        return res.status(400).json({ message: 'Invalid signature' })
+      }
+
+      const message = new TextEncoder().encode('Sign in request from WPI')
+
+      const result = nacl.sign.detached.verify(
+        message,
+        new Uint8Array(signature.data),
+        new PublicKey(walletAddress).toBytes(),
+      )
+
+      if (!result) {
+        return res.status(411).json({
+          message: 'Incorrect signature',
+        })
+      }
+    }
 
     const user = await prisma.user.findFirst({
       where: {

@@ -6,14 +6,13 @@ import React, {
   ReactNode,
   useEffect,
 } from 'react'
+import { useWallet } from '@solana/wallet-adapter-react'
 import { AuthFormData, User } from '@/utils/types'
 import { useLoader } from './LoaderContext'
 import axios from 'axios'
 import { BACKEND_URL, BASE_LAMPORTS, RPC_URL } from '@/utils/config'
-import { Connection } from '@solana/web3.js'
 import { useCustomWallet } from './CustomWalletContext'
-
-const connection = new Connection(RPC_URL)
+import { WalletType } from '@/utils/enum'
 
 interface AuthContextProps {
   token: string
@@ -46,7 +45,8 @@ interface AuthContextProviderProps {
 export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   children,
 }) => {
-  const { publicKey, balance, updateBalance } = useCustomWallet()
+  const { signMessage } = useWallet()
+  const { publicKey, balance, updateBalance, walletType } = useCustomWallet()
   const [token, setToken] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>()
@@ -120,12 +120,28 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [])
 
+  const signMessageHandler = async () => {
+    const message = new TextEncoder().encode('Sign in request from WPI')
+    if (walletType === WalletType.DEFAULT) {
+      if (!publicKey) {
+        return new Uint8Array()
+      }
+      const signature = await signMessage?.(message)
+      return signature
+    } else {
+      return null
+    }
+  }
+
   const signIn = async (formData: AuthFormData) => {
     setIsLoading(true)
     try {
+      const signature = await signMessageHandler()
       const response = await axios.post(`${BACKEND_URL}/v1/user/sign-in`, {
         walletAddress: formData.walletAddress,
         pin: formData.pin,
+        signature,
+        walletType,
       })
       const responseData = response.data
       if (responseData.userExists) {
@@ -147,11 +163,14 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   const signUp = async (formData: AuthFormData) => {
     setIsLoading(true)
     try {
+      const signature = await signMessageHandler()
       const response = await axios.post(`${BACKEND_URL}/v1/user/create-user`, {
         name: formData.name,
         walletAddress: formData.walletAddress,
         upiId: formData.upiId,
         pin: formData.pin,
+        signature,
+        walletType,
       })
       const token = response.data.token
       localStorage.setItem('token', token)

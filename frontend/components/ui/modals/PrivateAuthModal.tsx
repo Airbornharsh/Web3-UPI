@@ -80,7 +80,10 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
       return
     }
     try {
-      const walletAddress = encodePrivateKey(formData.privateKey, formData.pin)
+      const walletAddress = encodePrivateKey(
+        formData.privateKey as string,
+        formData.pin,
+      )
       if (!walletAddress) {
         setErrorToastMessage('Invalid Private Key')
         return
@@ -132,7 +135,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
         type="password"
         name="name"
         className="rounded border border-slate-400 border-opacity-50 p-2 outline-none focus:border-opacity-100"
-        value={formData.privateKey}
+        value={formData.privateKey as string}
         onChange={(e) => {
           const address = getPublicKeyFromPrivateKey(e.target.value)
           setFormData((f) => {
@@ -283,7 +286,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
                 type="text"
                 name={key}
                 className="rounded border border-slate-400 border-opacity-50 bg-gray-200 p-2 outline-none focus:border-opacity-100"
-                value={formData[key]}
+                value={formData[key] as string}
                 disabled={true}
                 onChange={(e) => {
                   setFormData((f) => {

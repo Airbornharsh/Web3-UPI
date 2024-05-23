@@ -233,6 +233,7 @@ const AuthModal = () => {
     <div className="flex h-screen w-screen items-center justify-center">
       <form className="w-[90vw] max-w-[25rem] rounded-lg bg-gray-100 px-6 py-4">
         {Object.keys(formData).map((key) => {
+          if (key === 'signature') return null
           if (step === 4) {
             if (key === 'pin') return null
           } else {
@@ -255,7 +256,7 @@ const AuthModal = () => {
                 type="text"
                 name={key}
                 className="rounded border border-slate-400 border-opacity-50 bg-gray-200 p-2 outline-none focus:border-opacity-100"
-                value={formData[key]}
+                value={formData[key]! as string}
                 disabled={true}
                 onChange={(e) => {
                   setFormData((f) => {
