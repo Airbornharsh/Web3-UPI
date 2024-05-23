@@ -6,7 +6,13 @@ import React, {
   useEffect,
 } from 'react'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  Message,
+} from '@solana/web3.js'
 import { BASE_LAMPORTS } from '@/utils/config'
 import { WalletType } from '@/utils/enum'
 import base58 from 'bs58'
@@ -100,6 +106,7 @@ export const CustomWalletProvider: React.FC<
       setStoredPublicKey(wallet.publicKey.toString())
       const encodedPrivateKey = encryptMessage(privateKey, pin)
       setEncodedPrivateKey(encodedPrivateKey)
+      console.log('encodedPrivateKey', encodedPrivateKey)
       localStorage.setItem('privateKey', encodedPrivateKey)
       return wallet.publicKey.toString()
     } catch (e) {

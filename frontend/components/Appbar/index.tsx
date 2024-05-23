@@ -84,7 +84,7 @@ export const Appbar = () => {
         {walletType === WalletType.DEFAULT ? (
           <AuthModal />
         ) : (
-          <PrivateAuthModal havePrivateKey={true} />
+          <PrivateAuthModal havePrivateKey={hasPrivateKey} />
         )}
       </Modal>
     </div>
