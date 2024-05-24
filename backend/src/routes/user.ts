@@ -73,7 +73,7 @@ userRouter.post('/create-user', async (req, res) => {
 
       const result = nacl.sign.detached.verify(
         message,
-        new Uint8Array(signature.data),
+        new Uint8Array(signature),
         new PublicKey(walletAddress).toBytes(),
       )
 
@@ -136,7 +136,7 @@ userRouter.post('/sign-in', async (req, res) => {
 
       const result = nacl.sign.detached.verify(
         message,
-        new Uint8Array(signature.data),
+        new Uint8Array(signature),
         new PublicKey(walletAddress).toBytes(),
       )
 

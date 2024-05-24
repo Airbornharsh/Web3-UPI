@@ -12,6 +12,7 @@ import {
   SystemProgram,
   Transaction,
   Message,
+  sendAndConfirmTransaction,
 } from '@solana/web3.js'
 import { BASE_LAMPORTS } from '@/utils/config'
 import { WalletType } from '@/utils/enum'
@@ -106,7 +107,6 @@ export const CustomWalletProvider: React.FC<
       setStoredPublicKey(wallet.publicKey.toString())
       const encodedPrivateKey = encryptMessage(privateKey, pin)
       setEncodedPrivateKey(encodedPrivateKey)
-      console.log('encodedPrivateKey', encodedPrivateKey)
       localStorage.setItem('privateKey', encodedPrivateKey)
       return wallet.publicKey.toString()
     } catch (e) {
@@ -151,6 +151,9 @@ export const CustomWalletProvider: React.FC<
             lamports,
           }),
         )
+        // signature = await sendAndConfirmTransaction(connection, transaction, [
+        //   wallet,
+        // ])
         signature = await connection.sendTransaction(transaction, [wallet])
       } else if (walletType === WalletType.DEFAULT) {
         if (wallet) {
