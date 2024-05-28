@@ -8,6 +8,7 @@ import { Button } from '@mui/material'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { useLoader } from '@/context/LoaderContext'
 import { URL } from '@/utils/config'
+import FormButton from '../ui/buttons/FormButton'
 
 const SmallScreenMenu = () => {
   const { setQrCodeOpenData } = useLoader()
@@ -17,18 +18,14 @@ const SmallScreenMenu = () => {
 
   return (
     <div className="flex items-center gap-2 py-2 pr-4 text-xl">
-      <Hamburger toggled={open} toggle={setOpen} />
-      <div
-        className={`left-0 top-0 z-40 h-screen w-screen bg-[#00000040] ${open ? 'fixed' : 'hidden'}`}
-        onClick={(e) => setOpen(false)}
-      >
+      <Hamburger toggled={open} toggle={setOpen} color="#F2F2F2" />
+      {open && (
         <div
-          className={`absolute top-0 z-50 h-screen max-w-[90vw] border border-gray-300 bg-white px-2 pb-2 ${open ? 'right-0' : '-right-full'} transform transition-transform ${open ? 'translate-x-0' : 'translate-x-full'} ${open ? 'shadow-lg' : ''} ${open ? 'rounded-l-lg' : ''} ${open ? 'rounded-r-lg' : ''}`}
+          className={`bg-secondary absolute top-[4.2rem] z-50 max-w-[90vw] border border-gray-500 px-2 pb-2 ${open ? 'right-0' : '-right-full'} transform transition-transform ${open ? 'translate-x-0' : 'translate-x-full'} ${open ? 'shadow-lg' : ''} ${open ? 'rounded-l-lg' : ''} ${open ? 'rounded-r-lg' : ''}`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex flex-col">
-            <Hamburger toggled={open} toggle={setOpen} />
-            <div className="flex flex-col gap-4 rounded-lg bg-white p-4 shadow-md sm:flex-row sm:items-start sm:justify-between sm:p-6 lg:gap-6">
+            <div className="flex flex-col gap-4 rounded-lg p-4 shadow-md sm:flex-row sm:items-start sm:justify-between sm:p-6 lg:gap-6">
               <div className="flex flex-col gap-2 sm:flex-1">
                 <div className="flex items-center">
                   {user?.name && (
@@ -71,23 +68,31 @@ const SmallScreenMenu = () => {
               </div>
             </div>
             {isAuthenticated ? (
-              <Button
+              // <Button
+              //   onClick={() => {
+              //     setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
+              //   }}
+              //   style={{
+              //     backgroundColor: '#f0f0f0',
+              //     color: 'black',
+              //     padding: '10px 20px',
+              //     borderRadius: '10px',
+              //   }}
+              // >
+              //   Show QR
+              // </Button>
+              <FormButton
+                name="Show QR"
                 onClick={() => {
                   setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
                 }}
-                style={{
-                  backgroundColor: '#f0f0f0',
-                  color: 'black',
-                  padding: '10px 20px',
-                  borderRadius: '10px',
-                }}
-              >
-                Show QR
-              </Button>
+                disabled={!user?.upiId}
+                type="button"
+              />
             ) : null}
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
