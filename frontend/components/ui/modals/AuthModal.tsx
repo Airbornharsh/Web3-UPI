@@ -9,8 +9,15 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { AuthFormData } from '@/utils/types'
+import FormLabel from '../labels/FormLabel'
+import FormInput from '../inputs/FormInput'
+import FormButton from '../buttons/FormButton'
 
-const AuthModal = () => {
+interface AuthModalProps {
+  setOpenModal: (val: boolean) => void
+}
+
+const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
   const { setErrorToastMessage } = useLoader()
   const { publicKey } = useCustomWallet()
   const { signIn, signUp } = useAuth()
@@ -35,13 +42,12 @@ const AuthModal = () => {
 
   useEffect(() => {
     if (formData.walletAddress) {
-      walletCheckHandler({ preventDefault: () => {} })
+      walletCheckHandler()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.walletAddress])
 
-  const walletCheckHandler = async (e: any) => {
-    e.preventDefault()
+  const walletCheckHandler = async () => {
     setIsLoading(true)
     try {
       const response = await axios.post(`${BACKEND_URL}/v1/user/wallet-check`, {
@@ -68,8 +74,7 @@ const AuthModal = () => {
     }
   }
 
-  const upiCheckHandler = async (e: any) => {
-    e.preventDefault()
+  const upiCheckHandler = async () => {
     setIsLoading(true)
     try {
       const response = await axios.post(`${BACKEND_URL}/v1/user/upi-check`, {
@@ -88,8 +93,7 @@ const AuthModal = () => {
     }
   }
 
-  const signInHandler = async (e: any) => {
-    e.preventDefault()
+  const signInHandler = async () => {
     setIsLoading(true)
     try {
       await signIn(formData)
@@ -99,8 +103,7 @@ const AuthModal = () => {
     }
   }
 
-  const signUpHandler = async (e: any) => {
-    e.preventDefault()
+  const signUpHandler = async () => {
     setIsLoading(true)
     try {
       await signUp(formData)
@@ -118,99 +121,151 @@ const AuthModal = () => {
 
   const step1 = (
     <div className="flex flex-col gap-1">
-      <label className="font-semibold">Wallet Address:</label>
-      <input
+      <FormLabel name="Wallet Address:" />
+      <FormInput
         type="text"
         name="name"
-        className="rounded border border-slate-400 border-opacity-50 bg-gray-200 p-2 outline-none focus:border-opacity-100"
         disabled={true}
         value={formData.walletAddress}
       />
-      <button
-        className="rounded bg-blue-500 p-2 text-white"
-        onClick={walletCheckHandler}
+      <FormButton
+        name="Next"
+        onClick={() => {
+          walletCheckHandler()
+        }}
         disabled={!formData.walletAddress}
-      >
-        NEXT
-      </button>
+        type="submit"
+      />
+      <FormButton
+        name="Close"
+        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
+        onClick={() => {
+          setFormData({
+            name: '',
+            walletAddress: '',
+            upiId: '',
+            pin: '',
+          })
+          setOpenModal(false)
+        }}
+      />
     </div>
   )
 
   const step2 = (
     <div className="flex flex-col gap-1">
-      <label className="font-semibold">UPI ID:</label>
-      <input
-        type="text"
-        name="upiId"
-        className="rounded border border-slate-400 border-opacity-50 p-2 outline-none focus:border-opacity-100"
+      <FormLabel name={'UPI ID'} />
+      <FormInput
         value={formData.upiId}
-        onChange={(e) => {
+        onChange={(val) => {
           setFormData((f) => {
-            return { ...f, upiId: e.target.value }
+            return { ...f, upiId: val }
           })
         }}
+        name="upiId"
+        type="text"
       />
-      <button
-        className="rounded bg-blue-500 p-2 text-white"
-        onClick={upiCheckHandler}
+      <FormButton
+        name="Next"
+        onClick={() => {
+          upiCheckHandler()
+        }}
         disabled={!formData.upiId}
-      >
-        NEXT
-      </button>
+        type="submit"
+      />
+      <FormButton
+        name="Close"
+        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
+        onClick={() => {
+          setFormData({
+            name: '',
+            walletAddress: '',
+            upiId: '',
+            pin: '',
+          })
+          setOpenModal(false)
+        }}
+      />
     </div>
   )
 
   const step3 = (
     <div className="flex flex-col gap-1">
-      <label className="font-semibold">Name:</label>
-      <input
-        type="text"
-        name="name"
-        className="rounded border border-slate-400 border-opacity-50 p-2 outline-none focus:border-opacity-100"
+      <FormLabel name={'Name'} />
+      <FormInput
         value={formData.name}
-        onChange={(e) => {
+        onChange={(val) => {
           setFormData((f) => {
-            return { ...f, name: e.target.value }
+            return { ...f, name: val }
           })
         }}
+        name="name"
+        type="text"
       />
-      <button
-        className="rounded bg-blue-500 p-2 text-white"
-        onClick={() => setStep(4)}
+      <FormButton
+        name="Next"
+        onClick={() => {
+          setStep(4)
+        }}
         disabled={!formData.name}
-      >
-        NEXT
-      </button>
+        type="submit"
+      />
+      <FormButton
+        name="Close"
+        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
+        onClick={() => {
+          setFormData({
+            name: '',
+            walletAddress: '',
+            upiId: '',
+            pin: '',
+          })
+          setOpenModal(false)
+        }}
+      />
     </div>
   )
 
   const step4 = (
     <div className="flex flex-col gap-1">
-      <label className="font-semibold">PIN:</label>
-      <input
-        type={isWallet ? 'password' : 'text'}
-        name="pin"
-        className="rounded border border-slate-400 border-opacity-50 p-2 outline-none focus:border-opacity-100"
+      <FormLabel name={'PIN'} />
+      <FormInput
         value={formData.pin}
-        onChange={(e) => {
-          if (e.target.value.length > 6) {
+        onChange={(val) => {
+          if (val.length > 6) {
             return
           }
-          if (isNaN(Number(e.target.value))) {
+          if (isNaN(Number(val))) {
             return
           }
           setFormData((f) => {
-            return { ...f, pin: e.target.value }
+            return { ...f, pin: val }
           })
         }}
+        name="pin"
+        type={isWallet ? 'password' : 'text'}
       />
-      <button
-        className="rounded bg-blue-500 p-2 text-white"
-        onClick={isWallet ? signInHandler : signUpHandler}
+      <FormButton
+        name="Submit"
+        onClick={() => {
+          isWallet ? signInHandler() : signUpHandler()
+        }}
         disabled={!formData.pin}
-      >
-        SUBMIT
-      </button>
+        type="submit"
+      />
+      <FormButton
+        name="Close"
+        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
+        onClick={() => {
+          setFormData({
+            name: '',
+            walletAddress: '',
+            upiId: '',
+            pin: '',
+          })
+          setOpenModal(false)
+        }}
+      />
     </div>
   )
 
@@ -231,7 +286,7 @@ const AuthModal = () => {
 
   return (
     <div className="flex h-screen w-screen items-center justify-center">
-      <form className="w-[90vw] max-w-[25rem] rounded-lg bg-gray-100 px-6 py-4">
+      <form className="bg-secondary w-[90vw] max-w-[25rem] rounded-lg bg-gray-100 px-6 py-8">
         {Object.keys(formData).map((key) => {
           if (key === 'signature') return null
           if (step === 4) {
@@ -249,20 +304,28 @@ const AuthModal = () => {
               return null
           }
 
+          let keyValue = ''
+          if (key === 'walletAddress') {
+            keyValue = 'Wallet Address'
+          } else if (key === 'upiId') {
+            keyValue = 'UPI ID'
+          } else {
+            keyValue = key.charAt(0).toUpperCase() + key.slice(1)
+          }
+
           return (
             <div key={key} className="flex flex-col gap-1">
-              <label className="font-semibold">{key}</label>
-              <input
-                type="text"
-                name={key}
-                className="rounded border border-slate-400 border-opacity-50 bg-gray-200 p-2 outline-none focus:border-opacity-100"
+              <FormLabel name={keyValue} />
+              <FormInput
                 value={formData[key]! as string}
-                disabled={true}
-                onChange={(e) => {
+                onChange={(val) => {
                   setFormData((f) => {
-                    return { ...f, [key]: e.target.value }
+                    return { ...f, [key]: val }
                   })
                 }}
+                name={key}
+                type="text"
+                disabled={true}
               />
             </div>
           )

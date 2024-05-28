@@ -1,16 +1,18 @@
 'use client'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/inputs/input'
 import { useAuth } from '@/context/AuthContext'
 import { useLoader } from '@/context/LoaderContext'
 import { BACKEND_URL, BASE_LAMPORTS, NETWORK } from '@/utils/config'
 import { User } from '@/utils/types'
 import axios from 'axios'
 import Link from 'next/link'
+import AutorenewIcon from '@mui/icons-material/Autorenew'
 import React, { Suspense, useEffect, useState } from 'react'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { useSearchParams } from 'next/navigation'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { WalletType } from '@/utils/enum'
+import FormButton from '@/components/ui/buttons/FormButton'
 
 const Page = () => {
   return (
@@ -28,7 +30,7 @@ const PayPage = () => {
     setToastMessage,
     setQrCodeScanOpen,
   } = useLoader()
-  const { sendToken, walletType } = useCustomWallet()
+  const { sendToken, walletType, solPrice, getSolPrice } = useCustomWallet()
   const [upiDetails, setUpiDetails] = useState<User | null>(null)
   const [amount, setAmount] = useState<number>(0)
   const { setIsLoading } = useLoader()
@@ -119,7 +121,7 @@ const PayPage = () => {
     <main>
       <div className="flex flex-col items-center justify-center gap-2 pt-10 text-black">
         {upiDetails && (
-          <form className="flex flex-col gap-2">
+          <form className="bg-secondary flex flex-col gap-2 rounded-lg px-12 py-6">
             <h1 className="">{upiDetails.name}</h1>
             <span className="flex items-center">
               <h2 className="text-sm">
@@ -135,21 +137,41 @@ const PayPage = () => {
               </Link>
             </span>
             <h3 className="text-sm">UpiId: {upiDetails.upiId}</h3>
+            <span className="flex items-center">
+              <p>SOl Price: ${solPrice}</p>
+              <span
+                className="ml-2 cursor-pointer text-blue-500 hover:text-blue-700"
+                onClick={getSolPrice}
+              >
+                <AutorenewIcon className="scale-75" />
+              </span>
+            </span>
             <div className="relative h-10">
               <Input
                 value={amount.toString()}
                 placeHolder="Amount"
-                onChange={setAmount}
-                className="h-10"
+                onChange={(e) => {
+                  if (Number(e.target.value) < 0) {
+                    setAmount(0)
+                    return
+                  }
+                  if (Number(e.target.value) > 100000) {
+                    setAmount(100000)
+                    return
+                  }
+                  getSolPrice()
+                  setAmount(Number(e.target.value))
+                }}
+                className="text-background h-10"
               />
-              <span className="absolute right-0 top-0 flex h-10 w-12 items-center justify-center border-[0.01rem] border-l-0 border-cyan-400 bg-gray-200">
+              <span className="text-background bg-color3 absolute right-0 top-1 flex h-8 w-12 items-center justify-center">
                 SOL
               </span>
             </div>
-            <button
-              className="rounded bg-blue-500 p-2 text-white"
-              onClick={(e) => {
-                e.preventDefault()
+            <p>${amount * solPrice}</p>
+            <FormButton
+              name="Pay"
+              onClick={() => {
                 if (walletType === WalletType.DEFAULT) {
                   sendHandler({
                     pin: '',
@@ -167,9 +189,7 @@ const PayPage = () => {
                 }
               }}
               disabled={!amount}
-            >
-              Pay
-            </button>
+            />
           </form>
         )}
       </div>

@@ -15,7 +15,7 @@ const CustomWalletDisconnectButton = () => {
         <>
           <WalletDisconnectButton
             style={{
-              backgroundColor: 'rgb(14 116 144)',
+              backgroundColor: '#19B784',
               color: 'white',
               padding: '0.5rem 1rem',
               borderRadius: '0.5rem',

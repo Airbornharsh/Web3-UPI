@@ -12,11 +12,13 @@ import {
   SystemProgram,
   Transaction,
   Message,
+  sendAndConfirmTransaction,
 } from '@solana/web3.js'
 import { BASE_LAMPORTS } from '@/utils/config'
 import { WalletType } from '@/utils/enum'
 import base58 from 'bs58'
 import { decryptMessage, encryptMessage } from '@/utils/encrypt'
+import axios from 'axios'
 
 interface CustomWalletContextProps {
   publicKey: string
@@ -34,6 +36,8 @@ interface CustomWalletContextProps {
   getPublicKeyFromPrivateKey: (privateKey: string) => string | null
   disconnectPrivatWallet: () => void
   encodedPrivateKey: string
+  solPrice: number
+  getSolPrice: () => void
 }
 
 const CustomWalletContext = createContext<CustomWalletContextProps | undefined>(
@@ -69,6 +73,7 @@ export const CustomWalletProvider: React.FC<
   const [walletType, setWalletType] = useState<WalletType>(
     publicKey ? WalletType.DEFAULT : WalletType.CUSTOM,
   )
+  const [solPrice, setSolPrice] = useState<number>(0)
 
   useEffect(() => {
     const storedPrivateKey = localStorage.getItem('privateKey')
@@ -85,6 +90,23 @@ export const CustomWalletProvider: React.FC<
       setWalletType(WalletType.CUSTOM)
     }
   }, [publicKey])
+
+  useEffect(() => {
+    getSolPrice()
+  }, [])
+
+  const getSolPrice = async () => {
+    try {
+      const response = await axios.get(
+        'https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd',
+      )
+      if (response.data.solana.usd) {
+        setSolPrice(response.data.solana.usd)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   const setWalletTypeFn = (type: WalletType) => {
     setWalletType(type)
@@ -106,7 +128,6 @@ export const CustomWalletProvider: React.FC<
       setStoredPublicKey(wallet.publicKey.toString())
       const encodedPrivateKey = encryptMessage(privateKey, pin)
       setEncodedPrivateKey(encodedPrivateKey)
-      console.log('encodedPrivateKey', encodedPrivateKey)
       localStorage.setItem('privateKey', encodedPrivateKey)
       return wallet.publicKey.toString()
     } catch (e) {
@@ -151,6 +172,9 @@ export const CustomWalletProvider: React.FC<
             lamports,
           }),
         )
+        // signature = await sendAndConfirmTransaction(connection, transaction, [
+        //   wallet,
+        // ])
         signature = await connection.sendTransaction(transaction, [wallet])
       } else if (walletType === WalletType.DEFAULT) {
         if (wallet) {
@@ -194,7 +218,6 @@ export const CustomWalletProvider: React.FC<
         setBalance(response / BASE_LAMPORTS)
       }
     } catch (e) {
-      console.log(e)
       setBalance(0)
     }
   }
@@ -218,6 +241,8 @@ export const CustomWalletProvider: React.FC<
     getPublicKeyFromPrivateKey,
     disconnectPrivatWallet,
     encodedPrivateKey,
+    solPrice,
+    getSolPrice,
   }
 
   return (

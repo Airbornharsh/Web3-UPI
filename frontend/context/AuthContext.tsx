@@ -13,6 +13,7 @@ import axios from 'axios'
 import { BACKEND_URL, BASE_LAMPORTS, RPC_URL } from '@/utils/config'
 import { useCustomWallet } from './CustomWalletContext'
 import { WalletType } from '@/utils/enum'
+import { dictToArray } from '@/utils/fn'
 
 interface AuthContextProps {
   token: string
@@ -127,7 +128,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
         return new Uint8Array()
       }
       const signature = await signMessage?.(message)
-      return signature
+      return new Uint8Array(signature!)
     } else {
       return null
     }
@@ -140,7 +141,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       const response = await axios.post(`${BACKEND_URL}/v1/user/sign-in`, {
         walletAddress: formData.walletAddress,
         pin: formData.pin,
-        signature,
+        signature: dictToArray(signature),
         walletType,
       })
       const responseData = response.data
@@ -169,7 +170,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
         walletAddress: formData.walletAddress,
         upiId: formData.upiId,
         pin: formData.pin,
-        signature,
+        signature: dictToArray(signature),
         walletType,
       })
       const token = response.data.token

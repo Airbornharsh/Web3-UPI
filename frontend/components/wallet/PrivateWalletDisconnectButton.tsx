@@ -5,8 +5,8 @@ const PrivateWalletDisconnectButton = () => {
   const { disconnectPrivatWallet } = useCustomWallet()
   return (
     <div
+      className="bg-primary hover:bg-primary-dark rounded p-2"
       style={{
-        backgroundColor: 'rgb(14 116 144)',
         color: 'white',
         padding: '0.5rem 1rem',
         borderRadius: '0.5rem',

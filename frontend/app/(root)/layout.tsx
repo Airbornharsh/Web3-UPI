@@ -67,5 +67,9 @@ const Children: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
   const { publicKey } = useCustomWallet()
-  return <>{publicKey ? children : <ConnectWalletFirst />}</>
+  return (
+    <div className=" h-[calc(100vh-4rem)] w-[98vw] max-w-[80rem]">
+      {publicKey ? children : <ConnectWalletFirst />}
+    </div>
+  )
 }

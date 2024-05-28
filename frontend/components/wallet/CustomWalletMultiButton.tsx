@@ -12,8 +12,7 @@ const CustomWalletMultiButton = () => {
     <div className="flex flex-col items-center gap-2">
       <WalletMultiButton
         style={{
-          backgroundColor: 'rgb(14 116 144)',
-          color: 'white',
+          backgroundColor: '#19B784',
           padding: '0.5rem 1rem',
           borderRadius: '0.5rem',
           border: 'none',
@@ -23,7 +22,7 @@ const CustomWalletMultiButton = () => {
       <div className="text-base">
         <button
           onClick={() => setOpenModal(true)}
-          className="rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
+          className="border-primary text-primary rounded-lg border-[0.1rem] px-4 py-2"
         >
           Private Auth
         </button>
@@ -34,7 +33,7 @@ const CustomWalletMultiButton = () => {
           setOpenModal(false)
         }}
       >
-        <PrivateAuthModal havePrivateKey={false} />
+        <PrivateAuthModal havePrivateKey={false} setOpenModal={setOpenModal} />
       </Modal>
     </div>
   )
