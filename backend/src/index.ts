@@ -19,6 +19,14 @@ app.get('/', (req, res) => {
 app.use('/v1/user/', userRouter)
 app.use('/v1/txn/', txnRouter)
 
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err)
+})
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason)
+})
+
 app.listen(process.env.PORT ?? 8000, () => {
   console.log(`Server is running on port ${process.env.PORT}`)
 })

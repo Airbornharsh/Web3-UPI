@@ -170,7 +170,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
         walletAddress: formData.walletAddress,
         upiId: formData.upiId,
         pin: formData.pin,
-        signature,
+        signature: dictToArray(signature),
         walletType,
       })
       const token = response.data.token

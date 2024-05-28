@@ -12,7 +12,7 @@ import { URL } from '@/utils/config'
 const SmallScreenMenu = () => {
   const { setQrCodeOpenData } = useLoader()
   const { publicKey } = useCustomWallet()
-  const { user, balance, updateBalance } = useAuth()
+  const { user, balance, updateBalance, isAuthenticated } = useAuth()
   const [open, setOpen] = useState(false)
 
   return (
@@ -70,19 +70,21 @@ const SmallScreenMenu = () => {
                 )}
               </div>
             </div>
-            <Button
-              onClick={() => {
-                setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
-              }}
-              style={{
-                backgroundColor: '#f0f0f0',
-                color: 'black',
-                padding: '10px 20px',
-                borderRadius: '10px',
-              }}
-            >
-              Show QR
-            </Button>
+            {isAuthenticated ? (
+              <Button
+                onClick={() => {
+                  setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
+                }}
+                style={{
+                  backgroundColor: '#f0f0f0',
+                  color: 'black',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                }}
+              >
+                Show QR
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>
