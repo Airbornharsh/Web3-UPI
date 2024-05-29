@@ -6,8 +6,16 @@ const QrCodeCreate: React.FC<{
   text: string
 }> = ({ text }) => {
   return (
-    <div className="flex flex-col items-center gap-2 rounded bg-white p-4">
-      <QRCode value={text} />
+    <div className="bg-secondary flex aspect-square w-[90vw] max-w-[30rem] flex-col items-center gap-2 rounded p-4">
+      <span className="aspect-square w-[90%] border-[0.1rem]">
+        <QRCode
+          value={text}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      </span>
       <div>
         <span className="text-sm font-semibold text-gray-700">UPI ID: </span>
         <span className="text-sm font-semibold text-gray-700">
