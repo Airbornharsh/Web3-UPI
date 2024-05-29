@@ -150,17 +150,17 @@ const PayPage = () => {
               <Input
                 value={amount.toString()}
                 placeHolder="Amount"
-                onChange={(e) => {
-                  if (Number(e.target.value) < 0) {
+                onChange={(val) => {
+                  if (Number(val) < 0) {
                     setAmount(0)
                     return
                   }
-                  if (Number(e.target.value) > 100000) {
+                  if (Number(val) > 100000) {
                     setAmount(100000)
                     return
                   }
                   getSolPrice()
-                  setAmount(Number(e.target.value))
+                  setAmount(Number(val))
                 }}
                 className="text-background h-10"
               />
