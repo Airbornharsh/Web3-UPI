@@ -63,18 +63,6 @@ const PayPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upiId])
 
-  // const setError = (message: string) => {
-  //   toast.error(message, {
-  //     autoClose: 2000,
-  //   })
-  // }
-
-  // const setMessage = (message: string) => {
-  //   toast.success(message, {
-  //     autoClose: 2000,
-  //   })
-  // }
-
   const sendHandler = async ({ pin }: { pin?: string }) => {
     setIsLoading(true)
     try {
