@@ -63,18 +63,6 @@ const PayPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upiId])
 
-  // const setError = (message: string) => {
-  //   toast.error(message, {
-  //     autoClose: 2000,
-  //   })
-  // }
-
-  // const setMessage = (message: string) => {
-  //   toast.success(message, {
-  //     autoClose: 2000,
-  //   })
-  // }
-
   const sendHandler = async ({ pin }: { pin?: string }) => {
     setIsLoading(true)
     try {
@@ -150,17 +138,17 @@ const PayPage = () => {
               <Input
                 value={amount.toString()}
                 placeHolder="Amount"
-                onChange={(e) => {
-                  if (Number(e.target.value) < 0) {
+                onChange={(val) => {
+                  if (Number(val) < 0) {
                     setAmount(0)
                     return
                   }
-                  if (Number(e.target.value) > 100000) {
+                  if (Number(val) > 100000) {
                     setAmount(100000)
                     return
                   }
                   getSolPrice()
-                  setAmount(Number(e.target.value))
+                  setAmount(Number(val))
                 }}
                 className="text-background h-10"
               />
