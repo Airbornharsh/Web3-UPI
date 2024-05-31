@@ -6,10 +6,12 @@
   "author": "Harsh Keshri <harshkeshri1234567@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "npx concurrently \"yarn backend\" \"yarn frontend\"",
-    "build": "npx concurrently \"yarn backend:build\" \"yarn frontend:build\"",
+    "dev": "npx concurrently \"yarn ws\" \"yarn backend\" \"yarn frontend\"",
+    "build": "npx concurrently \"yarn ws:build\" \"yarn backend:build\" \"yarn frontend:build\"",
+    "ws": "cd ws && yarn dev",
     "backend": "cd backend && yarn dev",
     "frontend": "cd frontend && yarn dev",
+    "ws:build": "cd ws && yarn build",
     "backend:build": "cd backend && yarn build",
     "frontend:build": "cd frontend && yarn build",
     "format": "prettier --write ."
