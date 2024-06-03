@@ -19,6 +19,7 @@ model User {
 
   senderTransaction   Transaction[] @relation("sender")
   receiverTransaction Transaction[] @relation("receiver")
+  ClaimedSol          ClaimedSol[]
 }
 
 model Transaction {
@@ -32,6 +33,15 @@ model Transaction {
 
   sender   User @relation("sender", fields: [senderId], references: [id])
   receiver User @relation("receiver", fields: [recieverId], references: [id])
+}
+
+model ClaimedSol {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  walletAddress String
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum Status {
