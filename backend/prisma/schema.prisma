@@ -13,13 +13,29 @@ model User {
   name          String
   walletAddress String   @unique
   pin           String
+  walletBalance String   @default("0")
+  Locked        Boolean  @default(false)
   upiId         String   @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  senderTransaction   Transaction[] @relation("sender")
-  receiverTransaction Transaction[] @relation("receiver")
-  ClaimedSol          ClaimedSol[]
+  senderTransaction    Transaction[]          @relation("sender")
+  receiverTransaction  Transaction[]          @relation("receiver")
+  ClaimedSol           ClaimedSol[]
+  OperationTransaction OperationTransaction[]
+  Transaction          Transaction[]
+}
+
+model OperationTransaction {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  amount    String
+  signature String
+  operation OPERATION
+  status    Status    @default(PENDING)
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Transaction {
@@ -31,8 +47,10 @@ model Transaction {
   Status     Status   @default(PENDING)
   createdAt  DateTime @default(now())
 
-  sender   User @relation("sender", fields: [senderId], references: [id])
-  receiver User @relation("receiver", fields: [recieverId], references: [id])
+  sender   User  @relation("sender", fields: [senderId], references: [id])
+  receiver User  @relation("receiver", fields: [recieverId], references: [id])
+  User     User? @relation(fields: [userId], references: [id])
+  userId   Int?
 }
 
 model ClaimedSol {
@@ -48,6 +66,11 @@ enum Status {
   PENDING
   COMPLETED
   FAILED
+}
+
+enum OPERATION {
+  DEPOSIT
+  WITHDRAW
 }
 
 datasource db {
