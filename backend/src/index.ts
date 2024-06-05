@@ -5,6 +5,7 @@ import userRouter from './routes/user'
 import txnRouter from './routes/txn'
 import bodyParser from 'body-parser'
 import solRouter from './routes/sol'
+import operationRouter from './routes/operation'
 
 config()
 
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 app.use('/v1/claim', solRouter)
 app.use('/v1/user/', userRouter)
 app.use('/v1/txn/', txnRouter)
+app.use('/v1/operation/', operationRouter)
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err)

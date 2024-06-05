@@ -106,7 +106,12 @@ userRouter.post('/create-user', async (req, res) => {
     })
 
     const token = jwt.sign(
-      { walletAddress, upiId, name: user.name },
+      {
+        walletAddress,
+        upiId,
+        name: user.name,
+        walletBalance: user.walletBalance,
+      },
       process.env.JWT_SECRET ?? '',
     )
 
@@ -164,7 +169,12 @@ userRouter.post('/sign-in', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { walletAddress: user.walletAddress, upiId: user.upiId, name: user.name },
+      {
+        walletAddress: user.walletAddress,
+        upiId: user.upiId,
+        name: user.name,
+        walletBalance: user.walletBalance,
+      },
       process.env.JWT_SECRET ?? '',
     )
 
@@ -197,6 +207,7 @@ userRouter.get('/check-auth', authMiddleware, async (req, res) => {
         walletAddress: user.walletAddress,
         upiId: user.upiId,
         name: user.name,
+        walletBalance: user.walletBalance,
       },
     })
   } catch (e) {

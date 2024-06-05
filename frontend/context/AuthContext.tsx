@@ -25,6 +25,7 @@ interface AuthContextProps {
   updateBalance: () => void
   signIn: (formData: AuthFormData) => Promise<boolean>
   signUp: (formData: AuthFormData) => Promise<void>
+  handleDeposit: (lamports: number, pin?: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -47,7 +48,8 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   children,
 }) => {
   const { signMessage } = useWallet()
-  const { publicKey, balance, updateBalance, walletType } = useCustomWallet()
+  const { publicKey, balance, updateBalance, walletType, depositBalance } =
+    useCustomWallet()
   const [token, setToken] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>()
@@ -183,6 +185,33 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     }
   }
 
+  const handleDeposit = async (lamports: number, pin?: string) => {
+    setIsLoading(true)
+    try {
+      const signature = await depositBalance(lamports, pin)
+      const response = await axios.post(
+        `${BACKEND_URL}/v1/operation/deposit`,
+        {
+          lamports,
+          signature: dictToArray(signature),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      const responseData = response.data
+      if (responseData.success) {
+        updateBalance()
+      }
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const contextValue: AuthContextProps = {
     token,
     setToken,
@@ -193,6 +222,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     updateBalance,
     signIn,
     signUp,
+    handleDeposit,
   }
 
   return (
