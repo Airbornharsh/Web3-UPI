@@ -1,0 +1,192 @@
+{
+  "address": "5iwV4AcnutP5BPUbvzcsHYkzgzdPRcyEXEJLDA4i6a2L",
+  "metadata": {
+    "name": "solana_deposit_withdraw",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor",
+    "address": "5iwV4AcnutP5BPUbvzcsHYkzgzdPRcyEXEJLDA4i6a2L"
+  },
+  "instructions": [
+    {
+      "name": "create_user_account",
+      "discriminator": [146, 68, 100, 69, 63, 46, 182, 199],
+      "accounts": [
+        {
+          "name": "user_account",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "deposit",
+      "discriminator": [242, 35, 198, 137, 82, 225, 242, 182],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user_account",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "state",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "get_balance",
+      "discriminator": [5, 173, 180, 151, 243, 81, 233, 55],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user_account",
+          "writable": true
+        }
+      ],
+      "args": [],
+      "returns": "u64"
+    },
+    {
+      "name": "initialize",
+      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "admin",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "discriminator": [183, 18, 70, 156, 148, 109, 161, 34],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user_account",
+          "writable": true
+        },
+        {
+          "name": "vault",
+          "writable": true
+        },
+        {
+          "name": "state",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "State",
+      "discriminator": [216, 146, 107, 94, 104, 75, 182, 177]
+    },
+    {
+      "name": "UserAccount",
+      "discriminator": [211, 33, 136, 16, 186, 110, 242, 127]
+    }
+  ],
+  "types": [
+    {
+      "name": "State",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_funds",
+            "type": "u64"
+          },
+          {
+            "name": "users",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

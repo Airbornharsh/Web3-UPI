@@ -33,6 +33,7 @@ interface CustomWalletContextProps {
   updateBalance: () => void
   encodePrivateKey: (privateKey: string, pin: string) => string | null
   decodePrivateKey: (pin: string) => Keypair | null
+  getPrivateKey: (pin: string) => string | null
   getPublicKeyFromPrivateKey: (privateKey: string) => string | null
   disconnectPrivatWallet: () => void
   encodedPrivateKey: string
@@ -148,6 +149,16 @@ export const CustomWalletProvider: React.FC<
     }
   }
 
+  const getPrivateKey = (pin: string) => {
+    try {
+      const decodedPrivateKey = decryptMessage(encodedPrivateKey, pin)
+      return decodedPrivateKey
+    } catch (e) {
+      console.log(e)
+      return null
+    }
+  }
+
   // TODO: Implement Pin ASK
   const sendToken = async (
     recieverAddress: string,
@@ -238,6 +249,7 @@ export const CustomWalletProvider: React.FC<
     updateBalance,
     encodePrivateKey,
     decodePrivateKey,
+    getPrivateKey,
     getPublicKeyFromPrivateKey,
     disconnectPrivatWallet,
     encodedPrivateKey,

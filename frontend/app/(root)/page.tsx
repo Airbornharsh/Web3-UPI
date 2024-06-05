@@ -9,8 +9,8 @@ import axios from 'axios'
 
 export default function Home() {
   const { setToastMessage, setErrorToastMessage } = useLoader()
-  const { publicKey, updateBalance } = useCustomWallet()
-  const { token } = useAuth()
+  const { updateBalance } = useCustomWallet()
+  const { isAuthenticated, token } = useAuth()
 
   const claimSol = async () => {
     try {
@@ -32,19 +32,21 @@ export default function Home() {
   }
   return (
     <main className="flex flex-col items-center justify-center">
-      {publicKey && (
-        <Button
-          onClick={claimSol}
-          className="bg-primary hover:bg-primary-dark text-background mt-6"
-          style={{
-            padding: '10px 20px',
-            borderRadius: '10px',
-          }}
-        >
-          Claim 1 Sol for Testing
-        </Button>
+      {isAuthenticated && (
+        <>
+          <Button
+            onClick={claimSol}
+            className="bg-primary hover:bg-primary-dark text-background mt-6"
+            style={{
+              padding: '10px 20px',
+              borderRadius: '10px',
+            }}
+          >
+            Claim 1 Sol for Testing
+          </Button>
+          <Hero />
+        </>
       )}
-      <Hero />
     </main>
   )
 }
