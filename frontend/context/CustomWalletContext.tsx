@@ -261,14 +261,17 @@ export const CustomWalletProvider: React.FC<
             context: { slot: minContextSlot },
             value: { blockhash, lastValidBlockHeight },
           } = await connection.getLatestBlockhashAndContext()
+          console.log('Check 1')
           signature = await sendTransaction(txn, connection, {
             minContextSlot,
           })
+          console.log('Check 2')
           await connection.confirmTransaction({
             blockhash,
             lastValidBlockHeight,
             signature,
           })
+          console.log('Check 3')
         }
       }
     } catch (e) {

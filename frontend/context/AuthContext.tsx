@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   const [token, setToken] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>()
-  const { setIsLoading } = useLoader()
+  const { setIsLoading, setErrorToastMessage, setToastMessage } = useLoader()
 
   const checkAuth = async () => {
     setIsLoading(true)
@@ -190,12 +190,31 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   const handleDeposit = async (lamports: number, pin?: string) => {
     setIsLoading(true)
     try {
+      const preDepositResponse = await axios.post(
+        `${BACKEND_URL}/v1/operation/pre-deposit`,
+        {
+          lamports,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      const preDepositData = preDepositResponse.data
+      if (!preDepositData.status) {
+        throw new Error('Invalid Pre-Deposit')
+      }
       const signature = await depositBalance(lamports, pin)
+      if (!signature) {
+        throw new Error('Invalid Signature')
+      }
       const response = await axios.post(
         `${BACKEND_URL}/v1/operation/deposit`,
         {
           lamports,
-          signature: dictToArray(signature),
+          operationTransactionId: preDepositData.operation.id,
+          signature: signature,
         },
         {
           headers: {
@@ -204,12 +223,16 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
         },
       )
       const responseData = response.data
-      if (responseData.success) {
+      if (responseData.status) {
         setUser(responseData.user)
         updateBalance()
+        setToastMessage('Deposited')
+      } else {
+        setErrorToastMessage('Error')
       }
     } catch (e) {
       console.log(e)
+      setErrorToastMessage('Error')
     } finally {
       setIsLoading(false)
     }
@@ -230,7 +253,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
         },
       )
       const responseData = response.data
-      if (responseData.success) {
+      if (responseData.status) {
         setUser(responseData.user)
         updateBalance()
       }

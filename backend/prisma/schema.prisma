@@ -69,6 +69,7 @@ enum Status {
 }
 
 enum OPERATION {
+  PREDEPOSIT
   DEPOSIT
   WITHDRAW
 }

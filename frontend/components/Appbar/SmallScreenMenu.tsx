@@ -6,7 +6,7 @@ import { useState } from 'react'
 import Hamburger from 'hamburger-react'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { useLoader } from '@/context/LoaderContext'
-import { URL } from '@/utils/config'
+import { BASE_LAMPORTS, URL } from '@/utils/config'
 import FormButton from '../ui/buttons/FormButton'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -55,7 +55,11 @@ const SmallScreenMenu = () => {
                 <div className="flex items-center text-sm font-semibold text-gray-700">
                   <span className="flex flex-col">
                     <span>Bal: {balance} SOL</span>
-                    <span>Wallet: {user?.walletBalance || 0} SOL</span>
+                    <span>
+                      Wallet:{' '}
+                      {(parseInt(user?.walletBalance!) || 0) / BASE_LAMPORTS}{' '}
+                      SOL
+                    </span>
                   </span>
                   <span
                     className="ml-2 cursor-pointer text-blue-500 hover:text-blue-700"

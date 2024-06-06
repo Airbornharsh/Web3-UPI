@@ -13,7 +13,7 @@ const OperationModal = () => {
   const { operationOpen, setOperationOpen, setIsLoading, setOpenPin } =
     useLoader()
   const { walletType } = useCustomWallet()
-  const { handleDeposit,handleWithraw } = useAuth()
+  const { handleDeposit, handleWithraw } = useAuth()
   const [operationType, setOperationType] = useState<'DEPOSIT' | 'WITHRAW'>(
     'DEPOSIT',
   )
@@ -118,7 +118,7 @@ const OperationModal = () => {
                     },
                   })
                 }
-              }else{
+              } else {
                 handleWithrawHandler()
               }
             }}

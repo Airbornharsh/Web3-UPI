@@ -68,7 +68,7 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
     toast.error(message, {
       position: 'top-right',
       autoClose: 2000,
-    })  
+    })
   }
 
   const contextValue: LoaderContextProps = {
