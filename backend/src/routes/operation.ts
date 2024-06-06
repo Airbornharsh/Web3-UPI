@@ -435,9 +435,26 @@ operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
       })
     }
 
+    const serverTxnFee = (await calculateTransactionFee()) * BASE_LAMPORTS
+    const withdrawerLamports = Math.floor(
+      (100 * (parseInt(lamports) - serverTxnFee)) /
+        (100 + CONVENIENCE_FEE_PERCENTAGE),
+    )
+    const fee =
+      serverTxnFee +
+      Math.floor((withdrawerLamports * CONVENIENCE_FEE_PERCENTAGE) / 100)
+
+    if (withdrawerLamports <= 0) {
+      return res.status(400).json({
+        message: 'Invalid amount',
+        status: false,
+      })
+    }
+
     const withdrawOperation = await prisma.operationTransaction.create({
       data: {
-        amount: lamports.toString(),
+        amount: withdrawerLamports.toString(),
+        fee: fee.toString(),
         signature: '',
         status: 'PENDING',
         userId: withdrawer.id,
@@ -480,21 +497,6 @@ operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
       })
     }
 
-    if (parseInt(withdrawer.walletBalance) < lamports) {
-      await prisma.operationTransaction.update({
-        where: {
-          id: withdrawOperation.id,
-        },
-        data: {
-          status: 'FAILED',
-        },
-      })
-      return res.status(400).json({
-        message: 'Insufficient balance',
-        status: false,
-      })
-    }
-
     await prisma.user.update({
       where: {
         id: withdrawer.id,
@@ -504,13 +506,69 @@ operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
       },
     })
 
+    const newWithdrawer = await prisma.user.findFirst({
+      where: {
+        walletAddress: senderUser.walletAddress,
+      },
+    })
+
+    if (!newWithdrawer) {
+      await prisma.$transaction([
+        prisma.user.update({
+          where: {
+            id: withdrawer.id,
+          },
+          data: {
+            Locked: false,
+          },
+        }),
+        prisma.operationTransaction.update({
+          where: {
+            id: withdrawOperation.id,
+          },
+          data: {
+            status: 'FAILED',
+          },
+        }),
+      ])
+      return res.status(404).json({
+        message: 'User not found',
+        status: false,
+      })
+    }
+
+    if (parseInt(newWithdrawer.walletBalance) < lamports) {
+      await prisma.$transaction([
+        prisma.user.update({
+          where: {
+            id: withdrawer.id,
+          },
+          data: {
+            Locked: false,
+          },
+        }),
+        prisma.operationTransaction.update({
+          where: {
+            id: withdrawOperation.id,
+          },
+          data: {
+            status: 'FAILED',
+          },
+        }),
+      ])
+      return res.status(400).json({
+        message: 'Insufficient balance',
+        status: false,
+      })
+    }
+
     const wallet = VAULT_WALLET()
 
     const transaction = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: wallet.publicKey,
         toPubkey: new PublicKey(withdrawer.walletAddress),
-        lamports,
+        lamports: withdrawerLamports,
       }),
     )
     const signature = await sendAndConfirmTransaction(connection, transaction, [
@@ -523,35 +581,72 @@ operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
 
     if (
       (txn?.meta?.postBalances[1] ?? 0) - (txn?.meta?.preBalances[1] ?? 0) !==
-        lamports &&
-      (txn?.meta?.preBalances[0] ?? 0) - (txn?.meta?.postBalances[0] ?? 0) !==
-        lamports
+      withdrawerLamports
     ) {
-      await prisma.user.update({
-        where: {
-          id: withdrawer.id,
-        },
-        data: {
-          Locked: false,
-        },
-      })
-      await prisma.operationTransaction.update({
-        where: {
-          id: withdrawOperation.id,
-        },
-        data: {
-          status: 'FAILED',
-        },
-      })
+      await prisma.$transaction([
+        prisma.user.update({
+          where: {
+            id: withdrawer.id,
+          },
+          data: {
+            Locked: false,
+          },
+        }),
+        prisma.operationTransaction.update({
+          where: {
+            id: withdrawOperation.id,
+          },
+          data: {
+            status: 'FAILED',
+          },
+        }),
+      ])
       return res.status(400).json({
         message: 'Invalid Transaction',
         status: false,
       })
     }
 
+    await prisma.$transaction([
+      prisma.user.update({
+        where: {
+          id: withdrawer.id,
+        },
+        data: {
+          Locked: false,
+          walletBalance: (
+            parseInt(newWithdrawer.walletBalance) - lamports
+          ).toString(),
+        },
+      }),
+      prisma.operationTransaction.update({
+        where: {
+          id: withdrawOperation.id,
+        },
+        data: {
+          status: 'COMPLETED',
+          signature,
+        },
+      }),
+    ])
+
+    const user = await prisma.user.findFirst({
+      where: {
+        walletAddress: senderUser.walletAddress,
+      },
+    })
+
     return res.status(200).json({
       message: 'withdrawed',
       status: true,
+      user: {
+        walletBalance: user?.walletBalance,
+        walletAddress: user?.walletAddress,
+        id: user?.Locked,
+        upiId: user?.upiId,
+        craetedAt: user?.createdAt,
+        updatedAt: user?.updatedAt,
+      },
     })
   } catch (e) {
     console.log(e)
