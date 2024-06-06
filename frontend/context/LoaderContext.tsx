@@ -1,5 +1,4 @@
 import LoaderModal from '@/components/ui/modals/LoaderModal'
-import OperationModal from '@/components/ui/modals/OperationModal'
 import PinModal from '@/components/ui/modals/PinModal'
 import QrCodeViewModal from '@/components/ui/modals/QrCodeViewModal'
 import QrScanModal from '@/components/ui/modals/QrScanModal'
@@ -69,7 +68,7 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
     toast.error(message, {
       position: 'top-right',
       autoClose: 2000,
-    })
+    })  
   }
 
   const contextValue: LoaderContextProps = {
@@ -96,7 +95,6 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
       <PinModal />
       <QrScanModal />
       <QrCodeViewModal />
-      <OperationModal />
       <ToastContainer />
     </LoaderContext.Provider>
   )

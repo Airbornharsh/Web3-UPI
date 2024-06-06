@@ -14,6 +14,7 @@ import { BACKEND_URL, BASE_LAMPORTS, RPC_URL } from '@/utils/config'
 import { useCustomWallet } from './CustomWalletContext'
 import { WalletType } from '@/utils/enum'
 import { dictToArray } from '@/utils/fn'
+import OperationModal from '@/components/ui/modals/OperationModal'
 
 interface AuthContextProps {
   token: string
@@ -26,6 +27,7 @@ interface AuthContextProps {
   signIn: (formData: AuthFormData) => Promise<boolean>
   signUp: (formData: AuthFormData) => Promise<void>
   handleDeposit: (lamports: number, pin?: string) => Promise<void>
+  handleWithraw: (lamports: number) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -203,6 +205,33 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       )
       const responseData = response.data
       if (responseData.success) {
+        setUser(responseData.user)
+        updateBalance()
+      }
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleWithraw = async (lamports: number, pin?: string) => {
+    setIsLoading(true)
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/v1/operation/withraw`,
+        {
+          lamports,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      const responseData = response.data
+      if (responseData.success) {
+        setUser(responseData.user)
         updateBalance()
       }
     } catch (e) {
@@ -223,9 +252,13 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     signIn,
     signUp,
     handleDeposit,
+    handleWithraw,
   }
 
   return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>
+      {children}
+      <OperationModal />
+    </AuthContext.Provider>
   )
 }
