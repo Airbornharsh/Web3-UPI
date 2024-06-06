@@ -13,7 +13,7 @@ const OperationModal = () => {
   const { operationOpen, setOperationOpen, setIsLoading, setOpenPin } =
     useLoader()
   const { walletType } = useCustomWallet()
-  const { handleDeposit } = useAuth()
+  const { handleDeposit,handleWithraw } = useAuth()
   const [operationType, setOperationType] = useState<'DEPOSIT' | 'WITHRAW'>(
     'DEPOSIT',
   )
@@ -27,9 +27,17 @@ const OperationModal = () => {
     }
   }
 
-  const handleOperation = async ({ pin }: { pin?: string }) => {
+  const handleDepositHandler = async ({ pin }: { pin?: string }) => {
     try {
       await handleDeposit(Number(amount) * BASE_LAMPORTS, pin)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const handleWithrawHandler = async () => {
+    try {
+      await handleWithraw(Number(amount) * BASE_LAMPORTS)
     } catch (e) {
       console.log(e)
     }
@@ -56,7 +64,7 @@ const OperationModal = () => {
             }}
             disabled={operationType === 'DEPOSIT'}
             type="button"
-            className={`bg-secondary border-primary w-full border-[0.01rem] ${operationType === 'DEPOSIT' ? 'bg-primary-dark border-0' : ''}`}
+            className={`border-primary w-full border-[0.01rem] ${operationType === 'DEPOSIT' ? 'bg-primary-dark border-0' : 'bg-secondary'}`}
           />
           <span>/</span>
           <FormButton
@@ -66,7 +74,7 @@ const OperationModal = () => {
             }}
             disabled={operationType === 'WITHRAW'}
             type="button"
-            className={`bg-secondary border-primary w-full border-[0.01rem] ${operationType === 'WITHRAW' ? 'bg-primary-dark border-0' : ''}`}
+            className={`border-primary w-full border-[0.01rem] ${operationType === 'WITHRAW' ? 'bg-primary-dark border-0' : 'bg-secondary'}`}
           />
         </div>
         <div className="flex w-full flex-col gap-2">
@@ -94,20 +102,24 @@ const OperationModal = () => {
           <FormButton
             name="Checkout"
             onClick={() => {
-              if (walletType === WalletType.DEFAULT) {
-                handleOperation({
-                  pin: '',
-                })
-              } else {
-                setIsLoading(true)
-                setOpenPin({
-                  open: true,
-                  fn: (pin: string) => {
-                    handleOperation({
-                      pin,
-                    })
-                  },
-                })
+              if (operationType === 'DEPOSIT') {
+                if (walletType === WalletType.DEFAULT) {
+                  handleDepositHandler({
+                    pin: '',
+                  })
+                } else {
+                  setIsLoading(true)
+                  setOpenPin({
+                    open: true,
+                    fn: (pin: string) => {
+                      handleDepositHandler({
+                        pin,
+                      })
+                    },
+                  })
+                }
+              }else{
+                handleWithrawHandler()
               }
             }}
             type="button"
