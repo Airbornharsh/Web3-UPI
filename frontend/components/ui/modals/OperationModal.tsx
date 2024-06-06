@@ -1,23 +1,35 @@
 'use client'
 import { useLoader } from '@/context/LoaderContext'
-import { Modal } from '@mui/material'
+import { CircularProgress, Modal } from '@mui/material'
 import FormButton from '../buttons/FormButton'
 import { useState } from 'react'
 import FormInput from '../inputs/FormInput'
 import { WalletType } from '@/utils/enum'
 import { useAuth } from '@/context/AuthContext'
-import { BASE_LAMPORTS } from '@/utils/config'
+import { BACKEND_URL, BASE_LAMPORTS } from '@/utils/config'
 import { useCustomWallet } from '@/context/CustomWalletContext'
+import axios from 'axios'
 
 const OperationModal = () => {
   const { operationOpen, setOperationOpen, setIsLoading, setOpenPin } =
     useLoader()
-  const { walletType } = useCustomWallet()
-  const { handleDeposit, handleWithraw } = useAuth()
+  const { walletType, solPrice, getSolPrice } = useCustomWallet()
+  const { token, handleDeposit, handleWithraw } = useAuth()
   const [operationType, setOperationType] = useState<'DEPOSIT' | 'WITHRAW'>(
     'DEPOSIT',
   )
   const [amount, setAmount] = useState<string>('0')
+  const [withrawAmounts, setWithrawAmounts] = useState<{
+    lamports: string
+    fees: string
+    valid: boolean
+    loading: boolean
+  }>({
+    lamports: '0',
+    fees: '0',
+    valid: false,
+    loading: false,
+  })
 
   const isValidAmount = (amount: string) => {
     if (!isNaN(Number(amount))) {
@@ -25,6 +37,7 @@ const OperationModal = () => {
     } else if (Number(amount) <= 0) {
       return false
     }
+    return true
   }
 
   const handleDepositHandler = async ({ pin }: { pin?: string }) => {
@@ -32,6 +45,51 @@ const OperationModal = () => {
       await handleDeposit(Number(amount) * BASE_LAMPORTS, pin)
     } catch (e) {
       console.log(e)
+    }
+  }
+
+  const isWithrawValid = async (amount: string) => {
+    setWithrawAmounts({
+      ...withrawAmounts,
+      loading: true,
+    })
+    try {
+      const isWithrawResponse = await axios.post(
+        `${BACKEND_URL}/v1/operation/iswithraw`,
+        {
+          lamports: Number(amount) * BASE_LAMPORTS,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+
+      const responseData = isWithrawResponse.data
+      if (responseData.status) {
+        setWithrawAmounts({
+          lamports: responseData.lamports,
+          fees: responseData.fees,
+          valid: true,
+          loading: false,
+        })
+      } else {
+        setWithrawAmounts({
+          lamports: '0',
+          fees: '0',
+          valid: false,
+          loading: false,
+        })
+      }
+    } catch (e) {
+      console.log(e)
+      setWithrawAmounts({
+        lamports: '0',
+        fees: '0',
+        valid: false,
+        loading: false,
+      })
     }
   }
 
@@ -71,6 +129,7 @@ const OperationModal = () => {
             name="Withraw"
             onClick={() => {
               setOperationType('WITHRAW')
+              isWithrawValid(amount)
             }}
             disabled={operationType === 'WITHRAW'}
             type="button"
@@ -92,6 +151,9 @@ const OperationModal = () => {
                 if (Number(val) < 0) {
                   return
                 }
+                if (operationType === 'WITHRAW') {
+                  isWithrawValid(val)
+                }
                 setAmount(val)
               }}
             />
@@ -99,32 +161,71 @@ const OperationModal = () => {
               SOL
             </span>
           </div>
-          <FormButton
-            name="Checkout"
-            onClick={() => {
-              if (operationType === 'DEPOSIT') {
-                if (walletType === WalletType.DEFAULT) {
-                  handleDepositHandler({
-                    pin: '',
-                  })
+          {operationType === 'WITHRAW' && (
+            <div className="flex w-full flex-col gap-2">
+              <div className="flex w-full items-center gap-2">
+                <span>
+                  Sol: {parseInt(withrawAmounts.lamports) / BASE_LAMPORTS}
+                </span>
+                <span>
+                  Fees: {parseInt(withrawAmounts.fees) / BASE_LAMPORTS}
+                </span>
+              </div>
+              <div className="flex w-full items-center gap-2">
+                <span>
+                  Sol($):{' '}
+                  {(
+                    (parseInt(withrawAmounts.lamports) / BASE_LAMPORTS) *
+                    solPrice
+                  ).toFixed(2)}
+                </span>
+                <span>
+                  Fees($):{' '}
+                  {(
+                    (parseInt(withrawAmounts.fees) / BASE_LAMPORTS) *
+                    solPrice
+                  ).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          )}
+          {operationType === 'WITHRAW' && withrawAmounts.loading ? (
+            <div className="bg-primary-dark flex h-10 w-full items-center justify-center">
+              {/* <span className="text-background">Loading...</span> */}
+              <CircularProgress color="primary" />
+            </div>
+          ) : (
+            <FormButton
+              name="Checkout"
+              onClick={() => {
+                if (operationType === 'DEPOSIT') {
+                  if (walletType === WalletType.DEFAULT) {
+                    handleDepositHandler({
+                      pin: '',
+                    })
+                  } else {
+                    setIsLoading(true)
+                    setOpenPin({
+                      open: true,
+                      fn: (pin: string) => {
+                        handleDepositHandler({
+                          pin,
+                        })
+                      },
+                    })
+                  }
                 } else {
-                  setIsLoading(true)
-                  setOpenPin({
-                    open: true,
-                    fn: (pin: string) => {
-                      handleDepositHandler({
-                        pin,
-                      })
-                    },
-                  })
+                  handleWithrawHandler()
                 }
-              } else {
-                handleWithrawHandler()
+              }}
+              type="button"
+              className={`w-full ${isValidAmount(amount) ? 'bg-primary-dark' : 'bg-primary'}`}
+              disabled={
+                !isValidAmount(amount) &&
+                (operationType === 'DEPOSIT' ? false : !withrawAmounts.valid)
               }
-            }}
-            type="button"
-            className={`w-full ${isValidAmount(amount) ? 'bg-primary-dark' : 'bg-primary'}`}
-          />
+            />
+          )}
         </div>
       </div>
     </Modal>

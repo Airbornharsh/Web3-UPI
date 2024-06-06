@@ -1,8 +1,24 @@
 import { Router } from 'express'
-import { getTransactionWithRetry } from '../utils/connection'
+import {
+  calculateTransactionFee,
+  getTransactionWithRetry,
+} from '../utils/connection'
 import { authMiddleware } from '../middleware'
 import prisma from '../prisma'
-import { VAULT_WALLET } from '../config'
+import {
+  BASE_LAMPORTS,
+  CONVENIENCE_FEE_PERCENTAGE,
+  RPC_URL,
+  VAULT_WALLET,
+  connection,
+} from '../config'
+import {
+  Connection,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  sendAndConfirmTransaction,
+} from '@solana/web3.js'
 
 const operationRouter = Router()
 
@@ -325,10 +341,216 @@ operationRouter.post('/deposit', authMiddleware, async (req, res) => {
   }
 })
 
-operationRouter.post('/withraw', async (req, res) => {
+operationRouter.post('/iswithraw', authMiddleware, async (req, res) => {
   try {
+    const { lamports } = req.body
+    const user = res.locals.user
+
+    if (!lamports) {
+      return res.status(400).json({
+        message: 'Amount is required',
+        status: false,
+      })
+    }
+
+    const withdrawer = await prisma.user.findFirst({
+      where: {
+        walletAddress: user.walletAddress,
+      },
+    })
+
+    if (!withdrawer) {
+      return res.status(404).json({
+        message: 'User not found',
+        status: false,
+      })
+    }
+
+    const serverTxnFee = (await calculateTransactionFee()) * BASE_LAMPORTS
+    const withdrawerLamports = Math.floor(
+      (100 * (parseInt(lamports) - serverTxnFee)) /
+        (100 + CONVENIENCE_FEE_PERCENTAGE),
+    )
+
+    if (withdrawerLamports <= 0) {
+      return res.status(400).json({
+        message: 'Invalid amount',
+        status: false,
+      })
+    }
+
+    if (parseInt(withdrawer.walletBalance) < lamports) {
+      return res.status(400).json({
+        message: 'Insufficient balance',
+        status: false,
+      })
+    }
+
     return res.status(200).json({
-      message: 'Withrawed',
+      message: 'Withdrawable',
+      status: true,
+      lamports: withdrawerLamports,
+      fees:
+        serverTxnFee +
+        Math.floor((withdrawerLamports * CONVENIENCE_FEE_PERCENTAGE) / 100),
+    })
+  } catch (e) {
+    console.log(e)
+    return res.status(500).json({
+      message: 'Txn Error',
+      status: false,
+    })
+  }
+})
+
+operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
+  try {
+    const { lamports } = req.body
+    const senderUser = res.locals.user
+
+    if (!lamports) {
+      return res.status(400).json({
+        message: 'Amount is required',
+        status: false,
+      })
+    }
+
+    if (lamports <= 0) {
+      return res.status(400).json({
+        message: 'Invalid amount',
+        status: false,
+      })
+    }
+
+    const withdrawer = await prisma.user.findFirst({
+      where: {
+        walletAddress: senderUser.walletAddress,
+      },
+    })
+
+    if (!withdrawer) {
+      return res.status(404).json({
+        message: 'User not found',
+        status: false,
+      })
+    }
+
+    const withdrawOperation = await prisma.operationTransaction.create({
+      data: {
+        amount: lamports.toString(),
+        signature: '',
+        status: 'PENDING',
+        userId: withdrawer.id,
+        operation: 'WITHDRAW',
+      },
+    })
+
+    let withdrawerLocked = withdrawer?.Locked
+    let tries = 10
+    while (withdrawerLocked && tries > 0) {
+      console.log('Waiting for user to unlock', 10 - tries)
+      await new Promise((resolve) => setTimeout(resolve, 4000))
+      const tempwithdrawer = await prisma.user.findFirst({
+        where: {
+          walletAddress: senderUser.walletAddress,
+        },
+      })
+      if (!tempwithdrawer) {
+        return res.status(404).json({
+          message: 'User not found',
+          status: false,
+        })
+      }
+      withdrawerLocked = tempwithdrawer?.Locked!
+      tries--
+    }
+
+    if (withdrawerLocked) {
+      await prisma.operationTransaction.update({
+        where: {
+          id: withdrawOperation.id,
+        },
+        data: {
+          status: 'FAILED',
+        },
+      })
+      return res.status(400).json({
+        message: 'User is locked',
+        status: false,
+      })
+    }
+
+    if (parseInt(withdrawer.walletBalance) < lamports) {
+      await prisma.operationTransaction.update({
+        where: {
+          id: withdrawOperation.id,
+        },
+        data: {
+          status: 'FAILED',
+        },
+      })
+      return res.status(400).json({
+        message: 'Insufficient balance',
+        status: false,
+      })
+    }
+
+    await prisma.user.update({
+      where: {
+        id: withdrawer.id,
+      },
+      data: {
+        Locked: true,
+      },
+    })
+
+    const wallet = VAULT_WALLET()
+
+    const transaction = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: wallet.publicKey,
+        toPubkey: new PublicKey(withdrawer.walletAddress),
+        lamports,
+      }),
+    )
+    const signature = await sendAndConfirmTransaction(connection, transaction, [
+      wallet,
+    ])
+
+    const txn = await getTransactionWithRetry(signature, {
+      maxSupportedTransactionVersion: 1,
+    })
+
+    if (
+      (txn?.meta?.postBalances[1] ?? 0) - (txn?.meta?.preBalances[1] ?? 0) !==
+        lamports &&
+      (txn?.meta?.preBalances[0] ?? 0) - (txn?.meta?.postBalances[0] ?? 0) !==
+        lamports
+    ) {
+      await prisma.user.update({
+        where: {
+          id: withdrawer.id,
+        },
+        data: {
+          Locked: false,
+        },
+      })
+      await prisma.operationTransaction.update({
+        where: {
+          id: withdrawOperation.id,
+        },
+        data: {
+          status: 'FAILED',
+        },
+      })
+      return res.status(400).json({
+        message: 'Invalid Transaction',
+        status: false,
+      })
+    }
+
+    return res.status(200).json({
+      message: 'withdrawed',
       status: true,
     })
   } catch (e) {

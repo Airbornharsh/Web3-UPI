@@ -32,6 +32,7 @@ model OperationTransaction {
   amount    String
   signature String
   operation OPERATION
+  fee       String    @default("0")
   status    Status    @default(PENDING)
   createdAt DateTime  @default(now())
 

@@ -173,10 +173,10 @@ export const CustomWalletProvider: React.FC<
             lamports,
           }),
         )
-        // signature = await sendAndConfirmTransaction(connection, transaction, [
-        //   wallet,
-        // ])
-        signature = await connection.sendTransaction(transaction, [wallet])
+        signature = await sendAndConfirmTransaction(connection, transaction, [
+          wallet,
+        ])
+        // signature = await connection.sendTransaction(transaction, [wallet])
       } else if (walletType === WalletType.DEFAULT) {
         if (wallet) {
           const txn = new Transaction().add(

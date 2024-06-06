@@ -1,4 +1,8 @@
-import { Connection, VersionedTransactionResponse } from '@solana/web3.js'
+import {
+  Connection,
+  LAMPORTS_PER_SOL,
+  VersionedTransactionResponse,
+} from '@solana/web3.js'
 import { RPC_URL } from '../config'
 
 const connection = new Connection(RPC_URL ?? '')
@@ -30,4 +34,16 @@ async function getTransactionWithRetry(
   throw new Error(`Failed to fetch transaction after ${maxRetries} attempts`)
 }
 
-export { getTransactionWithRetry }
+const calculateTransactionFee = async (
+  transactionCount: number = 1,
+): Promise<number> => {
+  const feeCalculator = await connection.getRecentBlockhash()
+  const lamportsPerSignature = feeCalculator.feeCalculator.lamportsPerSignature
+
+  const totalFeeLamports = lamportsPerSignature * transactionCount
+  const totalFeeSOL = totalFeeLamports / LAMPORTS_PER_SOL
+
+  return totalFeeSOL
+}
+
+export { getTransactionWithRetry, calculateTransactionFee }
