@@ -4,17 +4,20 @@ import CustomWalletMultiButton from '../wallet/CustomWalletMultiButton'
 import { useAuth } from '@/context/AuthContext'
 import { useState } from 'react'
 import Hamburger from 'hamburger-react'
-import { Button } from '@mui/material'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { useLoader } from '@/context/LoaderContext'
-import { URL } from '@/utils/config'
+import { BASE_LAMPORTS, URL } from '@/utils/config'
 import FormButton from '../ui/buttons/FormButton'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 const SmallScreenMenu = () => {
-  const { setQrCodeOpenData } = useLoader()
+  const { setQrCodeOpenData, setOperationOpen } = useLoader()
   const { publicKey } = useCustomWallet()
   const { user, balance, updateBalance, isAuthenticated } = useAuth()
   const [open, setOpen] = useState(false)
+
+  const router = useRouter()
 
   return (
     <div className="flex items-center gap-2 py-2 pr-4 text-xl">
@@ -50,7 +53,14 @@ const SmallScreenMenu = () => {
                   )}
                 </div>
                 <div className="flex items-center text-sm font-semibold text-gray-700">
-                  <span>Bal: {balance} SOL</span>
+                  <span className="flex flex-col">
+                    <span>Bal: {balance} SOL</span>
+                    <span>
+                      Wallet:{' '}
+                      {(parseInt(user?.walletBalance!) || 0) / BASE_LAMPORTS}{' '}
+                      SOL
+                    </span>
+                  </span>
                   <span
                     className="ml-2 cursor-pointer text-blue-500 hover:text-blue-700"
                     onClick={updateBalance}
@@ -81,14 +91,25 @@ const SmallScreenMenu = () => {
               // >
               //   Show QR
               // </Button>
-              <FormButton
-                name="Show QR"
-                onClick={() => {
-                  setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
-                }}
-                disabled={!user?.upiId}
-                type="button"
-              />
+              <div className="flex flex-col gap-2">
+                <FormButton
+                  name="Deposit/Withraw"
+                  onClick={() => {
+                    setOpen(false)
+                    setOperationOpen(true)
+                  }}
+                  disabled={!user?.upiId}
+                  type="button"
+                />
+                <FormButton
+                  name="Show QR"
+                  onClick={() => {
+                    setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
+                  }}
+                  disabled={!user?.upiId}
+                  type="button"
+                />
+              </div>
             ) : null}
           </div>
         </div>

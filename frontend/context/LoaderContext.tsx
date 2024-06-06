@@ -21,6 +21,8 @@ interface LoaderContextProps {
   setQrCodeOpenData: (data: string) => void
   qrCodeScanOpen: boolean
   setQrCodeScanOpen: (open: boolean) => void
+  operationOpen: boolean
+  setOperationOpen: (open: boolean) => void
 }
 
 const LoaderContext = createContext<LoaderContextProps | undefined>(undefined)
@@ -53,6 +55,7 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
   })
   const [qrCodeOpenData, setQrCodeOpenData] = useState<string>('')
   const [qrCodeScanOpen, setQrCodeScanOpen] = useState<boolean>(false)
+  const [operationOpen, setOperationOpen] = useState<boolean>(false)
 
   const setToastMessage = (message: string) => {
     toast.success(message, {
@@ -81,6 +84,8 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
     setQrCodeOpenData,
     qrCodeScanOpen,
     setQrCodeScanOpen,
+    operationOpen,
+    setOperationOpen,
   }
 
   return (

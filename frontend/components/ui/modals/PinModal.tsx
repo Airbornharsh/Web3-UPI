@@ -1,6 +1,9 @@
 import { useLoader } from '@/context/LoaderContext'
 import { Modal } from '@mui/material'
 import React, { useState } from 'react'
+import FormInput from '../inputs/FormInput'
+import FormLabel from '../labels/FormLabel'
+import FormButton from '../buttons/FormButton'
 
 const PinModal = () => {
   const { openPin, setOpenPin } = useLoader()
@@ -19,35 +22,32 @@ const PinModal = () => {
         justifyContent: 'center',
       }}
     >
-      <form className="flex flex-col gap-1 rounded bg-gray-100 px-6 py-4">
-        <label className="font-semibold">Pin:</label>
-        <input
-          type="text"
-          name="upiId"
-          className="rounded border border-slate-400 border-opacity-50 p-2 outline-none focus:border-opacity-100"
+      <form className="bg-secondary flex w-[90vw] max-w-[15rem] flex-col gap-2 rounded-lg bg-gray-100 px-6 py-4">
+        <FormLabel name={'PIN'} />
+        <FormInput
           value={pin}
-          onChange={(e) => {
-            if (e.target.value.length > 6) {
+          onChange={(val) => {
+            if (val.length > 6) {
               return
             }
-            if (isNaN(Number(e.target.value))) {
+            if (isNaN(Number(val))) {
               return
             }
-            setPin(e.target.value)
+            setPin(val)
           }}
+          name="pin"
+          type={'text'}
         />
-        <button
-          className="rounded bg-blue-500 p-2 text-white"
-          onClick={(e) => {
-            e.preventDefault()
+        <FormButton
+          name="Submit"
+          onClick={() => {
             openPin.fn(pin)
             setPin('')
             setOpenPin({ open: false, fn: () => {} })
           }}
-          disabled={!(pin.length === 6)}
-        >
-          Submit
-        </button>
+          disabled={!pin.length || pin.length < 6}
+          type="submit"
+        />
       </form>
     </Modal>
   )

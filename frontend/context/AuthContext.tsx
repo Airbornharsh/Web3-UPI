@@ -14,6 +14,7 @@ import { BACKEND_URL, BASE_LAMPORTS, RPC_URL } from '@/utils/config'
 import { useCustomWallet } from './CustomWalletContext'
 import { WalletType } from '@/utils/enum'
 import { dictToArray } from '@/utils/fn'
+import OperationModal from '@/components/ui/modals/OperationModal'
 
 interface AuthContextProps {
   token: string
@@ -25,6 +26,8 @@ interface AuthContextProps {
   updateBalance: () => void
   signIn: (formData: AuthFormData) => Promise<boolean>
   signUp: (formData: AuthFormData) => Promise<void>
+  handleDeposit: (lamports: number, pin?: string) => Promise<void>
+  handleWithraw: (lamports: number) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -47,11 +50,12 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   children,
 }) => {
   const { signMessage } = useWallet()
-  const { publicKey, balance, updateBalance, walletType } = useCustomWallet()
+  const { publicKey, balance, updateBalance, walletType, depositBalance } =
+    useCustomWallet()
   const [token, setToken] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>()
-  const { setIsLoading } = useLoader()
+  const { setIsLoading, setErrorToastMessage, setToastMessage } = useLoader()
 
   const checkAuth = async () => {
     setIsLoading(true)
@@ -183,6 +187,87 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     }
   }
 
+  const handleDeposit = async (lamports: number, pin?: string) => {
+    setIsLoading(true)
+    try {
+      const preDepositResponse = await axios.post(
+        `${BACKEND_URL}/v1/operation/pre-deposit`,
+        {
+          lamports,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      const preDepositData = preDepositResponse.data
+      if (!preDepositData.status) {
+        throw new Error('Invalid Pre-Deposit')
+      }
+      const signature = await depositBalance(lamports, pin)
+      if (!signature) {
+        throw new Error('Invalid Signature')
+      }
+      const response = await axios.post(
+        `${BACKEND_URL}/v1/operation/deposit`,
+        {
+          lamports,
+          operationTransactionId: preDepositData.operation.id,
+          signature: signature,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      const responseData = response.data
+      if (responseData.status) {
+        setUser(responseData.user)
+        updateBalance()
+        setToastMessage('Deposited')
+      } else {
+        setErrorToastMessage('Error')
+      }
+    } catch (e) {
+      console.log(e)
+      setErrorToastMessage('Error')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleWithraw = async (lamports: number, pin?: string) => {
+    setIsLoading(true)
+    try {
+      const response = await axios.post(
+        `${BACKEND_URL}/v1/operation/withdraw`,
+        {
+          lamports,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      const responseData = response.data
+      if (responseData.status) {
+        setUser(responseData.user)
+        updateBalance()
+        setToastMessage('Withrawed')
+      } else {
+        setErrorToastMessage('Error')
+      }
+    } catch (e) {
+      console.log(e)
+      setErrorToastMessage('Error')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const contextValue: AuthContextProps = {
     token,
     setToken,
@@ -193,9 +278,14 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     updateBalance,
     signIn,
     signUp,
+    handleDeposit,
+    handleWithraw,
   }
 
   return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>
+      {children}
+      <OperationModal />
+    </AuthContext.Provider>
   )
 }

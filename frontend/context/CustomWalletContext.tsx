@@ -14,7 +14,7 @@ import {
   Message,
   sendAndConfirmTransaction,
 } from '@solana/web3.js'
-import { BASE_LAMPORTS } from '@/utils/config'
+import { BASE_LAMPORTS, VAULT_ADDRESS } from '@/utils/config'
 import { WalletType } from '@/utils/enum'
 import base58 from 'bs58'
 import { decryptMessage, encryptMessage } from '@/utils/encrypt'
@@ -38,6 +38,7 @@ interface CustomWalletContextProps {
   encodedPrivateKey: string
   solPrice: number
   getSolPrice: () => void
+  depositBalance: (lamports: number, pin?: string) => Promise<string>
 }
 
 const CustomWalletContext = createContext<CustomWalletContextProps | undefined>(
@@ -172,10 +173,10 @@ export const CustomWalletProvider: React.FC<
             lamports,
           }),
         )
-        // signature = await sendAndConfirmTransaction(connection, transaction, [
-        //   wallet,
-        // ])
-        signature = await connection.sendTransaction(transaction, [wallet])
+        signature = await sendAndConfirmTransaction(connection, transaction, [
+          wallet,
+        ])
+        // signature = await connection.sendTransaction(transaction, [wallet])
       } else if (walletType === WalletType.DEFAULT) {
         if (wallet) {
           const txn = new Transaction().add(
@@ -222,6 +223,63 @@ export const CustomWalletProvider: React.FC<
     }
   }
 
+  const depositBalance = async (lamports: number, pin?: string) => {
+    let signature = ''
+    try {
+      if (walletType === WalletType.CUSTOM && !pin) {
+        throw new Error('Pin is required for custom wallet')
+      }
+      if (!VAULT_ADDRESS) {
+        throw new Error('Vault address is not available')
+      }
+      if (walletType === WalletType.CUSTOM && encodedPrivateKey && pin) {
+        const wallet = decodePrivateKey(pin)
+        if (!wallet) {
+          throw new Error('Invalid pin')
+        }
+        const transaction = new Transaction().add(
+          SystemProgram.transfer({
+            fromPubkey: wallet.publicKey,
+            toPubkey: new PublicKey(VAULT_ADDRESS),
+            lamports,
+          }),
+        )
+        // signature = await sendAndConfirmTransaction(connection, transaction, [
+        //   wallet,
+        // ])
+        signature = await connection.sendTransaction(transaction, [wallet])
+      } else if (walletType === WalletType.DEFAULT) {
+        if (wallet) {
+          const txn = new Transaction().add(
+            SystemProgram.transfer({
+              fromPubkey: publicKey!,
+              toPubkey: new PublicKey(VAULT_ADDRESS),
+              lamports,
+            }),
+          )
+          const {
+            context: { slot: minContextSlot },
+            value: { blockhash, lastValidBlockHeight },
+          } = await connection.getLatestBlockhashAndContext()
+          console.log('Check 1')
+          signature = await sendTransaction(txn, connection, {
+            minContextSlot,
+          })
+          console.log('Check 2')
+          await connection.confirmTransaction({
+            blockhash,
+            lastValidBlockHeight,
+            signature,
+          })
+          console.log('Check 3')
+        }
+      }
+    } catch (e) {
+      console.log(e)
+    }
+    return signature
+  }
+
   const disconnectPrivatWallet = () => {
     localStorage.removeItem('privateKey')
     localStorage.removeItem('token')
@@ -243,6 +301,7 @@ export const CustomWalletProvider: React.FC<
     encodedPrivateKey,
     solPrice,
     getSolPrice,
+    depositBalance,
   }
 
   return (
