@@ -242,7 +242,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     setIsLoading(true)
     try {
       const response = await axios.post(
-        `${BACKEND_URL}/v1/operation/withraw`,
+        `${BACKEND_URL}/v1/operation/withdraw`,
         {
           lamports,
         },
@@ -256,9 +256,13 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       if (responseData.status) {
         setUser(responseData.user)
         updateBalance()
+        setToastMessage('Withrawed')
+      } else {
+        setErrorToastMessage('Error')
       }
     } catch (e) {
       console.log(e)
+      setErrorToastMessage('Error')
     } finally {
       setIsLoading(false)
     }

@@ -43,6 +43,8 @@ const OperationModal = () => {
   const handleDepositHandler = async ({ pin }: { pin?: string }) => {
     try {
       await handleDeposit(Number(amount) * BASE_LAMPORTS, pin)
+      setAmount('0')
+      setOperationOpen(false)
     } catch (e) {
       console.log(e)
     }
@@ -96,6 +98,14 @@ const OperationModal = () => {
   const handleWithrawHandler = async () => {
     try {
       await handleWithraw(Number(amount) * BASE_LAMPORTS)
+      setAmount('0')
+      setWithrawAmounts({
+        lamports: '0',
+        fees: '0',
+        valid: false,
+        loading: false,
+      })
+      setOperationOpen(false)
     } catch (e) {
       console.log(e)
     }
