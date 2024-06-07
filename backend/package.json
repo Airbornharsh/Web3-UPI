@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon src/index.ts",
-    "build": "tsc -b",
+    "build": "npx prisma generate && tsc -b",
     "start": "node dist/index.js",
     "prisma": "npx prisma"
   },
