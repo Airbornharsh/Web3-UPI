@@ -9,20 +9,21 @@ import { useLoader } from '@/context/LoaderContext'
 import { BASE_LAMPORTS, URL } from '@/utils/config'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
 import OperationModal from '../ui/modals/OperationModal'
 import QrCodeViewModal from '../ui/modals/QrCodeViewModal'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 
 const SmallScreenMenu = () => {
   const { setQrCodeOpenData, setOperationOpen } = useLoader()
@@ -34,14 +35,44 @@ const SmallScreenMenu = () => {
 
   return (
     <div className="flex items-center gap-2 py-2 pr-4 text-xl">
-      <Hamburger toggled={open} toggle={setOpen} color="#F2F2F2" />
-      {open && (
-        <div
-          className={`bg-secondary absolute top-[4.2rem] z-50 max-w-[90vw] border border-gray-500 px-2 pb-2 ${open ? 'right-0' : '-right-full'} transform transition-transform ${open ? 'translate-x-0' : 'translate-x-full'} ${open ? 'shadow-lg' : ''} ${open ? 'rounded-l-lg' : ''} ${open ? 'rounded-r-lg' : ''}`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex flex-col">
-            <div className="flex flex-col gap-4 rounded-lg p-4 text-white shadow-md">
+      <Sheet
+        open={open}
+        onOpenChange={() => {
+          if (open) {
+            setOpen(false)
+          }
+        }}
+      >
+        <SheetTrigger asChild>
+          {/* <Button onClick={() => setOpen(true)}>Open sheet</Button> */}
+          <Hamburger toggled={open} toggle={setOpen} color="#F2F2F2" />
+        </SheetTrigger>
+        <SheetContent>
+          {/* <SheetHeader>
+            <SheetTitle>Edit profile</SheetTitle>
+            <SheetDescription>Done</SheetDescription>
+          </SheetHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Name
+              </Label>
+              <Input id="name" value="Pedro Duarte" className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="username" className="text-right">
+                Username
+              </Label>
+              <Input id="username" value="@peduarte" className="col-span-3" />
+            </div>
+          </div>
+          <SheetFooter>
+            <SheetClose asChild>
+              <Button type="submit">Save changes</Button>
+            </SheetClose>
+          </SheetFooter> */}
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4 rounded-lg text-white shadow-md">
               <div className="flex flex-col gap-2 sm:flex-1">
                 <div className="flex items-center">
                   {user?.name && (
@@ -91,27 +122,14 @@ const SmallScreenMenu = () => {
               </div>
             </div>
             {isAuthenticated ? (
-              // <Button
-              //   onClick={() => {
-              //     setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
-              //   }}
-              //   style={{
-              //     backgroundColor: '#f0f0f0',
-              //     color: 'black',
-              //     padding: '10px 20px',
-              //     borderRadius: '10px',
-              //   }}
-              // >
-              //   Show QR
-              // </Button>
               <div className="flex flex-col gap-2">
                 <OperationModal />
                 <QrCodeViewModal />
               </div>
             ) : null}
           </div>
-        </div>
-      )}
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

@@ -1,8 +1,6 @@
 'use client'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { useEffect, useState } from 'react'
-import axios from 'axios'
-import { BACKEND_URL } from '@/utils/config'
 import { useAuth } from '@/context/AuthContext'
 import { Modal } from '@mui/material'
 import AuthModal from '../ui/modals/AuthModal'
