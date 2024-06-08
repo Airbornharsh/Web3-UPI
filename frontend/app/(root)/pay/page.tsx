@@ -1,5 +1,5 @@
 'use client'
-import { Input } from '@/components/ui/inputs/input'
+import { Input } from '@/components/ui/input'
 import { useAuth } from '@/context/AuthContext'
 import { useLoader } from '@/context/LoaderContext'
 import { BACKEND_URL, BASE_LAMPORTS, NETWORK } from '@/utils/config'
@@ -137,18 +137,18 @@ const PayPage = () => {
             <div className="relative h-10">
               <Input
                 value={amount.toString()}
-                placeHolder="Amount"
-                onChange={(val) => {
-                  if (Number(val) < 0) {
+                placeholder="Amount"
+                onChange={(e) => {
+                  if (Number(e.target.value) < 0) {
                     setAmount(0)
                     return
                   }
-                  if (Number(val) > 100000) {
+                  if (Number(e.target.value) > 100000) {
                     setAmount(100000)
                     return
                   }
                   getSolPrice()
-                  setAmount(Number(val))
+                  setAmount(Number(e.target.value))
                 }}
                 className="text-background h-10"
               />
