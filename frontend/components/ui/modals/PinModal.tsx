@@ -3,7 +3,7 @@ import { Modal } from '@mui/material'
 import React, { useState } from 'react'
 import FormInput from '../inputs/FormInput'
 import FormLabel from '../labels/FormLabel'
-import FormButton from '../buttons/FormButton'
+import { Button } from '@/components/ui/button'
 
 const PinModal = () => {
   const { openPin, setOpenPin } = useLoader()
@@ -38,16 +38,18 @@ const PinModal = () => {
           name="pin"
           type={'text'}
         />
-        <FormButton
-          name="Submit"
-          onClick={() => {
+        <Button
+          onClick={(e) => {
+            e.preventDefault()
             openPin.fn(pin)
             setPin('')
             setOpenPin({ open: false, fn: () => {} })
           }}
           disabled={!pin.length || pin.length < 6}
           type="submit"
-        />
+        >
+          Submit
+        </Button>
       </form>
     </Modal>
   )

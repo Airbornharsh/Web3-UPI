@@ -1,8 +1,8 @@
 'use client'
 import { useLoader } from '@/context/LoaderContext'
 import { CircularProgress, Modal } from '@mui/material'
-import FormButton from '../buttons/FormButton'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import FormInput from '../inputs/FormInput'
 import { WalletType } from '@/utils/enum'
 import { useAuth } from '@/context/AuthContext'
@@ -125,26 +125,30 @@ const OperationModal = () => {
     >
       <div className="bg-secondary flex w-[90vw] max-w-[25rem] flex-col items-center gap-3 p-4">
         <div className="flex w-full items-center gap-2">
-          <FormButton
-            name="Deposit"
-            onClick={() => {
+          <Button
+            onClick={(e) => {
+              e.preventDefault()
               setOperationType('DEPOSIT')
             }}
             disabled={operationType === 'DEPOSIT'}
             type="button"
             className={`border-primary w-full border-[0.01rem] ${operationType === 'DEPOSIT' ? 'bg-primary-dark border-0' : 'bg-secondary'}`}
-          />
+          >
+            Deposit
+          </Button>
           <span>/</span>
-          <FormButton
-            name="Withraw"
-            onClick={() => {
+          <Button
+            onClick={(e) => {
+              e.preventDefault()
               setOperationType('WITHRAW')
               isWithrawValid(amount)
             }}
             disabled={operationType === 'WITHRAW'}
             type="button"
             className={`border-primary w-full border-[0.01rem] ${operationType === 'WITHRAW' ? 'bg-primary-dark border-0' : 'bg-secondary'}`}
-          />
+          >
+            Withraw
+          </Button>
         </div>
         <div className="flex w-full flex-col gap-2">
           <div className="relative w-full">
@@ -205,9 +209,9 @@ const OperationModal = () => {
               <CircularProgress color="primary" />
             </div>
           ) : (
-            <FormButton
-              name="Checkout"
-              onClick={() => {
+            <Button
+              onClick={(e) => {
+                e.preventDefault()
                 if (operationType === 'DEPOSIT') {
                   if (walletType === WalletType.DEFAULT) {
                     handleDepositHandler({
@@ -234,7 +238,9 @@ const OperationModal = () => {
                 !isValidAmount(amount) &&
                 (operationType === 'DEPOSIT' ? false : !withrawAmounts.valid)
               }
-            />
+            >
+              Checkout
+            </Button>
           )}
         </div>
       </div>

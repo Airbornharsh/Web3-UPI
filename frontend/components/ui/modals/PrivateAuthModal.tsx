@@ -1,14 +1,13 @@
 'use client'
 import { useLoader } from '@/context/LoaderContext'
 import { useEffect, useState } from 'react'
-
+import { Button } from '@/components/ui/button'
 import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { AuthFormData } from '@/utils/types'
 import FormLabel from '../labels/FormLabel'
 import FormInput from '../inputs/FormInput'
-import FormButton from '../buttons/FormButton'
 
 interface PrivateAuthModalProps {
   havePrivateKey: boolean
@@ -182,14 +181,16 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
         name="pin"
         type="text"
       />
-      <FormButton
-        name="Submit"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           signInHandler()
         }}
         disabled={!formData.pin || !formData.privateKey}
         type="submit"
-      />
+      >
+        Submit
+      </Button>
     </div>
   )
 
@@ -212,14 +213,16 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
         name="upiId"
         type={'text'}
       />
-      <FormButton
-        name="Submit"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           encodedPrivateKeyHandler()
         }}
         disabled={!(formData.pin.length === 6)}
         type="submit"
-      />
+      >
+        Submit
+      </Button>
     </div>
   )
 
@@ -251,14 +254,16 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
           type="text"
         />
       </div>
-      <FormButton
-        name="Submit"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           signUpHandler()
         }}
         disabled={!formData.upiId}
         type="submit"
-      />
+      >
+        Submit
+      </Button>
     </div>
   )
 

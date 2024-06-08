@@ -12,7 +12,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { useSearchParams } from 'next/navigation'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { WalletType } from '@/utils/enum'
-import FormButton from '@/components/ui/buttons/FormButton'
+import { Button } from '@/components/ui/button'
 
 const Page = () => {
   return (
@@ -157,8 +157,7 @@ const PayPage = () => {
               </span>
             </div>
             <p>${amount * solPrice}</p>
-            <FormButton
-              name="Pay"
+            <Button
               onClick={() => {
                 if (walletType === WalletType.DEFAULT) {
                   sendHandler({
@@ -177,7 +176,9 @@ const PayPage = () => {
                 }
               }}
               disabled={!amount}
-            />
+            >
+              Pay
+            </Button>
           </form>
         )}
       </div>

@@ -2,7 +2,7 @@
 import { useLoader } from '@/context/LoaderContext'
 import { BACKEND_URL } from '@/utils/config'
 import axios from 'axios'
-import { ToastContainer, toast } from 'react-toastify'
+import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 
 import 'react-toastify/dist/ReactToastify.css'
@@ -11,7 +11,6 @@ import { useCustomWallet } from '@/context/CustomWalletContext'
 import { AuthFormData } from '@/utils/types'
 import FormLabel from '../labels/FormLabel'
 import FormInput from '../inputs/FormInput'
-import FormButton from '../buttons/FormButton'
 
 interface AuthModalProps {
   setOpenModal: (val: boolean) => void
@@ -128,18 +127,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
         disabled={true}
         value={formData.walletAddress}
       />
-      <FormButton
-        name="Next"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           walletCheckHandler()
         }}
         disabled={!formData.walletAddress}
         type="submit"
-      />
-      <FormButton
-        name="Close"
-        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
-        onClick={() => {
+      >
+        Next
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
           setFormData({
             name: '',
             walletAddress: '',
@@ -148,7 +149,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
           })
           setOpenModal(false)
         }}
-      />
+      >
+        Close
+      </Button>
     </div>
   )
 
@@ -165,18 +168,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
         name="upiId"
         type="text"
       />
-      <FormButton
-        name="Next"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           upiCheckHandler()
         }}
         disabled={!formData.upiId}
         type="submit"
-      />
-      <FormButton
-        name="Close"
-        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
-        onClick={() => {
+      >
+        Next
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
           setFormData({
             name: '',
             walletAddress: '',
@@ -185,7 +190,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
           })
           setOpenModal(false)
         }}
-      />
+      >
+        Close
+      </Button>
     </div>
   )
 
@@ -202,18 +209,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
         name="name"
         type="text"
       />
-      <FormButton
-        name="Next"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           setStep(4)
         }}
         disabled={!formData.name}
         type="submit"
-      />
-      <FormButton
-        name="Close"
-        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
-        onClick={() => {
+      >
+        Next
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
           setFormData({
             name: '',
             walletAddress: '',
@@ -222,7 +231,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
           })
           setOpenModal(false)
         }}
-      />
+      >
+        Close
+      </Button>
     </div>
   )
 
@@ -245,18 +256,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
         name="pin"
         type={isWallet ? 'password' : 'text'}
       />
-      <FormButton
-        name="Submit"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           isWallet ? signInHandler() : signUpHandler()
         }}
         disabled={!formData.pin}
         type="submit"
-      />
-      <FormButton
-        name="Close"
-        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
-        onClick={() => {
+      >
+        Submit
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
           setFormData({
             name: '',
             walletAddress: '',
@@ -265,7 +278,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
           })
           setOpenModal(false)
         }}
-      />
+      >
+        Close
+      </Button>
     </div>
   )
 

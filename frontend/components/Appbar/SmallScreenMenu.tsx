@@ -7,9 +7,9 @@ import Hamburger from 'hamburger-react'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { useLoader } from '@/context/LoaderContext'
 import { BASE_LAMPORTS, URL } from '@/utils/config'
-import FormButton from '../ui/buttons/FormButton'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 
 const SmallScreenMenu = () => {
   const { setQrCodeOpenData, setOperationOpen } = useLoader()
@@ -28,31 +28,31 @@ const SmallScreenMenu = () => {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex flex-col">
-            <div className="flex flex-col gap-4 rounded-lg p-4 shadow-md sm:flex-row sm:items-start sm:justify-between sm:p-6 lg:gap-6">
+            <div className="flex flex-col gap-4 rounded-lg p-4 text-white shadow-md">
               <div className="flex flex-col gap-2 sm:flex-1">
                 <div className="flex items-center">
                   {user?.name && (
-                    <span className="truncate text-sm font-semibold text-gray-700">
+                    <span className="truncate text-sm font-semibold ">
                       Name: {user?.name}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center">
                   {user?.upiId && (
-                    <span className="truncate text-sm font-semibold text-gray-700">
+                    <span className="truncate text-sm font-semibold ">
                       UpiId: {user?.upiId}
                     </span>
                   )}
                 </div>
                 <div className="flex items-center">
                   {publicKey && (
-                    <span className="truncate text-sm font-semibold text-gray-700">
+                    <span className="truncate text-sm font-semibold ">
                       {publicKey?.toString().slice(0, 6)}...
                       {publicKey?.toString().slice(-6)}
                     </span>
                   )}
                 </div>
-                <div className="flex items-center text-sm font-semibold text-gray-700">
+                <div className="flex items-center text-sm font-semibold ">
                   <span className="flex flex-col">
                     <span>Bal: {balance} SOL</span>
                     <span>
@@ -92,23 +92,25 @@ const SmallScreenMenu = () => {
               //   Show QR
               // </Button>
               <div className="flex flex-col gap-2">
-                <FormButton
-                  name="Deposit/Withraw"
+                <Button
                   onClick={() => {
                     setOpen(false)
                     setOperationOpen(true)
                   }}
                   disabled={!user?.upiId}
                   type="button"
-                />
-                <FormButton
-                  name="Show QR"
+                >
+                  Deposit/Withraw
+                </Button>
+                <Button
                   onClick={() => {
                     setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
                   }}
                   disabled={!user?.upiId}
                   type="button"
-                />
+                >
+                  Show QR
+                </Button>
               </div>
             ) : null}
           </div>

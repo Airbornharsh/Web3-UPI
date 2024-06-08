@@ -1,10 +1,10 @@
 'use client'
 import { Hero } from '@/components/Hero'
+import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/AuthContext'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { useLoader } from '@/context/LoaderContext'
 import { BACKEND_URL } from '@/utils/config'
-import { Button } from '@mui/material'
 import axios from 'axios'
 
 export default function Home() {
@@ -35,7 +35,7 @@ export default function Home() {
       {publicKey && (
         <Button
           onClick={claimSol}
-          className="bg-primary hover:bg-primary-dark text-background mt-6"
+          className="mt-6"
           style={{
             padding: '10px 20px',
             borderRadius: '10px',
