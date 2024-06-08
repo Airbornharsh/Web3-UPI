@@ -9,8 +9,8 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { AuthFormData } from '@/utils/types'
-import FormLabel from '../labels/FormLabel'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface AuthModalProps {
   setOpenModal: (val: boolean) => void
@@ -120,7 +120,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
 
   const step1 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name="Wallet Address:" />
+      <Label>Wallet Address</Label>
       <Input
         type="text"
         name="name"
@@ -157,7 +157,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
 
   const step2 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'UPI ID'} />
+      <Label>UPI ID</Label>
       <Input
         value={formData.upiId}
         onChange={(e) => {
@@ -198,7 +198,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
 
   const step3 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'Name'} />
+      <Label>Name</Label>
       <Input
         value={formData.name}
         onChange={(e) => {
@@ -239,7 +239,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
 
   const step4 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'PIN'} />
+      <Label>PIN</Label>
       <Input
         value={formData.pin}
         onChange={(e) => {
@@ -330,7 +330,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
 
           return (
             <div key={key} className="flex flex-col gap-1">
-              <FormLabel name={keyValue} />
+              <Label>{keyValue}</Label>
               <Input
                 value={formData[key]! as string}
                 onChange={(e) => {

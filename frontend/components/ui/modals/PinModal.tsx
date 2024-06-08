@@ -1,9 +1,9 @@
 import { useLoader } from '@/context/LoaderContext'
 import { Modal } from '@mui/material'
 import React, { useState } from 'react'
-import FormLabel from '../labels/FormLabel'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 const PinModal = () => {
   const { openPin, setOpenPin } = useLoader()
@@ -23,7 +23,7 @@ const PinModal = () => {
       }}
     >
       <form className="bg-secondary flex w-[90vw] max-w-[15rem] flex-col gap-2 rounded-lg bg-gray-100 px-6 py-4">
-        <FormLabel name={'PIN'} />
+        <Label>PIN</Label>
         <Input
           value={pin}
           onChange={(e) => {

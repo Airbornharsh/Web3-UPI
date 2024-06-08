@@ -17,8 +17,8 @@ const QrCodeCreate: React.FC<{
         />
       </span>
       <div>
-        <span className="text-sm font-semibold text-gray-700">UPI ID: </span>
-        <span className="text-sm font-semibold text-gray-700">
+        <span className="text-sm font-semibold text-white">UPI ID: </span>
+        <span className="text-sm font-semibold text-white">
           {text.split(URL + '/pay?upiId=')[1].split('&')[0]}
         </span>
       </div>

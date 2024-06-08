@@ -3,11 +3,11 @@ import { useLoader } from '@/context/LoaderContext'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { AuthFormData } from '@/utils/types'
-import FormLabel from '../labels/FormLabel'
 
 interface PrivateAuthModalProps {
   havePrivateKey: boolean
@@ -131,7 +131,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
 
   const step1 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'Private Key'} />
+      <Label>Private Key</Label>
       <Input
         type="password"
         name="privateKey"
@@ -147,7 +147,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
           })
         }}
       />
-      <FormLabel name={'Wallet Address'} />
+      <Label>Wallet Address</Label>
       <Input
         type="text"
         name="walletAddress"
@@ -164,7 +164,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
           })
         }}
       />
-      <FormLabel name={'PIN'} />
+      <Label>PIN</Label>
       <Input
         value={formData.pin}
         onChange={(e) => {
@@ -196,7 +196,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
 
   const step2 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'Pin'} />
+      <Label>PIN</Label>
       <Input
         value={formData.pin}
         onChange={(e) => {
@@ -229,7 +229,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
   const step3 = (
     <div className="flex flex-col gap-1">
       <div className="flex flex-col gap-1">
-        <FormLabel name={'Name'} />
+        <Label>Name</Label>
         <Input
           value={formData.upiId}
           onChange={(e) => {
@@ -242,7 +242,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
         />
       </div>
       <div className="flex flex-col gap-1">
-        <FormLabel name={'UPI Id'} />
+        <Label>UPI Id</Label>
         <Input
           value={formData.name}
           onChange={(e) => {
@@ -306,7 +306,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
 
           return (
             <div key={key} className="flex flex-col gap-1">
-              <FormLabel name={keyValue} />
+              <Label>{keyValue}</Label>
               <Input
                 value={formData[key]! as string}
                 onChange={(e) => {
