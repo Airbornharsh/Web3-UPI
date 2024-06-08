@@ -92,9 +92,9 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
     <LoaderContext.Provider value={contextValue}>
       {children}
       <LoaderModal />
-      <PinModal />
+      {/* <PinModal /> */}
       <QrScanModal />
-      <QrCodeViewModal />
+      {/* <QrCodeViewModal /> */}
       <ToastContainer />
     </LoaderContext.Provider>
   )

@@ -10,6 +10,19 @@ import { BASE_LAMPORTS, URL } from '@/utils/config'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import OperationModal from '../ui/modals/OperationModal'
+import QrCodeViewModal from '../ui/modals/QrCodeViewModal'
 
 const SmallScreenMenu = () => {
   const { setQrCodeOpenData, setOperationOpen } = useLoader()
@@ -92,25 +105,8 @@ const SmallScreenMenu = () => {
               //   Show QR
               // </Button>
               <div className="flex flex-col gap-2">
-                <Button
-                  onClick={() => {
-                    setOpen(false)
-                    setOperationOpen(true)
-                  }}
-                  disabled={!user?.upiId}
-                  type="button"
-                >
-                  Deposit/Withraw
-                </Button>
-                <Button
-                  onClick={() => {
-                    setQrCodeOpenData(`${URL}/pay?upiId=${user?.upiId}`)
-                  }}
-                  disabled={!user?.upiId}
-                  type="button"
-                >
-                  Show QR
-                </Button>
+                <OperationModal />
+                <QrCodeViewModal />
               </div>
             ) : null}
           </div>

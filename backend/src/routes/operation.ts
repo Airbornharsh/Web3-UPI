@@ -341,7 +341,7 @@ operationRouter.post('/deposit', authMiddleware, async (req, res) => {
   }
 })
 
-operationRouter.post('/iswithraw', authMiddleware, async (req, res) => {
+operationRouter.post('/iswithdraw', authMiddleware, async (req, res) => {
   try {
     const { lamports } = req.body
     const user = res.locals.user

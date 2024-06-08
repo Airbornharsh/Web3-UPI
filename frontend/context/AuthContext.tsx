@@ -27,7 +27,7 @@ interface AuthContextProps {
   signIn: (formData: AuthFormData) => Promise<boolean>
   signUp: (formData: AuthFormData) => Promise<void>
   handleDeposit: (lamports: number, pin?: string) => Promise<void>
-  handleWithraw: (lamports: number) => Promise<void>
+  handleWithdraw: (lamports: number) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -238,7 +238,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     }
   }
 
-  const handleWithraw = async (lamports: number, pin?: string) => {
+  const handleWithdraw = async (lamports: number, pin?: string) => {
     setIsLoading(true)
     try {
       const response = await axios.post(
@@ -256,7 +256,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       if (responseData.status) {
         setUser(responseData.user)
         updateBalance()
-        setToastMessage('Withrawed')
+        setToastMessage('Withdrawed')
       } else {
         setErrorToastMessage('Error')
       }
@@ -279,13 +279,13 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     signIn,
     signUp,
     handleDeposit,
-    handleWithraw,
+    handleWithdraw,
   }
 
   return (
     <AuthContext.Provider value={contextValue}>
       {children}
-      <OperationModal />
+      {/* <OperationModal /> */}
     </AuthContext.Provider>
   )
 }
