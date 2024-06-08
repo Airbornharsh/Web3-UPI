@@ -4,6 +4,7 @@ import { Modal } from '@mui/material'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import PrivateAuthModal from '../ui/modals/PrivateAuthModal'
 import { useState } from 'react'
+import { Button } from '../ui/button'
 
 const CustomWalletMultiButton = () => {
   const [openModal, setOpenModal] = useState(false)
@@ -20,12 +21,13 @@ const CustomWalletMultiButton = () => {
         }}
       />
       <div className="text-base">
-        <button
+        <Button
           onClick={() => setOpenModal(true)}
-          className="border-primary text-primary rounded-lg border-[0.1rem] px-4 py-2"
+          variant={'outline'}
+          className="w-full text-primary"
         >
           Private Auth
-        </button>
+        </Button>
       </div>
       <Modal
         open={openModal}
