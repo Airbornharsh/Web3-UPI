@@ -13,6 +13,18 @@ import { useSearchParams } from 'next/navigation'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { WalletType } from '@/utils/enum'
 import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { Label } from '@/components/ui/label'
 
 const Page = () => {
   return (
@@ -33,6 +45,8 @@ const PayPage = () => {
   const { sendToken, walletType, solPrice, getSolPrice } = useCustomWallet()
   const [upiDetails, setUpiDetails] = useState<User | null>(null)
   const [amount, setAmount] = useState<number>(0)
+  const [closeDialog, setCloseDialog] = useState(false)
+  const [pin, setPin] = useState('')
   const { setIsLoading } = useLoader()
   const { token, updateBalance } = useAuth()
   const upiId = searchParams.get('upiId')
@@ -107,7 +121,7 @@ const PayPage = () => {
 
   return (
     <main>
-      <div className="flex flex-col items-center justify-center gap-2 pt-10 text-black">
+      <div className="flex flex-col items-center justify-center gap-2 pt-10 text-white">
         {upiDetails && (
           <form className="bg-secondary flex flex-col gap-2 rounded-lg px-12 py-6">
             <h1 className="">{upiDetails.name}</h1>
@@ -150,35 +164,79 @@ const PayPage = () => {
                   getSolPrice()
                   setAmount(Number(e.target.value))
                 }}
-                className="text-background h-10"
               />
-              <span className="text-background bg-color3 absolute right-0 top-1 flex h-8 w-12 items-center justify-center">
+              <span className="bg-color3 absolute right-0 top-0 flex h-12 w-12 items-center justify-center font-bold text-white">
                 SOL
               </span>
             </div>
             <p>${amount * solPrice}</p>
-            <Button
-              onClick={() => {
-                if (walletType === WalletType.DEFAULT) {
-                  sendHandler({
-                    pin: '',
-                  })
-                } else {
-                  setOpenPin({
-                    open: true,
-                    fn: (pin: string) => {
-                      console.log('Wallet Details', upiDetails)
-                      sendHandler({
-                        pin,
-                      })
-                    },
-                  })
+            <AlertDialog
+              open={closeDialog}
+              onOpenChange={() => {
+                if (closeDialog) {
+                  setCloseDialog(false)
                 }
               }}
-              disabled={!amount}
             >
-              Pay
-            </Button>
+              <AlertDialogTrigger
+                onClick={() => {
+                  setCloseDialog(true)
+                }}
+                asChild
+                disabled={!amount}
+              >
+                <Button disabled={!amount}>Pay</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Are you sure you want to Pay to {upiId}?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-white">
+                    {amount + ' SOL'}
+                  </AlertDialogDescription>
+                  {walletType === WalletType.CUSTOM && (
+                    <AlertDialogDescription className="flex items-center gap-2 text-white">
+                      <Label>PIN:</Label>
+                      <Input
+                        value={pin}
+                        onChange={(e) => {
+                          if (e.target.value.length > 6) {
+                            return
+                          }
+                          if (isNaN(Number(e.target.value))) {
+                            return
+                          }
+                          setPin(e.target.value)
+                        }}
+                        name="pin"
+                        type={'text'}
+                        className="bg-secondary h-10 w-20 rounded-lg p-3 text-white outline-none"
+                      />
+                    </AlertDialogDescription>
+                  )}
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      if (walletType === WalletType.DEFAULT) {
+                        sendHandler({
+                          pin: '',
+                        })
+                      } else {
+                        sendHandler({
+                          pin,
+                        })
+                      }
+                      setPin('')
+                    }}
+                  >
+                    Confirm
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </form>
         )}
       </div>
