@@ -2,6 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
-div {
-  border-color: transparent;
+@layer base {
+  :root {
+    --white: 0 0% 100%; /* #FFFFFF */
+
+    --background: 160 10% 10%; /* #161B19 */
+    --foreground: 0 0% 100%; /* #FFFFFF */
+
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 160 10% 10%; /* #161B19 */
+
+    --popover: 0 0% 100%; /* #FFFFFF */
+    --popover-foreground: 160 10% 10%; /* #161B19 */
+
+    --primary: 162 76% 41%; /* #19B784 */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF */
+
+    --secondary: 165 9% 13%; /* #1E2423 */
+    --secondary-foreground: 162 76% 41%; /* #19B784 */
+
+    --muted: 165 9% 13%; /* #1E2423 */
+    --muted-foreground: 213 9% 25%; /* #3B4046 */
+
+    --accent: 161 74% 48%; /* #1DD79B */
+    --accent-foreground: 162 76% 41%; /* #19B784 */
+
+    --destructive: 0 84.2% 60.2%; /* Red color, not provided in the previous data, default kept */
+    --destructive-foreground: 0 0% 98%; /* #FFFFFF */
+
+    --border: 213 9% 25%; /* #3B4046 */
+    --input: 213 9% 25%; /* #3B4046 */
+    --ring: 160 10% 10%; /* #161B19 */
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 160 10% 10%; /* #161B19 */
+    --foreground: 0 0% 100%; /* #FFFFFF */
+
+    --card: 160 10% 10%; /* #161B19 */
+    --card-foreground: 0 0% 100%; /* #FFFFFF */
+
+    --popover: 160 10% 10%; /* #161B19 */
+    --popover-foreground: 0 0% 100%; /* #FFFFFF */
+
+    --primary: 0 0% 100%; /* #FFFFFF */
+    --primary-foreground: 162 76% 41%; /* #19B784 */
+
+    --secondary: 213 9% 25%; /* #3B4046 */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF */
+
+    --muted: 213 9% 25%; /* #3B4046 */
+    --muted-foreground: 161 74% 48%; /* #1DD79B */
+
+    --accent: 213 9% 25%; /* #3B4046 */
+    --accent-foreground: 0 0% 100%; /* #FFFFFF */
+
+    --destructive: 0 62.8% 30.6%; /* Darker red color, not provided in the previous data, default kept */
+    --destructive-foreground: 0 0% 100%; /* #FFFFFF */
+
+    --border: 213 9% 25%; /* #3B4046 */
+    --input: 213 9% 25%; /* #3B4046 */
+    --ring: 213 9% 25%; /* #3B4046 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

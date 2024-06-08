@@ -1,14 +1,13 @@
 'use client'
 import { useLoader } from '@/context/LoaderContext'
 import { useEffect, useState } from 'react'
-
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { AuthFormData } from '@/utils/types'
-import FormLabel from '../labels/FormLabel'
-import FormInput from '../inputs/FormInput'
-import FormButton from '../buttons/FormButton'
 
 interface PrivateAuthModalProps {
   havePrivateKey: boolean
@@ -132,106 +131,110 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
 
   const step1 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'Private Key'} />
-      <FormInput
+      <Label>Private Key</Label>
+      <Input
         type="password"
         name="privateKey"
         value={formData.privateKey as string}
-        onChange={(val) => {
-          const address = getPublicKeyFromPrivateKey(val)
+        onChange={(e) => {
+          const address = getPublicKeyFromPrivateKey(e.target.value)
           setFormData((f) => {
             return {
               ...f,
-              privateKey: val,
+              privateKey: e.target.value,
               walletAddress: address ? address : '',
             }
           })
         }}
       />
-      <FormLabel name={'Wallet Address'} />
-      <FormInput
+      <Label>Wallet Address</Label>
+      <Input
         type="text"
         name="walletAddress"
         value={formData.walletAddress}
         disabled={true}
-        onChange={(val) => {
-          const address = getPublicKeyFromPrivateKey(val)
+        onChange={(e) => {
+          const address = getPublicKeyFromPrivateKey(e.target.value)
           setFormData((f) => {
             return {
               ...f,
-              privateKey: val,
+              privateKey: e.target.value,
               walletAddress: address ? address : '',
             }
           })
         }}
       />
-      <FormLabel name={'PIN'} />
-      <FormInput
+      <Label>PIN</Label>
+      <Input
         value={formData.pin}
-        onChange={(val) => {
-          if (val.length > 6) {
+        onChange={(e) => {
+          if (e.target.value.length > 6) {
             return
           }
-          if (isNaN(Number(val))) {
+          if (isNaN(Number(e.target.value))) {
             return
           }
           setFormData((f) => {
-            return { ...f, pin: val }
+            return { ...f, pin: e.target.value }
           })
         }}
         name="pin"
         type="text"
       />
-      <FormButton
-        name="Submit"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           signInHandler()
         }}
         disabled={!formData.pin || !formData.privateKey}
         type="submit"
-      />
+      >
+        Submit
+      </Button>
     </div>
   )
 
   const step2 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'Pin'} />
-      <FormInput
+      <Label>PIN</Label>
+      <Input
         value={formData.pin}
-        onChange={(val) => {
-          if (val.length > 6) {
+        onChange={(e) => {
+          if (e.target.value.length > 6) {
             return
           }
-          if (isNaN(Number(val))) {
+          if (isNaN(Number(e.target.value))) {
             return
           }
           setFormData((f) => {
-            return { ...f, pin: val }
+            return { ...f, pin: e.target.value }
           })
         }}
         name="upiId"
         type={'text'}
       />
-      <FormButton
-        name="Submit"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           encodedPrivateKeyHandler()
         }}
         disabled={!(formData.pin.length === 6)}
         type="submit"
-      />
+      >
+        Submit
+      </Button>
     </div>
   )
 
   const step3 = (
     <div className="flex flex-col gap-1">
       <div className="flex flex-col gap-1">
-        <FormLabel name={'Name'} />
-        <FormInput
+        <Label>Name</Label>
+        <Input
           value={formData.upiId}
-          onChange={(val) => {
+          onChange={(e) => {
             setFormData((f) => {
-              return { ...f, upiId: val }
+              return { ...f, upiId: e.target.value }
             })
           }}
           name="upiId"
@@ -239,26 +242,28 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
         />
       </div>
       <div className="flex flex-col gap-1">
-        <FormLabel name={'UPI Id'} />
-        <FormInput
+        <Label>UPI Id</Label>
+        <Input
           value={formData.name}
-          onChange={(val) => {
+          onChange={(e) => {
             setFormData((f) => {
-              return { ...f, name: val }
+              return { ...f, name: e.target.value }
             })
           }}
           name="name"
           type="text"
         />
       </div>
-      <FormButton
-        name="Submit"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           signUpHandler()
         }}
         disabled={!formData.upiId}
         type="submit"
-      />
+      >
+        Submit
+      </Button>
     </div>
   )
 
@@ -301,12 +306,12 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
 
           return (
             <div key={key} className="flex flex-col gap-1">
-              <FormLabel name={keyValue} />
-              <FormInput
+              <Label>{keyValue}</Label>
+              <Input
                 value={formData[key]! as string}
-                onChange={(val) => {
+                onChange={(e) => {
                   setFormData((f) => {
-                    return { ...f, [key]: val }
+                    return { ...f, [key]: e.target.value }
                   })
                 }}
                 name={key}

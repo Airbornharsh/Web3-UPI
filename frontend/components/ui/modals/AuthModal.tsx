@@ -2,16 +2,15 @@
 import { useLoader } from '@/context/LoaderContext'
 import { BACKEND_URL } from '@/utils/config'
 import axios from 'axios'
-import { ToastContainer, toast } from 'react-toastify'
+import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 
 import 'react-toastify/dist/ReactToastify.css'
 import { useAuth } from '@/context/AuthContext'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { AuthFormData } from '@/utils/types'
-import FormLabel from '../labels/FormLabel'
-import FormInput from '../inputs/FormInput'
-import FormButton from '../buttons/FormButton'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface AuthModalProps {
   setOpenModal: (val: boolean) => void
@@ -121,25 +120,27 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
 
   const step1 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name="Wallet Address:" />
-      <FormInput
+      <Label>Wallet Address</Label>
+      <Input
         type="text"
         name="name"
         disabled={true}
         value={formData.walletAddress}
       />
-      <FormButton
-        name="Next"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           walletCheckHandler()
         }}
         disabled={!formData.walletAddress}
         type="submit"
-      />
-      <FormButton
-        name="Close"
-        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
-        onClick={() => {
+      >
+        Next
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
           setFormData({
             name: '',
             walletAddress: '',
@@ -148,35 +149,39 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
           })
           setOpenModal(false)
         }}
-      />
+      >
+        Close
+      </Button>
     </div>
   )
 
   const step2 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'UPI ID'} />
-      <FormInput
+      <Label>UPI ID</Label>
+      <Input
         value={formData.upiId}
-        onChange={(val) => {
+        onChange={(e) => {
           setFormData((f) => {
-            return { ...f, upiId: val }
+            return { ...f, upiId: e.target.value }
           })
         }}
         name="upiId"
         type="text"
       />
-      <FormButton
-        name="Next"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           upiCheckHandler()
         }}
         disabled={!formData.upiId}
         type="submit"
-      />
-      <FormButton
-        name="Close"
-        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
-        onClick={() => {
+      >
+        Next
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
           setFormData({
             name: '',
             walletAddress: '',
@@ -185,35 +190,39 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
           })
           setOpenModal(false)
         }}
-      />
+      >
+        Close
+      </Button>
     </div>
   )
 
   const step3 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'Name'} />
-      <FormInput
+      <Label>Name</Label>
+      <Input
         value={formData.name}
-        onChange={(val) => {
+        onChange={(e) => {
           setFormData((f) => {
-            return { ...f, name: val }
+            return { ...f, name: e.target.value }
           })
         }}
         name="name"
         type="text"
       />
-      <FormButton
-        name="Next"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           setStep(4)
         }}
         disabled={!formData.name}
         type="submit"
-      />
-      <FormButton
-        name="Close"
-        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
-        onClick={() => {
+      >
+        Next
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
           setFormData({
             name: '',
             walletAddress: '',
@@ -222,41 +231,45 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
           })
           setOpenModal(false)
         }}
-      />
+      >
+        Close
+      </Button>
     </div>
   )
 
   const step4 = (
     <div className="flex flex-col gap-1">
-      <FormLabel name={'PIN'} />
-      <FormInput
+      <Label>PIN</Label>
+      <Input
         value={formData.pin}
-        onChange={(val) => {
-          if (val.length > 6) {
+        onChange={(e) => {
+          if (e.target.value.length > 6) {
             return
           }
-          if (isNaN(Number(val))) {
+          if (isNaN(Number(e.target.value))) {
             return
           }
           setFormData((f) => {
-            return { ...f, pin: val }
+            return { ...f, pin: e.target.value }
           })
         }}
         name="pin"
         type={isWallet ? 'password' : 'text'}
       />
-      <FormButton
-        name="Submit"
-        onClick={() => {
+      <Button
+        onClick={(e) => {
+          e.preventDefault()
           isWallet ? signInHandler() : signUpHandler()
         }}
         disabled={!formData.pin}
         type="submit"
-      />
-      <FormButton
-        name="Close"
-        className="border-primary text-primary hover:bg-primary border-[0.1rem] bg-transparent hover:text-white"
-        onClick={() => {
+      >
+        Submit
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
           setFormData({
             name: '',
             walletAddress: '',
@@ -265,7 +278,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
           })
           setOpenModal(false)
         }}
-      />
+      >
+        Close
+      </Button>
     </div>
   )
 
@@ -315,12 +330,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
 
           return (
             <div key={key} className="flex flex-col gap-1">
-              <FormLabel name={keyValue} />
-              <FormInput
+              <Label>{keyValue}</Label>
+              <Input
                 value={formData[key]! as string}
-                onChange={(val) => {
+                onChange={(e) => {
                   setFormData((f) => {
-                    return { ...f, [key]: val }
+                    return { ...f, [key]: e.target.value }
                   })
                 }}
                 name={key}

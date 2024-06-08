@@ -1,6 +1,6 @@
 import { useLoader } from '@/context/LoaderContext'
 import UpiList from './UpiList'
-import { Button } from '@mui/material'
+import { Button } from '@/components/ui/button'
 
 export const Hero = () => {
   const { setQrCodeScanOpen } = useLoader()
@@ -10,7 +10,6 @@ export const Hero = () => {
         onClick={() => {
           setQrCodeScanOpen(true)
         }}
-        className="bg-primary hover:bg-primary-dark text-background"
         style={{
           padding: '10px 20px',
           borderRadius: '10px',

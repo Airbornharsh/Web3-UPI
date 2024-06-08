@@ -1,13 +1,13 @@
 'use client'
 import { useLoader } from '@/context/LoaderContext'
 import { CircularProgress, Modal } from '@mui/material'
-import FormButton from '../buttons/FormButton'
 import { useState } from 'react'
-import FormInput from '../inputs/FormInput'
+import { Button } from '@/components/ui/button'
 import { WalletType } from '@/utils/enum'
 import { useAuth } from '@/context/AuthContext'
 import { BACKEND_URL, BASE_LAMPORTS } from '@/utils/config'
 import { useCustomWallet } from '@/context/CustomWalletContext'
+import { Input } from '@/components/ui/input'
 import axios from 'axios'
 
 const OperationModal = () => {
@@ -125,46 +125,49 @@ const OperationModal = () => {
     >
       <div className="bg-secondary flex w-[90vw] max-w-[25rem] flex-col items-center gap-3 p-4">
         <div className="flex w-full items-center gap-2">
-          <FormButton
-            name="Deposit"
-            onClick={() => {
+          <Button
+            onClick={(e) => {
+              e.preventDefault()
               setOperationType('DEPOSIT')
             }}
-            disabled={operationType === 'DEPOSIT'}
+            // disabled={operationType === 'DEPOSIT'}
             type="button"
-            className={`border-primary w-full border-[0.01rem] ${operationType === 'DEPOSIT' ? 'bg-primary-dark border-0' : 'bg-secondary'}`}
-          />
-          <span>/</span>
-          <FormButton
-            name="Withraw"
-            onClick={() => {
+            className={`border-primary w-full border-[0.01rem] ${operationType === 'DEPOSIT' ? 'bg-primary/90 border-0' : 'bg-secondary'}`}
+          >
+            Deposit
+          </Button>
+          <Button
+            onClick={(e) => {
+              e.preventDefault()
               setOperationType('WITHRAW')
               isWithrawValid(amount)
             }}
-            disabled={operationType === 'WITHRAW'}
+            // disabled={operationType === 'WITHRAW'}
             type="button"
-            className={`border-primary w-full border-[0.01rem] ${operationType === 'WITHRAW' ? 'bg-primary-dark border-0' : 'bg-secondary'}`}
-          />
+            className={`border-primary w-full border-[0.01rem] ${operationType === 'WITHRAW' ? 'bg-primary/90 border-0' : 'bg-secondary'}`}
+          >
+            Withraw
+          </Button>
         </div>
         <div className="flex w-full flex-col gap-2">
           <div className="relative w-full">
-            <FormInput
+            <Input
               type="text"
               name="name"
               value={amount}
               disabled={false}
               className="w-full"
-              onChange={(val) => {
-                if (isNaN(Number(val))) {
+              onChange={(e) => {
+                if (isNaN(Number(e.target.value))) {
                   return
                 }
-                if (Number(val) < 0) {
+                if (Number(e.target.value) < 0) {
                   return
                 }
                 if (operationType === 'WITHRAW') {
-                  isWithrawValid(val)
+                  isWithrawValid(e.target.value)
                 }
-                setAmount(val)
+                setAmount(e.target.value)
               }}
             />
             <span className="text-color3 bg-secondary absolute right-0 top-0 flex h-10 w-12 items-center justify-center">
@@ -205,9 +208,9 @@ const OperationModal = () => {
               <CircularProgress color="primary" />
             </div>
           ) : (
-            <FormButton
-              name="Checkout"
-              onClick={() => {
+            <Button
+              onClick={(e) => {
+                e.preventDefault()
                 if (operationType === 'DEPOSIT') {
                   if (walletType === WalletType.DEFAULT) {
                     handleDepositHandler({
@@ -234,7 +237,9 @@ const OperationModal = () => {
                 !isValidAmount(amount) &&
                 (operationType === 'DEPOSIT' ? false : !withrawAmounts.valid)
               }
-            />
+            >
+              Checkout
+            </Button>
           )}
         </div>
       </div>
