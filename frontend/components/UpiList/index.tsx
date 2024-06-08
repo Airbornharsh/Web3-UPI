@@ -1,11 +1,10 @@
 import { User } from '@/utils/types'
 import { useEffect, useState } from 'react'
-import { Input } from '../ui/inputs/input'
 import axios from 'axios'
 import { BACKEND_URL } from '@/utils/config'
 import Item from './Item'
 import { useAuth } from '@/context/AuthContext'
-import FormInput from '../ui/inputs/FormInput'
+import { Input } from '@/components/ui/input'
 
 const UpiList = () => {
   const [userList, setUserList] = useState<User[]>([])
@@ -38,10 +37,12 @@ const UpiList = () => {
   return (
     <div>
       <div>
-        <FormInput
-          onChange={setUpiId}
+        <Input
+          onChange={(e) => {
+            setUpiId(e.target.value)
+          }}
           value={upiId}
-          placeHolder={'Upi Id'}
+          placeholder={'Upi Id'}
           name="upiId"
         />
       </div>

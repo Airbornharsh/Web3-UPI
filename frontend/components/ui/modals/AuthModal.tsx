@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useCustomWallet } from '@/context/CustomWalletContext'
 import { AuthFormData } from '@/utils/types'
 import FormLabel from '../labels/FormLabel'
-import FormInput from '../inputs/FormInput'
+import { Input } from '@/components/ui/input'
 
 interface AuthModalProps {
   setOpenModal: (val: boolean) => void
@@ -121,7 +121,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
   const step1 = (
     <div className="flex flex-col gap-1">
       <FormLabel name="Wallet Address:" />
-      <FormInput
+      <Input
         type="text"
         name="name"
         disabled={true}
@@ -158,11 +158,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
   const step2 = (
     <div className="flex flex-col gap-1">
       <FormLabel name={'UPI ID'} />
-      <FormInput
+      <Input
         value={formData.upiId}
-        onChange={(val) => {
+        onChange={(e) => {
           setFormData((f) => {
-            return { ...f, upiId: val }
+            return { ...f, upiId: e.target.value }
           })
         }}
         name="upiId"
@@ -199,11 +199,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
   const step3 = (
     <div className="flex flex-col gap-1">
       <FormLabel name={'Name'} />
-      <FormInput
+      <Input
         value={formData.name}
-        onChange={(val) => {
+        onChange={(e) => {
           setFormData((f) => {
-            return { ...f, name: val }
+            return { ...f, name: e.target.value }
           })
         }}
         name="name"
@@ -240,17 +240,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
   const step4 = (
     <div className="flex flex-col gap-1">
       <FormLabel name={'PIN'} />
-      <FormInput
+      <Input
         value={formData.pin}
-        onChange={(val) => {
-          if (val.length > 6) {
+        onChange={(e) => {
+          if (e.target.value.length > 6) {
             return
           }
-          if (isNaN(Number(val))) {
+          if (isNaN(Number(e.target.value))) {
             return
           }
           setFormData((f) => {
-            return { ...f, pin: val }
+            return { ...f, pin: e.target.value }
           })
         }}
         name="pin"
@@ -331,11 +331,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
           return (
             <div key={key} className="flex flex-col gap-1">
               <FormLabel name={keyValue} />
-              <FormInput
+              <Input
                 value={formData[key]! as string}
-                onChange={(val) => {
+                onChange={(e) => {
                   setFormData((f) => {
-                    return { ...f, [key]: val }
+                    return { ...f, [key]: e.target.value }
                   })
                 }}
                 name={key}

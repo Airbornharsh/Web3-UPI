@@ -1,9 +1,9 @@
 import { useLoader } from '@/context/LoaderContext'
 import { Modal } from '@mui/material'
 import React, { useState } from 'react'
-import FormInput from '../inputs/FormInput'
 import FormLabel from '../labels/FormLabel'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const PinModal = () => {
   const { openPin, setOpenPin } = useLoader()
@@ -24,16 +24,16 @@ const PinModal = () => {
     >
       <form className="bg-secondary flex w-[90vw] max-w-[15rem] flex-col gap-2 rounded-lg bg-gray-100 px-6 py-4">
         <FormLabel name={'PIN'} />
-        <FormInput
+        <Input
           value={pin}
-          onChange={(val) => {
-            if (val.length > 6) {
+          onChange={(e) => {
+            if (e.target.value.length > 6) {
               return
             }
-            if (isNaN(Number(val))) {
+            if (isNaN(Number(e.target.value))) {
               return
             }
-            setPin(val)
+            setPin(e.target.value)
           }}
           name="pin"
           type={'text'}

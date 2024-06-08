@@ -3,11 +3,11 @@ import { useLoader } from '@/context/LoaderContext'
 import { CircularProgress, Modal } from '@mui/material'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import FormInput from '../inputs/FormInput'
 import { WalletType } from '@/utils/enum'
 import { useAuth } from '@/context/AuthContext'
 import { BACKEND_URL, BASE_LAMPORTS } from '@/utils/config'
 import { useCustomWallet } from '@/context/CustomWalletContext'
+import { Input } from '@/components/ui/input'
 import axios from 'axios'
 
 const OperationModal = () => {
@@ -130,45 +130,44 @@ const OperationModal = () => {
               e.preventDefault()
               setOperationType('DEPOSIT')
             }}
-            disabled={operationType === 'DEPOSIT'}
+            // disabled={operationType === 'DEPOSIT'}
             type="button"
-            className={`border-primary w-full border-[0.01rem] ${operationType === 'DEPOSIT' ? 'bg-primary-dark border-0' : 'bg-secondary'}`}
+            className={`border-primary w-full border-[0.01rem] ${operationType === 'DEPOSIT' ? 'bg-primary/90 border-0' : 'bg-secondary'}`}
           >
             Deposit
           </Button>
-          <span>/</span>
           <Button
             onClick={(e) => {
               e.preventDefault()
               setOperationType('WITHRAW')
               isWithrawValid(amount)
             }}
-            disabled={operationType === 'WITHRAW'}
+            // disabled={operationType === 'WITHRAW'}
             type="button"
-            className={`border-primary w-full border-[0.01rem] ${operationType === 'WITHRAW' ? 'bg-primary-dark border-0' : 'bg-secondary'}`}
+            className={`border-primary w-full border-[0.01rem] ${operationType === 'WITHRAW' ? 'bg-primary/90 border-0' : 'bg-secondary'}`}
           >
             Withraw
           </Button>
         </div>
         <div className="flex w-full flex-col gap-2">
           <div className="relative w-full">
-            <FormInput
+            <Input
               type="text"
               name="name"
               value={amount}
               disabled={false}
               className="w-full"
-              onChange={(val) => {
-                if (isNaN(Number(val))) {
+              onChange={(e) => {
+                if (isNaN(Number(e.target.value))) {
                   return
                 }
-                if (Number(val) < 0) {
+                if (Number(e.target.value) < 0) {
                   return
                 }
                 if (operationType === 'WITHRAW') {
-                  isWithrawValid(val)
+                  isWithrawValid(e.target.value)
                 }
-                setAmount(val)
+                setAmount(e.target.value)
               }}
             />
             <span className="text-color3 bg-secondary absolute right-0 top-0 flex h-10 w-12 items-center justify-center">
