@@ -537,7 +537,7 @@ operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
       })
     }
 
-    if (parseInt(newWithdrawer.walletBalance) < lamports) {
+    if (parseInt(newWithdrawer.walletBalance) < parseInt(lamports)) {
       await prisma.$transaction([
         prisma.user.update({
           where: {

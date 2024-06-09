@@ -23,7 +23,6 @@ model User {
   receiverTransaction  Transaction[]          @relation("receiver")
   ClaimedSol           ClaimedSol[]
   OperationTransaction OperationTransaction[]
-  Transaction          Transaction[]
 }
 
 model OperationTransaction {
@@ -32,26 +31,29 @@ model OperationTransaction {
   amount    String
   signature String
   operation OPERATION
+  to        String    @default("")
   fee       String    @default("0")
   status    Status    @default(PENDING)
   createdAt DateTime  @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  Transaction Transaction[]
 }
 
 model Transaction {
-  id         Int      @id @default(autoincrement())
-  senderId   Int
-  recieverId Int
-  amount     String
-  signature  String
-  Status     Status   @default(PENDING)
-  createdAt  DateTime @default(now())
+  id                     Int        @id @default(autoincrement())
+  senderId               Int
+  recieverId             Int
+  amount                 String
+  signature              String     @default("")
+  wallet                 WalletType @default(WALLET1)
+  Status                 Status     @default(PENDING)
+  operationTransactionId Int?
+  createdAt              DateTime   @default(now())
 
-  sender   User  @relation("sender", fields: [senderId], references: [id])
-  receiver User  @relation("receiver", fields: [recieverId], references: [id])
-  User     User? @relation(fields: [userId], references: [id])
-  userId   Int?
+  sender    User                  @relation("sender", fields: [senderId], references: [id])
+  receiver  User                  @relation("receiver", fields: [recieverId], references: [id])
+  operation OperationTransaction? @relation(fields: [operationTransactionId], references: [id])
 }
 
 model ClaimedSol {
@@ -61,6 +63,11 @@ model ClaimedSol {
   createdAt     DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+enum WalletType {
+  WALLET1
+  WALLET2
 }
 
 enum Status {

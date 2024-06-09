@@ -142,6 +142,7 @@ const PayPage = () => {
             upiId: upiDetails.upiId,
             walletAddress: upiDetails.walletAddress,
             lamports,
+            pin,
           },
           {
             headers: {
