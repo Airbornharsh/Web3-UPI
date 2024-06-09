@@ -1,6 +1,8 @@
+'use client'
 import React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import Operation from '@/components/history/Operation'
+import Transaction from '@/components/history/Transaction'
 
 const Page = () => {
   return (
@@ -11,7 +13,7 @@ const Page = () => {
           <TabsTrigger value="transaction">transaction</TabsTrigger>
         </TabsList>
         <Operation />
-        <TabsContent value="transaction"></TabsContent>
+        <Transaction />
       </Tabs>
     </main>
   )

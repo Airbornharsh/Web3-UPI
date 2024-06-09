@@ -9,7 +9,10 @@ import React, {
 import { useWallet } from '@solana/wallet-adapter-react'
 import {
   AuthFormData,
+  OperationQuery,
   OperationType,
+  PageType,
+  TransactionQuery,
   TransactionType,
   User,
 } from '@/utils/types'
@@ -33,25 +36,41 @@ interface AuthContextProps {
   handleDeposit: (lamports: number, pin?: string) => Promise<void>
   handleWithdraw: (lamports: number) => Promise<void>
   transactions: {
-    query: {
-      page: number
-      limit: number
-      status: string
-      order: string
-    }
+    query: TransactionQuery
     data: TransactionType[]
+    page: PageType
   }
   operations: {
-    query: {
-      page: number
-      limit: number
-      status: string
-      order: string
-    }
+    query: OperationQuery
     data: OperationType[]
+    page: PageType
   }
-  getTransactionsHandler: () => Promise<void>
-  getOperationsHandler: () => Promise<void>
+  getTransactionsHandler: (query: TransactionQuery) => Promise<void>
+  getOperationsHandler: (query: OperationQuery) => Promise<void>
+  setTransactions: React.Dispatch<
+    React.SetStateAction<{
+      query: TransactionQuery
+      data: TransactionType[]
+      page: {
+        total: number
+        current: number
+        last: number
+        first: number
+      }
+    }>
+  >
+  setOperations: React.Dispatch<
+    React.SetStateAction<{
+      query: OperationQuery
+      data: OperationType[]
+      page: {
+        total: number
+        current: number
+        last: number
+        first: number
+      }
+    }>
+  >
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -80,13 +99,14 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>()
   const [transactions, setTransactions] = useState<{
-    query: {
-      page: number
-      limit: number
-      status: string
-      order: string
-    }
+    query: TransactionQuery
     data: TransactionType[]
+    page: {
+      total: number
+      current: number
+      last: number
+      first: number
+    }
   }>({
     query: {
       page: 1,
@@ -95,23 +115,37 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       order: 'desc',
     },
     data: [],
+    page: {
+      total: 0,
+      current: 1,
+      last: 1,
+      first: 1,
+    },
   })
   const [operations, setOperations] = useState<{
-    query: {
-      page: number
-      limit: number
-      status: string
-      order: string
-    }
+    query: OperationQuery
     data: OperationType[]
+    page: {
+      total: number
+      current: number
+      last: number
+      first: number
+    }
   }>({
     query: {
       page: 1,
       limit: 10,
       status: 'ALL',
       order: 'desc',
+      operation: 'ALL',
     },
     data: [],
+    page: {
+      total: 0,
+      current: 1,
+      last: 1,
+      first: 1,
+    },
   })
   const { setIsLoading, setErrorToastMessage, setToastMessage } = useLoader()
 
@@ -326,11 +360,22 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     }
   }
 
+  useEffect(() => {
+    if (isAuthenticated) getTransactionsHandler()
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, transactions.query])
+
+  useEffect(() => {
+    if (isAuthenticated) getOperationsHandler()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, operations.query])
+
   const getTransactionsHandler = async () => {
     setIsLoading(true)
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/v1/transaction/history?page=${transactions.query.page}&limit=${transactions.query.limit}&status=${transactions.query.status}&order=${transactions.query.order}`,
+        `${BACKEND_URL}/v1/txn/history?page=${transactions.query.page}&limit=${transactions.query.limit}&status=${transactions.query.status}&order=${transactions.query.order}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -338,7 +383,18 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
         },
       )
       const responseData = response.data
-      setTransactions(responseData.transactions)
+      setTransactions((prev) => {
+        return {
+          ...prev,
+          data: responseData.transactions,
+          page: {
+            total: responseData.totalPages,
+            current: responseData.currentPage,
+            last: responseData.lastPage,
+            first: responseData.firstPage,
+          },
+        }
+      })
     } catch (e) {
       console.log(e)
     } finally {
@@ -350,7 +406,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     setIsLoading(true)
     try {
       const response = await axios.get(
-        `${BACKEND_URL}/v1/operation/history?page=${operations.query.page}&limit=${operations.query.limit}&status=${operations.query.status}&order=${operations.query.order}`,
+        `${BACKEND_URL}/v1/operation/history?page=${operations.query.page}&limit=${operations.query.limit}&status=${operations.query.status}&order=${operations.query.order}&operation=${operations.query.operation}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -358,7 +414,18 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
         },
       )
       const responseData = response.data
-      setOperations(responseData.operations)
+      setOperations((prev) => {
+        return {
+          ...prev,
+          data: responseData.transactions,
+          page: {
+            total: responseData.totalPages,
+            current: responseData.currentPage,
+            last: responseData.lastPage,
+            first: responseData.firstPage,
+          },
+        }
+      })
     } catch (e) {
       console.log(e)
     } finally {
@@ -382,6 +449,8 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     transactions,
     getOperationsHandler,
     getTransactionsHandler,
+    setOperations,
+    setTransactions,
   }
 
   return (

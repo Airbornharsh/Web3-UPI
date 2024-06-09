@@ -490,20 +490,43 @@ txnRouter.get('/history', authMiddleware, async (req, res) => {
     const query = req.query
     const page = query.page ? parseInt(query.page as string) : 1
     const limit = query.limit ? parseInt(query.limit as string) : 10
-    const status = (query.status ? query.status : 'COMPLETED') as $Enums.Status
+    const status = (query.status ? query.status : 'COMPLETED') as
+      | $Enums.Status
+      | 'ALL'
     const order = (query.order ? query.order : 'desc') as 'asc' | 'desc'
+    const user = res.locals.user
+
+    const userData = await prisma.user.findFirst({
+      where: {
+        walletAddress: user.walletAddress,
+      },
+    })
+
+    if (!userData) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    let whereObject: any = {
+      OR: [
+        {
+          senderId: userData.id,
+        },
+        {
+          recieverId: userData.id,
+        },
+      ],
+    }
+
+    if (status !== 'ALL') {
+      whereObject = {
+        ...whereObject,
+        status,
+      }
+    }
 
     const transactions = await prisma.transaction.findMany({
       where: {
-        OR: [
-          {
-            senderId: res.locals.user.id,
-          },
-          {
-            recieverId: res.locals.user.id,
-          },
-        ],
-        status: status,
+        ...whereObject,
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -512,11 +535,26 @@ txnRouter.get('/history', authMiddleware, async (req, res) => {
       },
     })
 
-    if (transactions.length === 0) {
-      return res.status(404).json({ message: 'No transactions found' })
-    }
+    const totalCount = await prisma.transaction.count({
+      where: {
+        ...whereObject,
+      },
+    })
 
-    res.json({ message: 'Transaction List', transactions })
+    const totalPages = Math.ceil(totalCount / limit)
+    const currentPage = page
+    const firstPage = 1
+    const lastPage = totalPages
+
+    res.json({
+      message: 'Transaction List',
+      status: true,
+      transactions,
+      totalPages,
+      currentPage,
+      firstPage,
+      lastPage,
+    })
   } catch (e) {
     console.log(e)
     return res.status(500).json({ message: 'Something went wrong' })

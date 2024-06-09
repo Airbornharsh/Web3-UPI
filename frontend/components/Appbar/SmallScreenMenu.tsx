@@ -113,20 +113,30 @@ const SmallScreenMenu = () => {
                   </span>
                 </div>
               </div>
-              <div className="mt-4 sm:mt-0">
-                {publicKey ? (
-                  <CustomWalletDisconnectButton />
-                ) : (
-                  <CustomWalletMultiButton />
-                )}
-              </div>
+              {isAuthenticated ? (
+                <div className="mt-4 flex flex-col gap-2">
+                  <Link href={'/'}>
+                    <Button className='w-full'>Home</Button>
+                  </Link>
+                  <Link href={'/history'}>
+                    <Button className='w-full'>History</Button>
+                  </Link>
+                </div>
+              ) : null}
             </div>
             {isAuthenticated ? (
-              <div className="flex flex-col gap-2">
+              <div className="mt-4 flex flex-col gap-2">
                 <OperationModal />
                 <QrCodeViewModal />
               </div>
             ) : null}
+            <div className="mt-4 sm:mt-0">
+              {publicKey ? (
+                <CustomWalletDisconnectButton />
+              ) : (
+                <CustomWalletMultiButton />
+              )}
+            </div>
           </div>
         </SheetContent>
       </Sheet>

@@ -18,9 +18,9 @@ export interface OperationType {
   amount: string
   signature: string
   operation: 'WITHDRAW' | 'DEPOSIT' | 'PREDEPOSIT'
-  to: string
+  to?: string | OtherUserType
   fee: string
-  status: Status
+  status: 'PENDING' | 'COMPLETED' | 'FAILED'
   createdAt: Date
 }
 
@@ -31,15 +31,9 @@ export interface TransactionType {
   amount: string
   signature: string
   wallet: 'WALLET1' | 'WALLET2'
-  status: Status
+  status: 'PENDING' | 'COMPLETED' | 'FAILED'
   operationTransactionId: number | null
   createdAt: Date
-}
-
-export enum Status {
-  PENDING = 'PENDING',
-  SUCCESS = 'SUCCESS',
-  FAILED = 'FAILED',
 }
 
 export interface OtherUserType {
@@ -47,4 +41,26 @@ export interface OtherUserType {
   walletAddress: string
   upiId: string
   name: string
+}
+
+export interface OperationQuery {
+  page: number
+  limit: number
+  status: 'COMPLETED' | 'PENDING' | 'FAILED' | 'ALL'
+  order: 'asc' | 'desc'
+  operation: 'DEPOSIT' | 'WITHDRAW' | 'ALL'
+}
+
+export interface TransactionQuery {
+  page: number
+  limit: number
+  status: 'COMPLETED' | 'PENDING' | 'FAILED' | 'ALL'
+  order: 'asc' | 'desc'
+}
+
+export interface PageType {
+  current: number
+  total: number
+  first: number
+  last: number
 }

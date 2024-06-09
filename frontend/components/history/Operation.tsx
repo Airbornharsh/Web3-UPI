@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import {
   Table,
@@ -20,117 +21,254 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { TabsContent } from '@/components/ui/tabs'
-
-const invoices = [
-  {
-    invoice: 'INV001',
-    paymentStatus: 'Paid',
-    totalAmount: '$250.00',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    invoice: 'INV002',
-    paymentStatus: 'Pending',
-    totalAmount: '$150.00',
-    paymentMethod: 'PayPal',
-  },
-  {
-    invoice: 'INV003',
-    paymentStatus: 'Unpaid',
-    totalAmount: '$350.00',
-    paymentMethod: 'Bank Transfer',
-  },
-  {
-    invoice: 'INV004',
-    paymentStatus: 'Paid',
-    totalAmount: '$450.00',
-    paymentMethod: 'Credit Card',
-  },
-  {
-    invoice: 'INV005',
-    paymentStatus: 'Paid',
-    totalAmount: '$550.00',
-    paymentMethod: 'PayPal',
-  },
-  {
-    invoice: 'INV006',
-    paymentStatus: 'Pending',
-    totalAmount: '$200.00',
-    paymentMethod: 'Bank Transfer',
-  },
-  {
-    invoice: 'INV007',
-    paymentStatus: 'Unpaid',
-    totalAmount: '$300.00',
-    paymentMethod: 'Credit Card',
-  },
-]
+import { useAuth } from '@/context/AuthContext'
+import { OperationQuery } from '@/utils/types'
 
 const Operation = () => {
+  const { operations, setOperations } = useAuth()
+
+  const renderPaginationItems = () => {
+    const paginationItems = []
+
+    // Previous Button
+    paginationItems.push(
+      <PaginationItem key="prev">
+        <PaginationPrevious
+          onClick={() => {
+            if (operations.page.current === 1) return
+            const temp = {
+              ...operations,
+              query: {
+                ...operations.query,
+                page: operations.page.current - 1,
+              },
+            }
+            setOperations(temp)
+          }}
+        />
+      </PaginationItem>,
+    )
+
+    // Page numbers
+    for (
+      let i = operations.page.first;
+      i <= operations.page.last && i <= operations.page.total;
+      i++
+    ) {
+      paginationItems.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => {
+              const temp = {
+                ...operations,
+                query: {
+                  ...operations.query,
+                  page: i,
+                },
+              }
+              setOperations(temp)
+            }}
+            isActive={i === operations.page.current}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>,
+      )
+    }
+
+    // Ellipsis
+    if (operations.page.last < operations.page.total) {
+      paginationItems.push(
+        <PaginationItem key="ellipsis">
+          <PaginationEllipsis />
+        </PaginationItem>,
+      )
+    }
+
+    // Next Button
+    paginationItems.push(
+      <PaginationItem key="next">
+        <PaginationNext
+          onClick={() => {
+            if (operations.page.current === operations.page.total) return
+            const temp = {
+              ...operations,
+              query: {
+                ...operations.query,
+                page: operations.page.current + 1,
+              },
+            }
+            setOperations(temp)
+          }}
+        />
+      </PaginationItem>,
+    )
+
+    return paginationItems
+  }
+
   return (
     <TabsContent value="operation">
       <Card className="w-[98vw] max-w-[80rem] ">
         <CardHeader>
-          <CardTitle>Account</CardTitle>
+          <CardTitle>Operation</CardTitle>
           <CardDescription>
-            Make changes to your account here. Click save when youre done.
+            <div className="mt-2 flex flex-wrap gap-2">
+              <div className="w-full sm:max-w-32">
+                <Select
+                  onValueChange={(val) =>
+                    setOperations((o) => {
+                      return {
+                        ...o,
+                        query: {
+                          ...o.query,
+                          operation: val,
+                        } as OperationQuery,
+                      }
+                    })
+                  }
+                  defaultValue={operations.query.operation}
+                >
+                  <SelectTrigger className="min-w-32">
+                    <SelectValue placeholder="Operation" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Operation</SelectLabel>
+                      <SelectItem value="ALL">
+                        <span>ALL</span>
+                      </SelectItem>
+                      <SelectItem value="DEPOSIT">
+                        <span>Deposit</span>
+                      </SelectItem>
+                      <SelectItem value="WITHDRAW">
+                        <span>Withdraw</span>
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-full sm:max-w-32">
+                <Select
+                  onValueChange={(val) =>
+                    setOperations((o) => {
+                      return {
+                        ...o,
+                        query: {
+                          ...o.query,
+                          status: val,
+                        } as OperationQuery,
+                      }
+                    })
+                  }
+                  defaultValue={operations.query.status}
+                >
+                  <SelectTrigger className="min-w-32">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Status</SelectLabel>
+                      <SelectItem value="ALL">
+                        <span>ALL</span>
+                      </SelectItem>
+                      <SelectItem value="COMPLETED">
+                        <span>Completed</span>
+                      </SelectItem>
+                      <SelectItem value="PENDING">
+                        <span>Pending</span>
+                      </SelectItem>
+                      <SelectItem value="FAILED">
+                        <span>Failed</span>
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-full sm:max-w-32">
+                <Select
+                  onValueChange={(val) =>
+                    setOperations((o) => {
+                      return {
+                        ...o,
+                        query: {
+                          ...o.query,
+                          order: val,
+                        } as OperationQuery,
+                      }
+                    })
+                  }
+                  defaultValue={operations.query.order}
+                >
+                  <SelectTrigger className="min-w-32">
+                    <SelectValue placeholder="Order" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Order</SelectLabel>
+                      <SelectItem value="asc">
+                        <span>Ascending</span>
+                      </SelectItem>
+                      <SelectItem value="desc">
+                        <span>Descending</span>
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">Invoice</TableHead>
+                {/* <TableHead className="w-[100px]">Operation Id</TableHead> */}
+                <TableHead className="w-[100px]">Signature</TableHead>
+                <TableHead>Operation</TableHead>
+                <TableHead>Amount(SOL)</TableHead>
+                <TableHead>Fee(SOL)</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Method</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+                <TableHead>Created At</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.map((invoice) => (
-                <TableRow key={invoice.invoice}>
-                  <TableCell className="font-medium">
-                    {invoice.invoice}
+              {operations.data?.map((operation) => (
+                <TableRow key={operation.id}>
+                  {/* <TableCell>{operation.id}</TableCell> */}
+                  <TableCell>
+                    {operation.signature
+                      ? operation.signature.slice(0, 12) +
+                        '...' +
+                        operation.signature.slice(-12)
+                      : ''}
                   </TableCell>
-                  <TableCell>{invoice.paymentStatus}</TableCell>
-                  <TableCell>{invoice.paymentMethod}</TableCell>
-                  <TableCell className="text-right">
-                    {invoice.totalAmount}
+                  <TableCell>{operation.operation}</TableCell>
+                  <TableCell>{operation.amount}</TableCell>
+                  <TableCell>{operation.fee}</TableCell>
+                  <TableCell>{operation.status}</TableCell>
+                  <TableCell>
+                    {new Date(operation.createdAt).toLocaleDateString()}{' '}
+                    {new Date(operation.createdAt).toLocaleTimeString()}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
             <Pagination className="mt-6 text-white">
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious href="#" />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#" isActive>
-                    2
-                  </PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationLink href="#">3</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-                <PaginationItem>
-                  <PaginationNext href="#" />
-                </PaginationItem>
-              </PaginationContent>
+              <PaginationContent>{renderPaginationItems()}</PaginationContent>
             </Pagination>
           </Table>
         </CardContent>
