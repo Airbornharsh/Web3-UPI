@@ -734,6 +734,16 @@ operationRouter.get('/history', authMiddleware, async (req, res) => {
       where: {
         ...whereObject,
       },
+      include: {
+        to: {
+          select: {
+            walletAddress: true,
+            upiId: true,
+            name: true,
+            id: true,
+          },
+        },
+      },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: {

@@ -18,7 +18,8 @@ export interface OperationType {
   amount: string
   signature: string
   operation: 'WITHDRAW' | 'DEPOSIT' | 'PREDEPOSIT'
-  to?: string | OtherUserType
+  toId: number
+  to: OtherUserType
   fee: string
   status: 'PENDING' | 'COMPLETED' | 'FAILED'
   createdAt: Date
@@ -26,8 +27,10 @@ export interface OperationType {
 
 export interface TransactionType {
   id: number
-  senderId: number | OtherUserType
-  recieverId: number | OtherUserType
+  senderId: number
+  recieverId: number
+  sender: OtherUserType
+  receiver: OtherUserType
   amount: string
   signature: string
   wallet: 'WALLET1' | 'WALLET2'

@@ -528,6 +528,24 @@ txnRouter.get('/history', authMiddleware, async (req, res) => {
       where: {
         ...whereObject,
       },
+      include: {
+        receiver: {
+          select: {
+            walletAddress: true,
+            upiId: true,
+            name: true,
+            id: true,
+          },
+        },
+        sender: {
+          select: {
+            walletAddress: true,
+            upiId: true,
+            name: true,
+            id: true,
+          },
+        },
+      },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: {

@@ -239,6 +239,7 @@ const Operation = () => {
                 {/* <TableHead className="w-[100px]">Operation Id</TableHead> */}
                 <TableHead className="w-[100px]">Signature</TableHead>
                 <TableHead>Operation</TableHead>
+                <TableHead>To</TableHead>
                 <TableHead>Amount(SOL)</TableHead>
                 <TableHead>Fee(SOL)</TableHead>
                 <TableHead>Status</TableHead>
@@ -257,6 +258,9 @@ const Operation = () => {
                       : ''}
                   </TableCell>
                   <TableCell>{operation.operation}</TableCell>
+                  <TableCell>
+                    {operation.to ? operation.to.upiId : operation.toId}
+                  </TableCell>
                   <TableCell>{operation.amount}</TableCell>
                   <TableCell>{operation.fee}</TableCell>
                   <TableCell>{operation.status}</TableCell>
