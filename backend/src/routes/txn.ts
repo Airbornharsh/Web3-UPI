@@ -19,6 +19,7 @@ import {
   calculateTransactionFee,
   getTransactionWithRetry,
 } from '../utils/connection'
+import { $Enums } from '@prisma/client'
 
 const txnRouter = Router()
 
@@ -478,6 +479,44 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
         updatedAt: sender?.updatedAt,
       },
     })
+  } catch (e) {
+    console.log(e)
+    return res.status(500).json({ message: 'Something went wrong' })
+  }
+})
+
+txnRouter.get('/history', authMiddleware, async (req, res) => {
+  try {
+    const query = req.query
+    const page = query.page ? parseInt(query.page as string) : 1
+    const limit = query.limit ? parseInt(query.limit as string) : 10
+    const status = (query.status ? query.status : 'COMPLETED') as $Enums.Status
+    const order = (query.order ? query.order : 'desc') as 'asc' | 'desc'
+
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        OR: [
+          {
+            senderId: res.locals.user.id,
+          },
+          {
+            recieverId: res.locals.user.id,
+          },
+        ],
+        Status: status,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        createdAt: order,
+      },
+    })
+
+    if (transactions.length === 0) {
+      return res.status(404).json({ message: 'No transactions found' })
+    }
+
+    res.json({ message: 'Transaction List', transactions })
   } catch (e) {
     console.log(e)
     return res.status(500).json({ message: 'Something went wrong' })

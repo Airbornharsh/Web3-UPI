@@ -19,6 +19,7 @@ import {
   Transaction,
   sendAndConfirmTransaction,
 } from '@solana/web3.js'
+import { $Enums } from '@prisma/client'
 
 const operationRouter = Router()
 
@@ -647,6 +648,63 @@ operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
         craetedAt: user?.createdAt,
         updatedAt: user?.updatedAt,
       },
+    })
+  } catch (e) {
+    console.log(e)
+    return res.status(500).json({
+      message: 'Txn Error',
+      status: false,
+    })
+  }
+})
+
+operationRouter.get('/history', authMiddleware, async (req, res) => {
+  try {
+    const query = req.query
+    let operation = query.operation ? query.operation : 'ALL'
+    const status = (query.status ? query.status : 'COMPLETED') as $Enums.Status
+    const order = (query.order ? query.order : 'desc') as 'asc' | 'desc'
+    const user = res.locals.user
+
+    let whereObject = {}
+
+    if (operation === 'DEPOSIT') {
+      whereObject = {
+        OR: [
+          {
+            operation: 'DEPOSIT',
+          },
+          {
+            operation: 'PREDEPOSIT',
+          },
+        ],
+      }
+    } else if (operation === 'WITHDRAW') {
+      whereObject = {
+        operation: 'WITHDRAW',
+      }
+    } else {
+      return res.status(400).json({
+        message: 'Invalid operation',
+        status: false,
+      })
+    }
+
+    const transactions = await prisma.operationTransaction.findMany({
+      where: {
+        userId: user.id,
+        status,
+        ...whereObject,
+      },
+      orderBy: {
+        createdAt: order,
+      },
+    })
+
+    return res.status(200).json({
+      message: 'Transactions',
+      status: true,
+      transactions,
     })
   } catch (e) {
     console.log(e)
