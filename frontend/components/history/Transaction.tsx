@@ -222,8 +222,16 @@ const Transaction = () => {
                         transaction.signature.slice(-12)
                       : 'From Local Wallet'}
                   </TableCell>
-                  <TableCell>{transaction.senderId as number}</TableCell>
-                  <TableCell>{transaction.recieverId as number}</TableCell>
+                  <TableCell>
+                    {transaction.sender
+                      ? transaction.sender.upiId
+                      : transaction.senderId}
+                  </TableCell>
+                  <TableCell>
+                    {transaction.receiver
+                      ? transaction.receiver.upiId
+                      : transaction.recieverId}
+                  </TableCell>
                   <TableCell>{transaction.amount}</TableCell>
                   <TableCell>{transaction.status}</TableCell>
                   <TableCell>
