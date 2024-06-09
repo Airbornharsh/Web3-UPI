@@ -134,7 +134,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
           id: txn.id,
         },
         data: {
-          Status: 'FAILED',
+          status: 'FAILED',
         },
       })
       return res.status(411).json({
@@ -152,7 +152,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
           id: txn.id,
         },
         data: {
-          Status: 'FAILED',
+          status: 'FAILED',
         },
       })
       return res.status(411).json({
@@ -170,7 +170,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
           id: txn.id,
         },
         data: {
-          Status: 'FAILED',
+          status: 'FAILED',
         },
       })
       return res.status(411).json({
@@ -184,7 +184,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
         id: txn.id,
       },
       data: {
-        Status: 'COMPLETED',
+        status: 'COMPLETED',
       },
     })
 
@@ -265,7 +265,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
         fee: fee.toString(),
         status: 'PENDING',
         userId: sender.id,
-        to: receiver.walletAddress,
+        toId: receiver.id,
         operation: 'WITHDRAW',
         signature: '',
       },
@@ -278,7 +278,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
           senderId: sender.id,
           recieverId: receiver.id,
           wallet: 'WALLET2',
-          Status: 'PENDING',
+          status: 'PENDING',
           operationTransactionId: withdrawOperation.id,
         },
       }),
@@ -356,7 +356,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
             id: txn.id,
           },
           data: {
-            Status: 'FAILED',
+            status: 'FAILED',
           },
         }),
         prisma.user.update({
@@ -412,7 +412,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
             id: txn.id,
           },
           data: {
-            Status: 'FAILED',
+            status: 'FAILED',
           },
         }),
         prisma.user.update({
@@ -445,7 +445,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
           id: txn.id,
         },
         data: {
-          Status: 'COMPLETED',
+          status: 'COMPLETED',
         },
       }),
       prisma.user.update({
@@ -503,7 +503,7 @@ txnRouter.get('/history', authMiddleware, async (req, res) => {
             recieverId: res.locals.user.id,
           },
         ],
-        Status: status,
+        status: status,
       },
       skip: (page - 1) * limit,
       take: limit,

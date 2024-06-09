@@ -7,14 +7,18 @@ import React, {
   useEffect,
 } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { AuthFormData, User } from '@/utils/types'
+import {
+  AuthFormData,
+  OperationType,
+  TransactionType,
+  User,
+} from '@/utils/types'
 import { useLoader } from './LoaderContext'
 import axios from 'axios'
 import { BACKEND_URL, BASE_LAMPORTS, RPC_URL } from '@/utils/config'
 import { useCustomWallet } from './CustomWalletContext'
 import { WalletType } from '@/utils/enum'
 import { dictToArray } from '@/utils/fn'
-import OperationModal from '@/components/ui/modals/OperationModal'
 
 interface AuthContextProps {
   token: string
@@ -28,6 +32,26 @@ interface AuthContextProps {
   signUp: (formData: AuthFormData) => Promise<void>
   handleDeposit: (lamports: number, pin?: string) => Promise<void>
   handleWithdraw: (lamports: number) => Promise<void>
+  transactions: {
+    query: {
+      page: number
+      limit: number
+      status: string
+      order: string
+    }
+    data: TransactionType[]
+  }
+  operations: {
+    query: {
+      page: number
+      limit: number
+      status: string
+      order: string
+    }
+    data: OperationType[]
+  }
+  getTransactionsHandler: () => Promise<void>
+  getOperationsHandler: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
@@ -55,6 +79,40 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
   const [token, setToken] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>()
+  const [transactions, setTransactions] = useState<{
+    query: {
+      page: number
+      limit: number
+      status: string
+      order: string
+    }
+    data: TransactionType[]
+  }>({
+    query: {
+      page: 1,
+      limit: 10,
+      status: 'ALL',
+      order: 'desc',
+    },
+    data: [],
+  })
+  const [operations, setOperations] = useState<{
+    query: {
+      page: number
+      limit: number
+      status: string
+      order: string
+    }
+    data: OperationType[]
+  }>({
+    query: {
+      page: 1,
+      limit: 10,
+      status: 'ALL',
+      order: 'desc',
+    },
+    data: [],
+  })
   const { setIsLoading, setErrorToastMessage, setToastMessage } = useLoader()
 
   const checkAuth = async () => {
@@ -268,6 +326,46 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     }
   }
 
+  const getTransactionsHandler = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/v1/transaction/history?page=${transactions.query.page}&limit=${transactions.query.limit}&status=${transactions.query.status}&order=${transactions.query.order}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      const responseData = response.data
+      setTransactions(responseData.transactions)
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const getOperationsHandler = async () => {
+    setIsLoading(true)
+    try {
+      const response = await axios.get(
+        `${BACKEND_URL}/v1/operation/history?page=${operations.query.page}&limit=${operations.query.limit}&status=${operations.query.status}&order=${operations.query.order}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      const responseData = response.data
+      setOperations(responseData.operations)
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const contextValue: AuthContextProps = {
     token,
     setToken,
@@ -280,6 +378,10 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
     signUp,
     handleDeposit,
     handleWithdraw,
+    operations,
+    transactions,
+    getOperationsHandler,
+    getTransactionsHandler,
   }
 
   return (
