@@ -1,10 +1,10 @@
-import { User } from '@/utils/types'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { BACKEND_URL } from '@/utils/config'
 import Item from './Item'
 import { useAuth } from '@/context/AuthContext'
 import { Input } from '@/components/ui/input'
+import { User } from '@/utils/types'
 
 const UpiList = () => {
   const [userList, setUserList] = useState<User[]>([])
@@ -21,43 +21,33 @@ const UpiList = () => {
           },
         },
       )
-      const responseData = response.data
-      setUserList(responseData.users ?? [])
-    } catch (e) {
-      console.log(e)
+      setUserList(response.data.users ?? [])
+    } catch (error) {
+      console.error(error)
       setUserList([])
     }
   }
 
   useEffect(() => {
-    fetchUserList()
+    if (upiId) {
+      fetchUserList()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upiId])
 
   return (
-    <div>
-      <div>
-        <Input
-          onChange={(e) => {
-            setUpiId(e.target.value)
-          }}
-          value={upiId}
-          placeholder={'Upi Id'}
-          name="upiId"
-        />
-      </div>
-      <div>
-        <div>
-          {userList.map((user, index) => {
-            return (
-              <Item
-                key={index.toString() + user.walletAddress}
-                user={user}
-                index={index}
-              />
-            )
-          })}
-        </div>
+    <div className="rounded-lg p-4 shadow-md">
+      <Input
+        onChange={(e) => setUpiId(e.target.value)}
+        value={upiId}
+        placeholder="Enter UPI ID"
+        name="upiId"
+        className="mb-4"
+      />
+      <div className="space-y-4">
+        {userList.map((user, index) => (
+          <Item key={`${index}-${user.walletAddress}`} user={user} />
+        ))}
       </div>
     </div>
   )
