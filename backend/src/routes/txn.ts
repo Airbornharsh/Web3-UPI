@@ -472,7 +472,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
       user: {
         walletBalance: sender?.walletBalance,
         walletAddress: sender?.walletAddress,
-        id: sender?.Locked,
+        id: sender?.id,
         upiId: sender?.upiId,
         craetedAt: sender?.createdAt,
         updatedAt: sender?.updatedAt,

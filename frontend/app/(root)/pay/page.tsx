@@ -157,6 +157,7 @@ const PayPage = () => {
       }
       const responseData = response.data
       if (responseData.status) {
+        responseData.user && setUser(responseData.user)
         setToastMessage('Transaction successful')
         setAmount('0')
       } else {
