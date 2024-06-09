@@ -61,7 +61,7 @@ const PayPage = () => {
     'wallet-1',
   )
   const { setIsLoading } = useLoader()
-  const { token, updateBalance, balance, user } = useAuth()
+  const { token, updateBalance, balance, user, setUser } = useAuth()
   const upiId = searchParams.get('upiId')
 
   const onLoad = async () => {
@@ -121,6 +121,10 @@ const PayPage = () => {
           lamports,
           pin,
         )
+        if (!signature) {
+          setErrorToastMessage('Transaction failed')
+          return
+        }
         response = await axios.post(
           `${BACKEND_URL}/v1/txn/send/wallet-1`,
           {
@@ -280,7 +284,8 @@ const PayPage = () => {
                   <AlertDialogDescription className="text-white">
                     {amount + ' SOL'}
                   </AlertDialogDescription>
-                  {walletType === WalletType.CUSTOM && (
+                  {(walletSelected === 'wallet-2' ||
+                    walletType == WalletType.CUSTOM) && (
                     <AlertDialogDescription className="flex items-center gap-2 text-white">
                       <Label>PIN:</Label>
                       <Input
@@ -305,7 +310,7 @@ const PayPage = () => {
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={() => {
-                      if (walletType === WalletType.DEFAULT) {
+                      if (walletSelected === 'wallet-1') {
                         sendHandler({
                           pin: '',
                         })
