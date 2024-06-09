@@ -36,6 +36,7 @@ import {
 import { TabsContent } from '@/components/ui/tabs'
 import { useAuth } from '@/context/AuthContext'
 import { OperationQuery } from '@/utils/types'
+import { BASE_LAMPORTS } from '@/utils/config'
 
 const Operation = () => {
   const { operations, setOperations } = useAuth()
@@ -261,8 +262,8 @@ const Operation = () => {
                   <TableCell>
                     {operation.to ? operation.to.upiId : operation.toId}
                   </TableCell>
-                  <TableCell>{operation.amount}</TableCell>
-                  <TableCell>{operation.fee}</TableCell>
+                  <TableCell>{parseInt(operation.amount) / BASE_LAMPORTS}</TableCell>
+                  <TableCell>{parseInt(operation.fee) / BASE_LAMPORTS}</TableCell>
                   <TableCell>{operation.status}</TableCell>
                   <TableCell>
                     {new Date(operation.createdAt).toLocaleDateString()}{' '}

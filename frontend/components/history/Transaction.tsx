@@ -36,6 +36,7 @@ import {
 import { TabsContent } from '@/components/ui/tabs'
 import { useAuth } from '@/context/AuthContext'
 import { TransactionQuery } from '@/utils/types'
+import { BASE_LAMPORTS } from '@/utils/config'
 
 const Transaction = () => {
   const { transactions, setTransactions } = useAuth()
@@ -203,7 +204,7 @@ const Transaction = () => {
             <TableHeader>
               <TableRow>
                 {/* <TableHead className="w-[100px]">Transaction Id</TableHead> */}
-                <TableHead className="w-[100px]">Signature</TableHead>
+                <TableHead className="w-[200px]">Signature</TableHead>
                 <TableHead>Sender</TableHead>
                 <TableHead>Reciever</TableHead>
                 <TableHead>Amount(SOL)</TableHead>
@@ -232,7 +233,9 @@ const Transaction = () => {
                       ? transaction.receiver.upiId
                       : transaction.recieverId}
                   </TableCell>
-                  <TableCell>{transaction.amount}</TableCell>
+                  <TableCell>
+                    {parseInt(transaction.amount) / BASE_LAMPORTS}
+                  </TableCell>
                   <TableCell>{transaction.status}</TableCell>
                   <TableCell>
                     {new Date(transaction.createdAt).toLocaleDateString()}{' '}
