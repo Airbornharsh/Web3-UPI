@@ -19,6 +19,7 @@ import {
   calculateTransactionFee,
   getTransactionWithRetry,
 } from '../utils/connection'
+import { $Enums } from '@prisma/client'
 
 const txnRouter = Router()
 
@@ -133,7 +134,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
           id: txn.id,
         },
         data: {
-          Status: 'FAILED',
+          status: 'FAILED',
         },
       })
       return res.status(411).json({
@@ -151,7 +152,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
           id: txn.id,
         },
         data: {
-          Status: 'FAILED',
+          status: 'FAILED',
         },
       })
       return res.status(411).json({
@@ -169,7 +170,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
           id: txn.id,
         },
         data: {
-          Status: 'FAILED',
+          status: 'FAILED',
         },
       })
       return res.status(411).json({
@@ -183,7 +184,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
         id: txn.id,
       },
       data: {
-        Status: 'COMPLETED',
+        status: 'COMPLETED',
       },
     })
 
@@ -264,7 +265,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
         fee: fee.toString(),
         status: 'PENDING',
         userId: sender.id,
-        to: receiver.walletAddress,
+        toId: receiver.id,
         operation: 'WITHDRAW',
         signature: '',
       },
@@ -277,7 +278,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
           senderId: sender.id,
           recieverId: receiver.id,
           wallet: 'WALLET2',
-          Status: 'PENDING',
+          status: 'PENDING',
           operationTransactionId: withdrawOperation.id,
         },
       }),
@@ -355,7 +356,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
             id: txn.id,
           },
           data: {
-            Status: 'FAILED',
+            status: 'FAILED',
           },
         }),
         prisma.user.update({
@@ -411,7 +412,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
             id: txn.id,
           },
           data: {
-            Status: 'FAILED',
+            status: 'FAILED',
           },
         }),
         prisma.user.update({
@@ -444,7 +445,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
           id: txn.id,
         },
         data: {
-          Status: 'COMPLETED',
+          status: 'COMPLETED',
         },
       }),
       prisma.user.update({
@@ -477,6 +478,82 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
         craetedAt: sender?.createdAt,
         updatedAt: sender?.updatedAt,
       },
+    })
+  } catch (e) {
+    console.log(e)
+    return res.status(500).json({ message: 'Something went wrong' })
+  }
+})
+
+txnRouter.get('/history', authMiddleware, async (req, res) => {
+  try {
+    const query = req.query
+    const page = query.page ? parseInt(query.page as string) : 1
+    const limit = query.limit ? parseInt(query.limit as string) : 10
+    const status = (query.status ? query.status : 'COMPLETED') as
+      | $Enums.Status
+      | 'ALL'
+    const order = (query.order ? query.order : 'desc') as 'asc' | 'desc'
+    const user = res.locals.user
+
+    const userData = await prisma.user.findFirst({
+      where: {
+        walletAddress: user.walletAddress,
+      },
+    })
+
+    if (!userData) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    let whereObject: any = {
+      OR: [
+        {
+          senderId: userData.id,
+        },
+        {
+          recieverId: userData.id,
+        },
+      ],
+    }
+
+    if (status !== 'ALL') {
+      whereObject = {
+        ...whereObject,
+        status,
+      }
+    }
+
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        ...whereObject,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        createdAt: order,
+      },
+    })
+
+    const totalCount = await prisma.transaction.count({
+      where: {
+        ...whereObject,
+      },
+    })
+
+    const totalPages = Math.ceil(totalCount / limit)
+    const currentPage = page
+    const firstPage = 1
+    const lastPage = totalPages
+
+    res.json({
+      message: 'Transaction List',
+      status: true,
+      transactions,
+      totalPages,
+      currentPage,
+      firstPage,
+      lastPage,
     })
   } catch (e) {
     console.log(e)

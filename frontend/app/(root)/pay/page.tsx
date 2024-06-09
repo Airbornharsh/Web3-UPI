@@ -34,7 +34,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { parse } from 'postcss'
 
 const Page = () => {
   return (
@@ -209,11 +208,7 @@ const PayPage = () => {
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a Wallet" />
               </SelectTrigger>
-              <SelectContent
-                onChange={(e) => {
-                  console.log(e.target)
-                }}
-              >
+              <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Wallet</SelectLabel>
                   <SelectItem value="wallet-1">

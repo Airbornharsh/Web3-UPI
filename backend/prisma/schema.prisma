@@ -19,10 +19,11 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  senderTransaction    Transaction[]          @relation("sender")
-  receiverTransaction  Transaction[]          @relation("receiver")
-  ClaimedSol           ClaimedSol[]
-  OperationTransaction OperationTransaction[]
+  senderTransaction        Transaction[]          @relation("sender")
+  receiverTransaction      Transaction[]          @relation("receiver")
+  ClaimedSol               ClaimedSol[]
+  userOperationTransaction OperationTransaction[] @relation("user")
+  toOperationTransaction   OperationTransaction[] @relation("to")
 }
 
 model OperationTransaction {
@@ -31,12 +32,13 @@ model OperationTransaction {
   amount    String
   signature String
   operation OPERATION
-  to        String    @default("")
+  toId      Int?
   fee       String    @default("0")
   status    Status    @default(PENDING)
   createdAt DateTime  @default(now())
 
-  user        User          @relation(fields: [userId], references: [id])
+  user        User          @relation("user", fields: [userId], references: [id])
+  to          User?         @relation("to", fields: [toId], references: [id])
   Transaction Transaction[]
 }
 
@@ -47,7 +49,7 @@ model Transaction {
   amount                 String
   signature              String     @default("")
   wallet                 WalletType @default(WALLET1)
-  Status                 Status     @default(PENDING)
+  status                 Status     @default(PENDING)
   operationTransactionId Int?
   createdAt              DateTime   @default(now())
 

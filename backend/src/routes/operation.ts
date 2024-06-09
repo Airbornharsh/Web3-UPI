@@ -19,6 +19,7 @@ import {
   Transaction,
   sendAndConfirmTransaction,
 } from '@solana/web3.js'
+import { $Enums } from '@prisma/client'
 
 const operationRouter = Router()
 
@@ -647,6 +648,118 @@ operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
         craetedAt: user?.createdAt,
         updatedAt: user?.updatedAt,
       },
+    })
+  } catch (e) {
+    console.log(e)
+    return res.status(500).json({
+      message: 'Txn Error',
+      status: false,
+    })
+  }
+})
+
+operationRouter.get('/history', authMiddleware, async (req, res) => {
+  try {
+    const query = req.query
+    const page = query.page ? parseInt(query.page as string) : 1
+    const limit = query.limit ? parseInt(query.limit as string) : 10
+    let operation = query.operation ? query.operation : 'ALL'
+    const status = (query.status ? query.status : 'COMPLETED') as
+      | $Enums.Status
+      | 'ALL'
+    const order = (query.order ? query.order : 'desc') as 'asc' | 'desc'
+    const user = res.locals.user
+
+    const userData = await prisma.user.findFirst({
+      where: {
+        walletAddress: user.walletAddress,
+      },
+    })
+
+    if (!userData) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    let whereObject: any = {
+      userId: userData.id,
+    }
+
+    if (status !== 'ALL') {
+      whereObject = {
+        ...whereObject,
+        status,
+      }
+    }
+
+    if (operation === 'ALL') {
+      whereObject = {
+        ...whereObject,
+        OR: [
+          {
+            operation: 'DEPOSIT',
+          },
+          {
+            operation: 'PREDEPOSIT',
+          },
+          {
+            operation: 'WITHDRAW',
+          },
+        ],
+      }
+    } else if (operation === 'DEPOSIT') {
+      whereObject = {
+        ...whereObject,
+        OR: [
+          {
+            operation: 'DEPOSIT',
+          },
+          {
+            operation: 'PREDEPOSIT',
+          },
+        ],
+      }
+    } else if (operation === 'WITHDRAW') {
+      whereObject = {
+        ...whereObject,
+        operation: 'WITHDRAW',
+      }
+    } else {
+      return res.status(400).json({
+        message: 'Invalid operation',
+        status: false,
+      })
+    }
+
+    const transactions = await prisma.operationTransaction.findMany({
+      where: {
+        ...whereObject,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        createdAt: order,
+      },
+    })
+
+    const totalCount = await prisma.operationTransaction.count({
+      where: {
+        ...whereObject,
+      },
+    })
+
+    const totalPages = Math.ceil(totalCount / limit)
+    const currentPage = page
+    const firstPage = 1
+    const lastPage = totalPages
+
+    return res.status(200).json({
+      message: 'Transactions',
+      status: true,
+      transactions,
+      totalPages,
+      currentPage,
+      firstPage,
+      lastPage,
     })
   } catch (e) {
     console.log(e)
