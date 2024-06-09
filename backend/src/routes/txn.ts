@@ -44,7 +44,7 @@ txnRouter.get('/upiId', authMiddleware, async (req, res) => {
   }
 })
 
-txnRouter.post('/send', authMiddleware, async (req, res) => {
+txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
   try {
     const { lamports, upiId, walletAddress, signature } = req.body
     const senderUser = res.locals.user
@@ -53,6 +53,16 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
 
     if (!lamports || !upiId) {
       return res.status(400).json({ message: 'Amount and UPI ID is required' })
+    }
+
+    if (lamports <= 0) {
+      return res.status(400).json({ message: 'Amount cannot be negative' })
+    }
+
+    if (lamports < 20000000) {
+      return res
+        .status(400)
+        .json({ message: 'Amount should be more than 0.02 sol' })
     }
 
     const sender = await prisma.user.findFirst({

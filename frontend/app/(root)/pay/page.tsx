@@ -114,21 +114,42 @@ const PayPage = () => {
         setErrorToastMessage('Invalid amount')
         return
       }
-      const signature = await sendToken(upiDetails.walletAddress, lamports, pin)
-      const response = await axios.post(
-        `${BACKEND_URL}/v1/txn/send`,
-        {
-          upiId: upiDetails.upiId,
-          walletAddress: upiDetails.walletAddress,
+      let response
+      if (walletSelected === 'wallet-1') {
+        const signature = await sendToken(
+          upiDetails.walletAddress,
           lamports,
-          signature,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+          pin,
+        )
+        response = await axios.post(
+          `${BACKEND_URL}/v1/txn/send/wallet-1`,
+          {
+            upiId: upiDetails.upiId,
+            walletAddress: upiDetails.walletAddress,
+            lamports,
+            signature,
           },
-        },
-      )
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        )
+      } else {
+        response = await axios.post(
+          `${BACKEND_URL}/v1/txn/send/wallet-2`,
+          {
+            upiId: upiDetails.upiId,
+            walletAddress: upiDetails.walletAddress,
+            lamports,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        )
+      }
       const responseData = response.data
       if (responseData.success) {
         setToastMessage('Transaction successful')
@@ -219,6 +240,7 @@ const PayPage = () => {
                 SOL
               </span>
             </div>
+            <p>Min Sol: 0.02SOL</p>
             <p>${(parseFloat(amount) || 0) * solPrice}</p>
             <AlertDialog
               open={closeDialog}
@@ -237,10 +259,13 @@ const PayPage = () => {
               >
                 <Button
                   disabled={
-                    walletSelected === 'wallet-1'
-                      ? balance <= parseFloat(amount)
-                      : parseInt(user?.walletBalance!) / BASE_LAMPORTS <=
-                        parseFloat(amount)
+                    !(
+                      (parseFloat(amount) || 0) >= 0.02 &&
+                      (walletSelected === 'wallet-1'
+                        ? balance >= parseFloat(amount)
+                        : parseInt(user?.walletBalance!) / BASE_LAMPORTS >=
+                          parseFloat(amount))
+                    )
                   }
                 >
                   Pay
