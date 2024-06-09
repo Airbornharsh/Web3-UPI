@@ -25,6 +25,16 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { parse } from 'postcss'
 
 const Page = () => {
   return (
@@ -44,11 +54,14 @@ const PayPage = () => {
   } = useLoader()
   const { sendToken, walletType, solPrice, getSolPrice } = useCustomWallet()
   const [upiDetails, setUpiDetails] = useState<User | null>(null)
-  const [amount, setAmount] = useState<number>(0)
+  const [amount, setAmount] = useState<string>('0')
   const [closeDialog, setCloseDialog] = useState(false)
   const [pin, setPin] = useState('')
+  const [walletSelected, setWalletSelected] = useState<'wallet-1' | 'wallet-2'>(
+    'wallet-1',
+  )
   const { setIsLoading } = useLoader()
-  const { token, updateBalance } = useAuth()
+  const { token, updateBalance, balance, user, setUser } = useAuth()
   const upiId = searchParams.get('upiId')
 
   const onLoad = async () => {
@@ -71,6 +84,18 @@ const PayPage = () => {
     }
   }
 
+  const walletBalances = () => {
+    const wallet1_1 = balance.toString().split('.')[0]
+    const wallet1_2 = balance.toString().split('.')[1]?.slice(0, 2) || 0
+
+    const wallet1 = wallet1_1 + (wallet1_2 ? '.' + wallet1_2 : '')
+    const baseWallet2 = parseInt(user?.walletBalance!) / BASE_LAMPORTS
+    const wallet2_1 = baseWallet2.toString().split('.')[0]
+    const wallet2_2 = baseWallet2.toString().split('.')[1]?.slice(0, 2) || 0
+    const wallet2 = wallet2_1 + (wallet2_2 ? '.' + wallet2_2 : '')
+    return { wallet1, wallet2 }
+  }
+
   useEffect(() => {
     onLoad()
     setQrCodeScanOpen(false)
@@ -84,30 +109,56 @@ const PayPage = () => {
         setErrorToastMessage('Invalid UPI ID')
         return
       }
-      const lamports = BASE_LAMPORTS * amount
+      const lamports = BASE_LAMPORTS * (parseFloat(amount) || 0)
       if (lamports <= 0) {
         setErrorToastMessage('Invalid amount')
         return
       }
-      const signature = await sendToken(upiDetails.walletAddress, lamports, pin)
-      const response = await axios.post(
-        `${BACKEND_URL}/v1/txn/send`,
-        {
-          upiId: upiDetails.upiId,
-          walletAddress: upiDetails.walletAddress,
+      let response
+      if (walletSelected === 'wallet-1') {
+        const signature = await sendToken(
+          upiDetails.walletAddress,
           lamports,
-          signature,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+          pin,
+        )
+        if (!signature) {
+          setErrorToastMessage('Transaction failed')
+          return
+        }
+        response = await axios.post(
+          `${BACKEND_URL}/v1/txn/send/wallet-1`,
+          {
+            upiId: upiDetails.upiId,
+            walletAddress: upiDetails.walletAddress,
+            lamports,
+            signature,
           },
-        },
-      )
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        )
+      } else {
+        response = await axios.post(
+          `${BACKEND_URL}/v1/txn/send/wallet-2`,
+          {
+            upiId: upiDetails.upiId,
+            walletAddress: upiDetails.walletAddress,
+            lamports,
+            pin,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        )
+      }
       const responseData = response.data
-      if (responseData.success) {
+      if (responseData.status) {
         setToastMessage('Transaction successful')
-        setAmount(0)
+        setAmount('0')
       } else {
         setErrorToastMessage('Transaction failed')
       }
@@ -148,28 +199,54 @@ const PayPage = () => {
                 <AutorenewIcon className="scale-75" />
               </span>
             </span>
+            <Select
+              onValueChange={(val) =>
+                setWalletSelected(val as 'wallet-1' | 'wallet-2')
+              }
+              defaultValue={walletSelected}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a Wallet" />
+              </SelectTrigger>
+              <SelectContent
+                onChange={(e) => {
+                  console.log(e.target)
+                }}
+              >
+                <SelectGroup>
+                  <SelectLabel>Wallet</SelectLabel>
+                  <SelectItem value="wallet-1">
+                    <span>Wallet-1</span>{' '}
+                    <span>{walletBalances().wallet1}SOL</span>
+                  </SelectItem>
+                  <SelectItem value="wallet-2">
+                    <span>Wallet-2</span>{' '}
+                    <span>{walletBalances().wallet2}SOL</span>
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <div className="relative h-10">
               <Input
-                value={amount.toString()}
+                value={amount}
                 placeholder="Amount"
                 onChange={(e) => {
+                  if (isNaN(Number(e.target.value))) {
+                    return
+                  }
                   if (Number(e.target.value) < 0) {
-                    setAmount(0)
                     return
                   }
-                  if (Number(e.target.value) > 100000) {
-                    setAmount(100000)
-                    return
-                  }
-                  getSolPrice()
-                  setAmount(Number(e.target.value))
+                  // getSolPrice()
+                  setAmount(e.target.value)
                 }}
               />
               <span className="bg-color3 absolute right-0 top-0 flex h-12 w-12 items-center justify-center font-bold text-white">
                 SOL
               </span>
             </div>
-            <p>${amount * solPrice}</p>
+            <p>Min Sol: 0.02SOL</p>
+            <p>${(parseFloat(amount) || 0) * solPrice}</p>
             <AlertDialog
               open={closeDialog}
               onOpenChange={() => {
@@ -185,7 +262,19 @@ const PayPage = () => {
                 asChild
                 disabled={!amount}
               >
-                <Button disabled={!amount}>Pay</Button>
+                <Button
+                  disabled={
+                    !(
+                      (parseFloat(amount) || 0) >= 0.02 &&
+                      (walletSelected === 'wallet-1'
+                        ? balance >= parseFloat(amount)
+                        : parseInt(user?.walletBalance!) / BASE_LAMPORTS >=
+                          parseFloat(amount))
+                    )
+                  }
+                >
+                  Pay
+                </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -195,7 +284,8 @@ const PayPage = () => {
                   <AlertDialogDescription className="text-white">
                     {amount + ' SOL'}
                   </AlertDialogDescription>
-                  {walletType === WalletType.CUSTOM && (
+                  {(walletSelected === 'wallet-2' ||
+                    walletType == WalletType.CUSTOM) && (
                     <AlertDialogDescription className="flex items-center gap-2 text-white">
                       <Label>PIN:</Label>
                       <Input
@@ -220,7 +310,7 @@ const PayPage = () => {
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={() => {
-                      if (walletType === WalletType.DEFAULT) {
+                      if (walletSelected === 'wallet-1') {
                         sendHandler({
                           pin: '',
                         })

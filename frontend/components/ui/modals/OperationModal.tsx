@@ -27,7 +27,7 @@ import { calculateTransactionFee } from '@/utils/connection'
 
 const OperationModal = () => {
   const { operationOpen, setOperationOpen } = useLoader()
-  const { walletType, solPrice, balance } = useCustomWallet()
+  const { walletType, solPrice } = useCustomWallet()
   const { token, handleDeposit, handleWithdraw, user } = useAuth()
   const [operationType, setOperationType] = useState<'DEPOSIT' | 'WITHDRAW'>(
     'DEPOSIT',

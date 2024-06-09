@@ -1,31 +1,17 @@
 import { useCustomWallet } from '@/context/CustomWalletContext'
-import { WalletType } from '@/utils/enum'
-import { WalletDisconnectButton } from '@solana/wallet-adapter-react-ui'
-import PrivateWalletDisconnectButton from './PrivateWalletDisconnectButton'
+import { Button } from '../ui/button'
 
 const CustomWalletDisconnectButton = () => {
-  const { walletType } = useCustomWallet()
+  const { disconnectPrivatWallet } = useCustomWallet()
+
   return (
-    <>
-      {walletType === WalletType.CUSTOM ? (
-        <>
-          <PrivateWalletDisconnectButton />
-        </>
-      ) : (
-        <>
-          <WalletDisconnectButton
-            style={{
-              backgroundColor: '#19B784',
-              color: 'white',
-              padding: '0.5rem 1rem',
-              borderRadius: '0.5rem',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          />
-        </>
-      )}
-    </>
+    <Button
+      onClick={disconnectPrivatWallet}
+      variant={'outline'}
+      className="w-full"
+    >
+      Disconnect
+    </Button>
   )
 }
 

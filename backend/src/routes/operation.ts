@@ -247,7 +247,7 @@ operationRouter.post('/deposit', authMiddleware, async (req, res) => {
       ])
       return res.status(411).json({
         message: 'Transaction sent to wrong address',
-        success: false,
+        status: false,
       })
     }
 
@@ -275,7 +275,7 @@ operationRouter.post('/deposit', authMiddleware, async (req, res) => {
       ])
       return res.status(411).json({
         message: 'Transaction sent to wrong address',
-        success: false,
+        status: false,
       })
     }
 
@@ -537,7 +537,7 @@ operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
       })
     }
 
-    if (parseInt(newWithdrawer.walletBalance) < lamports) {
+    if (parseInt(newWithdrawer.walletBalance) < parseInt(lamports)) {
       await prisma.$transaction([
         prisma.user.update({
           where: {

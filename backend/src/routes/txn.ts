@@ -1,9 +1,24 @@
 import { Router } from 'express'
 import prisma from '../prisma'
 import { authMiddleware } from '../middleware'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { RPC_URL } from '../config'
-import { getTransactionWithRetry } from '../utils/connection'
+import bcrypt from 'bcrypt'
+import {
+  Connection,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  sendAndConfirmTransaction,
+} from '@solana/web3.js'
+import {
+  BASE_LAMPORTS,
+  CONVENIENCE_FEE_PERCENTAGE,
+  RPC_URL,
+  VAULT_WALLET,
+} from '../config'
+import {
+  calculateTransactionFee,
+  getTransactionWithRetry,
+} from '../utils/connection'
 
 const txnRouter = Router()
 
@@ -44,7 +59,7 @@ txnRouter.get('/upiId', authMiddleware, async (req, res) => {
   }
 })
 
-txnRouter.post('/send', authMiddleware, async (req, res) => {
+txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
   try {
     const { lamports, upiId, walletAddress, signature } = req.body
     const senderUser = res.locals.user
@@ -53,6 +68,16 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
 
     if (!lamports || !upiId) {
       return res.status(400).json({ message: 'Amount and UPI ID is required' })
+    }
+
+    if (lamports <= 0) {
+      return res.status(400).json({ message: 'Amount cannot be negative' })
+    }
+
+    if (lamports < 20000000) {
+      return res
+        .status(400)
+        .json({ message: 'Amount should be more than 0.02 sol' })
     }
 
     const sender = await prisma.user.findFirst({
@@ -113,7 +138,7 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
       })
       return res.status(411).json({
         message: 'Transaction signature/amount incorrect',
-        success: false,
+        status: false,
       })
     }
 
@@ -131,7 +156,7 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
       })
       return res.status(411).json({
         message: 'Transaction sent to wrong address',
-        success: false,
+        status: false,
       })
     }
 
@@ -149,7 +174,7 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
       })
       return res.status(411).json({
         message: 'Transaction sent to wrong address',
-        success: false,
+        status: false,
       })
     }
 
@@ -162,12 +187,300 @@ txnRouter.post('/send', authMiddleware, async (req, res) => {
       },
     })
 
-    return res.json({ message: 'Transaction successful', success: true })
+    return res.json({ message: 'Transaction successful', status: true })
   } catch (e) {
     console.log(e)
     return res
       .status(500)
-      .json({ message: 'Something went wrong', success: false })
+      .json({ message: 'Something went wrong', status: false })
+  }
+})
+
+txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
+  try {
+    const { lamports, upiId, walletAddress, pin } = req.body
+    const senderUser = res.locals.user
+
+    console.log(req.body)
+
+    if (!lamports || !upiId) {
+      return res.status(400).json({ message: 'Amount and UPI ID is required' })
+    }
+
+    if (lamports <= 0) {
+      return res.status(400).json({ message: 'Amount cannot be negative' })
+    }
+
+    if (lamports < 20000000) {
+      return res
+        .status(400)
+        .json({ message: 'Amount should be more than 0.02 sol' })
+    }
+
+    let sender = await prisma.user.findFirst({
+      where: {
+        walletAddress: senderUser.walletAddress,
+      },
+    })
+
+    if (!sender) {
+      return res.status(404).json({ message: 'Sender not found' })
+    }
+
+    const hashedPin = await bcrypt.compare(pin, sender.pin)
+
+    if (!hashedPin) {
+      return res.status(401).json({ message: 'Incorrect pin' })
+    }
+
+    const receiver = await prisma.user.findFirst({
+      where: {
+        upiId,
+        walletAddress,
+      },
+    })
+
+    if (!receiver) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    if (receiver.walletAddress === sender.walletAddress) {
+      return res
+        .status(400)
+        .json({ message: 'You cannot send money to yourself' })
+    }
+
+    const serverTxnFee = (await calculateTransactionFee()) * BASE_LAMPORTS
+    const withdrawerLamports = Math.floor(
+      (100 * (parseInt(lamports) - serverTxnFee)) /
+        (100 + CONVENIENCE_FEE_PERCENTAGE),
+    )
+    const fee =
+      serverTxnFee +
+      Math.floor((withdrawerLamports * CONVENIENCE_FEE_PERCENTAGE) / 100)
+    const withdrawOperation = await prisma.operationTransaction.create({
+      data: {
+        amount: withdrawerLamports.toString(),
+        fee: fee.toString(),
+        status: 'PENDING',
+        userId: sender.id,
+        to: receiver.walletAddress,
+        operation: 'WITHDRAW',
+        signature: '',
+      },
+    })
+
+    const data = await prisma.$transaction([
+      prisma.transaction.create({
+        data: {
+          amount: lamports.toString(),
+          senderId: sender.id,
+          recieverId: receiver.id,
+          wallet: 'WALLET2',
+          Status: 'PENDING',
+          operationTransactionId: withdrawOperation.id,
+        },
+      }),
+      prisma.user.findFirst({
+        where: {
+          walletAddress: sender.walletAddress,
+        },
+      }),
+    ])
+    const txn = data[0]
+    sender = data[1]
+
+    let withdrawerLocked = sender?.Locked
+    let tries = 10
+    while (withdrawerLocked && tries > 0) {
+      console.log('Waiting for user to unlock', 10 - tries)
+      await new Promise((resolve) => setTimeout(resolve, 4000))
+      const tempwithdrawer = await prisma.user.findFirst({
+        where: {
+          walletAddress: senderUser.walletAddress,
+        },
+      })
+      if (!tempwithdrawer) {
+        return res.status(404).json({
+          message: 'User not found',
+          status: false,
+        })
+      }
+      withdrawerLocked = tempwithdrawer?.Locked!
+      tries--
+    }
+
+    if (withdrawerLocked) {
+      await prisma.operationTransaction.update({
+        where: {
+          id: withdrawOperation.id,
+        },
+        data: {
+          status: 'FAILED',
+        },
+      })
+      return res.status(400).json({
+        message: 'User is locked',
+        status: false,
+      })
+    }
+
+    await prisma.user.update({
+      where: {
+        id: sender?.id,
+      },
+      data: {
+        Locked: true,
+      },
+    })
+
+    sender = await prisma.user.findFirst({
+      where: {
+        walletAddress: senderUser.walletAddress,
+      },
+    })
+
+    if (parseInt(sender?.walletBalance!) < parseInt(lamports)) {
+      await prisma.$transaction([
+        prisma.operationTransaction.update({
+          where: {
+            id: withdrawOperation.id,
+          },
+          data: {
+            status: 'FAILED',
+          },
+        }),
+        prisma.transaction.update({
+          where: {
+            id: txn.id,
+          },
+          data: {
+            Status: 'FAILED',
+          },
+        }),
+        prisma.user.update({
+          where: {
+            id: sender?.id,
+          },
+          data: {
+            Locked: false,
+          },
+        }),
+      ])
+      return res.status(400).json({
+        message: 'Insufficient balance',
+        status: false,
+      })
+    }
+
+    const wallet = VAULT_WALLET()
+
+    const transaction = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: wallet.publicKey,
+        toPubkey: new PublicKey(receiver.walletAddress),
+        lamports: withdrawerLamports,
+      }),
+    )
+
+    const signature = await sendAndConfirmTransaction(connection, transaction, [
+      wallet,
+    ])
+
+    const txn2 = await getTransactionWithRetry(signature, {
+      maxSupportedTransactionVersion: 1,
+    })
+
+    if (
+      (txn2?.meta?.postBalances[1] ?? 0) - (txn2?.meta?.preBalances[1] ?? 0) !==
+        withdrawerLamports &&
+      (txn2?.meta?.preBalances[0] ?? 0) - (txn2?.meta?.postBalances[0] ?? 0) !==
+        withdrawerLamports
+    ) {
+      await prisma.$transaction([
+        prisma.operationTransaction.update({
+          where: {
+            id: withdrawOperation.id,
+          },
+          data: {
+            status: 'FAILED',
+          },
+        }),
+        prisma.transaction.update({
+          where: {
+            id: txn.id,
+          },
+          data: {
+            Status: 'FAILED',
+          },
+        }),
+        prisma.user.update({
+          where: {
+            id: sender?.id,
+          },
+          data: {
+            Locked: false,
+          },
+        }),
+      ])
+      return res.status(411).json({
+        message: 'Transaction signature/amount incorrect',
+        status: false,
+      })
+    }
+
+    await prisma.$transaction([
+      prisma.operationTransaction.update({
+        where: {
+          id: withdrawOperation.id,
+        },
+        data: {
+          status: 'COMPLETED',
+          signature,
+        },
+      }),
+      prisma.transaction.update({
+        where: {
+          id: txn.id,
+        },
+        data: {
+          Status: 'COMPLETED',
+        },
+      }),
+      prisma.user.update({
+        where: {
+          id: sender?.id,
+        },
+        data: {
+          Locked: false,
+          walletBalance: (
+            parseInt(sender?.walletBalance!) - lamports
+          ).toString(),
+        },
+      }),
+    ])
+
+    sender = await prisma.user.findFirst({
+      where: {
+        walletAddress: senderUser.walletAddress,
+      },
+    })
+
+    return res.status(200).json({
+      message: 'Transaction successful',
+      status: true,
+      user: {
+        walletBalance: sender?.walletBalance,
+        walletAddress: sender?.walletAddress,
+        id: sender?.Locked,
+        upiId: sender?.upiId,
+        craetedAt: sender?.createdAt,
+        updatedAt: sender?.updatedAt,
+      },
+    })
+  } catch (e) {
+    console.log(e)
+    return res.status(500).json({ message: 'Something went wrong' })
   }
 })
 

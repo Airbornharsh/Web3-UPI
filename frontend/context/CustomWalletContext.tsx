@@ -65,7 +65,7 @@ export const CustomWalletProvider: React.FC<
   CustomWalletContextProviderProps
 > = ({ children }) => {
   const { connection } = useConnection()
-  const { publicKey, wallet, sendTransaction } = useWallet()
+  const { publicKey, wallet, sendTransaction, disconnect } = useWallet()
   const [encodedPrivateKey, setEncodedPrivateKey] = useState<string>('')
   const [storedPublicKey, setStoredPublicKey] = useState<string>(
     publicKey ? publicKey.toString() : '',
@@ -281,6 +281,7 @@ export const CustomWalletProvider: React.FC<
   }
 
   const disconnectPrivatWallet = () => {
+    disconnect()
     localStorage.removeItem('privateKey')
     localStorage.removeItem('token')
     setEncodedPrivateKey('')

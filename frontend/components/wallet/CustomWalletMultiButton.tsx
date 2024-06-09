@@ -1,10 +1,9 @@
-import { useCustomWallet } from '@/context/CustomWalletContext'
-import { WalletType } from '@/utils/enum'
 import { Modal } from '@mui/material'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 import PrivateAuthModal from '../ui/modals/PrivateAuthModal'
 import { useState } from 'react'
 import { Button } from '../ui/button'
+import { useWallet } from '@solana/wallet-adapter-react'
 
 const CustomWalletMultiButton = () => {
   const [openModal, setOpenModal] = useState(false)
@@ -14,21 +13,22 @@ const CustomWalletMultiButton = () => {
       <WalletMultiButton
         style={{
           backgroundColor: '#19B784',
-          padding: '0.5rem 1rem',
           borderRadius: '0.5rem',
           border: 'none',
           cursor: 'pointer',
+          height: '3rem',
+          width: '60vw',
+          maxWidth: '21rem',
+          fontSize: '0.9rem',
+          fontWeight: 500,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       />
-      <div className="text-base">
-        <Button
-          onClick={() => setOpenModal(true)}
-          variant={'outline'}
-          className="w-full text-primary"
-        >
-          Private Auth
-        </Button>
-      </div>
+      <Button onClick={() => setOpenModal(true)} className="w-full">
+        Private Auth
+      </Button>
       <Modal
         open={openModal}
         onClose={() => {
@@ -42,3 +42,4 @@ const CustomWalletMultiButton = () => {
 }
 
 export default CustomWalletMultiButton
+
