@@ -138,7 +138,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
       })
       return res.status(411).json({
         message: 'Transaction signature/amount incorrect',
-        success: false,
+        status: false,
       })
     }
 
@@ -156,7 +156,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
       })
       return res.status(411).json({
         message: 'Transaction sent to wrong address',
-        success: false,
+        status: false,
       })
     }
 
@@ -174,7 +174,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
       })
       return res.status(411).json({
         message: 'Transaction sent to wrong address',
-        success: false,
+        status: false,
       })
     }
 
@@ -187,12 +187,12 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
       },
     })
 
-    return res.json({ message: 'Transaction successful', success: true })
+    return res.json({ message: 'Transaction successful', status: true })
   } catch (e) {
     console.log(e)
     return res
       .status(500)
-      .json({ message: 'Something went wrong', success: false })
+      .json({ message: 'Something went wrong', status: false })
   }
 })
 
@@ -425,7 +425,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
       ])
       return res.status(411).json({
         message: 'Transaction signature/amount incorrect',
-        success: false,
+        status: false,
       })
     }
 
