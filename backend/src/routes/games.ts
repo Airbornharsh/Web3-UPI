@@ -94,7 +94,7 @@ gamesRouter.post('/dice', authMiddleware, async (req, res) => {
           rollUnder: rollUnder.toString(),
           win,
         },
-      }), 
+      }),
       prisma.user.update({
         where: {
           walletAddress: user.walletAddress,
@@ -120,4 +120,72 @@ gamesRouter.post('/dice', authMiddleware, async (req, res) => {
   }
 })
 
+gamesRouter.get('/dice', authMiddleware, async (req, res) => {
+  try {
+    const localUser = res.locals.user
+    const query = req.query
+    const limit = parseInt(query.limit as string) || 10
+    const page = parseInt(query.page as string) || 1
+    const order = (query.order ? query.order : 'desc') as 'asc' | 'desc'
+    const win = (query.win ? query.win : 'ALL') as 'WON' | 'LOST' | 'ALL'
+
+    const user = await prisma.user.findFirst({
+      where: {
+        walletAddress: localUser.walletAddress,
+      },
+    })
+    if (!user) {
+      return res.status(400).send({ message: 'User not found' })
+    }
+
+    let whereObject: any = {
+      userId: user.id,
+      gameType: 'DICE',
+    }
+    if (win === 'ALL') {
+    } else if (win === 'WON') {
+      whereObject = {
+        ...whereObject,
+        win: true,
+      }
+    } else if (win === 'LOST') {
+      whereObject = {
+        ...whereObject,
+        win: false,
+      }
+    }
+    const games = await prisma.game.findMany({
+      where: {
+        ...whereObject,
+      },
+      orderBy: {
+        createdAt: order,
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+    })
+    const totalGames = await prisma.game.count({
+      where: {
+        ...whereObject,
+      },
+    })
+    const totalPages = Math.ceil(totalGames / limit)
+    const currentPage = page
+    const firstPage = 1
+    const lastPage = totalPages
+
+    return res.status(200).json({
+      message: 'Games fetched successfully',
+      status: true,
+      games,
+      totalPages,
+      currentPage,
+      firstPage,
+      lastPage,
+    })
+  } catch (e) {
+    console.error(e)
+    res.status(500).send({ message: 'Internal Server Error' })
+  }
+})
 export default gamesRouter

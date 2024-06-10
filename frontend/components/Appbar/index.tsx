@@ -63,7 +63,7 @@ export const Appbar = () => {
       <div className="relative flex w-[98vw] max-w-[80rem] items-center justify-between pb-2 pt-2">
         <div className="text-color3 flex items-end justify-center pl-4 pt-3 text-2xl">
           <span>WPI </span>
-          <span className="text-sm pb-1">({NETWORK})</span>
+          <span className="pb-1 text-sm">({NETWORK})</span>
         </div>
         {
           <div className="flex items-center gap-1">
