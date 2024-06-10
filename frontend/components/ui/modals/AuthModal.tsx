@@ -66,8 +66,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
       } else {
         setStep(2)
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
     }
@@ -85,8 +87,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
       } else {
         setStep(3)
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
     }

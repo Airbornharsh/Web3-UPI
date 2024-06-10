@@ -24,7 +24,7 @@ import axios from 'axios'
 import { Label } from '../label'
 
 const OperationModal = () => {
-  const { operationOpen, setOperationOpen } = useLoader()
+  const { operationOpen, setOperationOpen, setErrorToastMessage } = useLoader()
   const { walletType, solPrice } = useCustomWallet()
   const { token, handleDeposit, handleWithdraw, user } = useAuth()
   const [operationType, setOperationType] = useState<'DEPOSIT' | 'WITHDRAW'>(
@@ -59,8 +59,10 @@ const OperationModal = () => {
       await handleDeposit(Number(amount) * BASE_LAMPORTS, pin)
       setAmount('0')
       setOperationOpen(false)
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     }
   }
 
@@ -98,7 +100,7 @@ const OperationModal = () => {
           loading: false,
         })
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
       setWithdrawAmounts({
         lamports: '0',
@@ -120,8 +122,10 @@ const OperationModal = () => {
         loading: false,
       })
       setOperationOpen(false)
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     }
   }
 
