@@ -234,7 +234,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
           value={formData.upiId}
           onChange={(e) => {
             setFormData((f) => {
-              return { ...f, upiId: e.target.value }
+              return { ...f, name: e.target.value }
             })
           }}
           name="upiId"
@@ -243,16 +243,24 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
       </div>
       <div className="flex flex-col gap-1">
         <Label>UPI Id</Label>
-        <Input
-          value={formData.name}
-          onChange={(e) => {
-            setFormData((f) => {
-              return { ...f, name: e.target.value }
-            })
-          }}
-          name="name"
-          type="text"
-        />
+        <div className="relative">
+          <Input
+            value={formData.name}
+            onChange={(e) => {
+              setFormData((f) => {
+                return { ...f, upiId: e.target.value }
+              })
+            }}
+            name="name"
+            type="text"
+            className="border-[0.01rem]"
+          />
+          <span
+            className={`text-color3 bg-secondary absolute right-0 top-0 flex h-12 w-12 cursor-not-allowed items-center justify-center border-y-[0.01rem] border-r-[0.01rem] px-8 text-gray-500`}
+          >
+            @wpi
+          </span>
+        </div>
       </div>
       <Button
         onClick={(e) => {
@@ -308,7 +316,11 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
             <div key={key} className="flex flex-col gap-1">
               <Label>{keyValue}</Label>
               <Input
-                value={formData[key]! as string}
+                value={
+                  key === 'upiId'
+                    ? (formData[key]! as string) + '@wpi'
+                    : (formData[key]! as string)
+                }
                 onChange={(e) => {
                   setFormData((f) => {
                     return { ...f, [key]: e.target.value }

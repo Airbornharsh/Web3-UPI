@@ -84,7 +84,7 @@ const SmallScreenMenu = () => {
                 <div className="flex items-center">
                   {user?.upiId && (
                     <span className="truncate text-sm font-semibold ">
-                      UpiId: {user?.upiId}
+                      UpiId: {user?.upiId}@wpi
                     </span>
                   )}
                 </div>
