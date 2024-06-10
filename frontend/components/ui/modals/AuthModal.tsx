@@ -158,16 +158,24 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
   const step2 = (
     <div className="flex flex-col gap-1">
       <Label>UPI ID</Label>
-      <Input
-        value={formData.upiId}
-        onChange={(e) => {
-          setFormData((f) => {
-            return { ...f, upiId: e.target.value }
-          })
-        }}
-        name="upiId"
-        type="text"
-      />
+      <div className="relative">
+        <Input
+          value={formData.upiId}
+          onChange={(e) => {
+            setFormData((f) => {
+              return { ...f, upiId: e.target.value }
+            })
+          }}
+          name="upiId"
+          type="text"
+          className="border-[0.01rem]"
+        />
+        <span
+          className={`text-color3 bg-secondary absolute right-0 top-0 flex h-12 w-12 cursor-not-allowed items-center justify-center border-y-[0.01rem] border-r-[0.01rem] px-8 text-gray-500`}
+        >
+          @wpi
+        </span>
+      </div>
       <Button
         onClick={(e) => {
           e.preventDefault()
@@ -332,7 +340,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
             <div key={key} className="flex flex-col gap-1">
               <Label>{keyValue}</Label>
               <Input
-                value={formData[key]! as string}
+                value={
+                  key === 'upiId'
+                    ? (formData[key]! as string) + '@wpi'
+                    : (formData[key]! as string)
+                }
                 onChange={(e) => {
                   setFormData((f) => {
                     return { ...f, [key]: e.target.value }

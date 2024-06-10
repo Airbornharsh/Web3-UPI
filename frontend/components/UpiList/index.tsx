@@ -37,13 +37,20 @@ const UpiList = () => {
 
   return (
     <div className="rounded-lg p-4 shadow-md">
-      <Input
-        onChange={(e) => setUpiId(e.target.value)}
-        value={upiId}
-        placeholder="Enter UPI ID"
-        name="upiId"
-        className="mb-4"
-      />
+      <div className="relative">
+        <Input
+          onChange={(e) => setUpiId(e.target.value)}
+          value={upiId}
+          placeholder="Enter UPI ID"
+          name="upiId"
+          className="mb-4 border-[0.01rem] "
+        />
+        <span
+          className={`text-color3 bg-secondary absolute right-0 top-0 flex h-12 w-12 cursor-not-allowed items-center justify-center border-y-[0.01rem] border-r-[0.01rem] px-8 text-gray-500`}
+        >
+          @wpi
+        </span>
+      </div>
       <div className="space-y-4">
         {userList.map((user, index) => (
           <Item key={`${index}-${user.walletAddress}`} user={user} />

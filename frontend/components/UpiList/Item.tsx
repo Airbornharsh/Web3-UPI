@@ -23,7 +23,7 @@ const Item: React.FC<ItemProps> = ({ user }) => {
         Address: {user.walletAddress.slice(0, 6)}...
         {user.walletAddress.slice(-6)}
       </h2>
-      <h3 className="text-xs">UPI ID: {user.upiId}</h3>
+      <h3 className="text-xs">UPI ID: {user.upiId}@wpi</h3>
     </div>
   )
 }
