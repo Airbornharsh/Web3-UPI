@@ -8,3 +8,6 @@ export const BASE_LAMPORTS = process.env.NEXT_PUBLIC_BASE_LAMPORTS
   : 1000000000
 export const URL = process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'
 export const VAULT_ADDRESS = process.env.NEXT_PUBLIC_VAULT_ADDRESS || ''
+export const DICE_MULTIPLIER = process.env.NEXT_PUBLIC_DICE_MULTIPLIER
+  ? parseInt(process.env.NEXT_PUBLIC_DICE_MULTIPLIER)
+  : 98

@@ -76,3 +76,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.spin {
+  transform: rotate(0deg); /* Initial state */
+}
