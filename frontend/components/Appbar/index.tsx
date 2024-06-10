@@ -11,7 +11,7 @@ import { WalletType } from '@/utils/enum'
 import PrivateAuthModal from '../ui/modals/PrivateAuthModal'
 import { useLoader } from '@/context/LoaderContext'
 import Link from 'next/link'
-import { BASE_LAMPORTS } from '@/utils/config'
+import { BASE_LAMPORTS, NETWORK } from '@/utils/config'
 import { Card } from '../ui/card'
 
 export const Appbar = () => {
@@ -61,8 +61,9 @@ export const Appbar = () => {
   return (
     <div className="bg-secondary flex h-16 w-screen justify-center border-b">
       <div className="relative flex w-[98vw] max-w-[80rem] items-center justify-between pb-2 pt-2">
-        <div className="text-color3 flex justify-center pl-4 pt-3 text-2xl">
-          WPI
+        <div className="text-color3 flex items-end justify-center pl-4 pt-3 text-2xl">
+          <span>WPI </span>
+          <span className="text-sm pb-1">({NETWORK})</span>
         </div>
         {
           <div className="flex items-center gap-1">
@@ -75,8 +76,9 @@ export const Appbar = () => {
             </Link>
             {isAuthenticated && (
               <div className="flex items-center gap-1">
-                <Card className="text-color3 text-sm p-2 text-gray-500">
-                  {(parseInt(user?.walletBalance!) / BASE_LAMPORTS).toFixed(4)} SOL
+                <Card className="text-color3 p-2 text-sm text-gray-500">
+                  {(parseInt(user?.walletBalance!) / BASE_LAMPORTS).toFixed(4)}{' '}
+                  SOL
                 </Card>
               </div>
             )}
