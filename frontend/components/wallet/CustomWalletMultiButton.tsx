@@ -42,4 +42,3 @@ const CustomWalletMultiButton = () => {
 }
 
 export default CustomWalletMultiButton
-

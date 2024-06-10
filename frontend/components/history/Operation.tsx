@@ -262,8 +262,12 @@ const Operation = () => {
                   <TableCell>
                     {operation.to ? operation.to.upiId : operation.toId}
                   </TableCell>
-                  <TableCell>{parseInt(operation.amount) / BASE_LAMPORTS}</TableCell>
-                  <TableCell>{parseInt(operation.fee) / BASE_LAMPORTS}</TableCell>
+                  <TableCell>
+                    {parseInt(operation.amount) / BASE_LAMPORTS}
+                  </TableCell>
+                  <TableCell>
+                    {parseInt(operation.fee) / BASE_LAMPORTS}
+                  </TableCell>
                   <TableCell>{operation.status}</TableCell>
                   <TableCell>
                     {new Date(operation.createdAt).toLocaleDateString()}{' '}

@@ -116,10 +116,10 @@ const SmallScreenMenu = () => {
               {isAuthenticated ? (
                 <div className="mt-4 flex flex-col gap-2">
                   <Link href={'/'}>
-                    <Button className='w-full'>Home</Button>
+                    <Button className="w-full">Home</Button>
                   </Link>
                   <Link href={'/history'}>
-                    <Button className='w-full'>History</Button>
+                    <Button className="w-full">History</Button>
                   </Link>
                 </div>
               ) : null}
