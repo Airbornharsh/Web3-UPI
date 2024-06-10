@@ -231,7 +231,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
       <div className="flex flex-col gap-1">
         <Label>Name</Label>
         <Input
-          value={formData.upiId}
+          value={formData.name}
           onChange={(e) => {
             setFormData((f) => {
               return { ...f, name: e.target.value }
@@ -245,7 +245,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
         <Label>UPI Id</Label>
         <div className="relative">
           <Input
-            value={formData.name}
+            value={formData.upiId}
             onChange={(e) => {
               setFormData((f) => {
                 return { ...f, upiId: e.target.value }
