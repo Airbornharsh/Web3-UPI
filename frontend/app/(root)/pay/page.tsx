@@ -307,9 +307,14 @@ const PayPage = () => {
                   <AlertDialogAction
                     onClick={() => {
                       if (walletSelected === 'wallet-1') {
-                        sendHandler({
-                          pin: '',
-                        })
+                        if (walletType === WalletType.CUSTOM) {
+                          sendHandler({
+                            pin,
+                          })
+                        } else
+                          sendHandler({
+                            pin: '',
+                          })
                       } else {
                         sendHandler({
                           pin,
