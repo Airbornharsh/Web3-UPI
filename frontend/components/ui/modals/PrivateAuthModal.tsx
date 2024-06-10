@@ -31,7 +31,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
     name: '',
     walletAddress: '',
     upiId: '',
-    pin: '999999',
+    pin: '',
     privateKey: '',
   })
   const [step, setStep] = useState(1)

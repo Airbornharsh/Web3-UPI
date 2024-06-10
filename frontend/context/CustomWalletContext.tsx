@@ -156,7 +156,7 @@ export const CustomWalletProvider: React.FC<
     pin?: string,
   ) => {
     let signature = ''
-    pin = pin || '999999'
+    pin = pin || ''
     try {
       if (walletType === WalletType.CUSTOM && !pin) {
         throw new Error('Pin is required for custom wallet')
