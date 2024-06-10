@@ -121,6 +121,9 @@ const SmallScreenMenu = () => {
                   <Link href={'/history'}>
                     <Button className="w-full">History</Button>
                   </Link>
+                  <Link href={'/games'}>
+                    <Button className="w-full">Games</Button>
+                  </Link>
                 </div>
               ) : null}
             </div>
