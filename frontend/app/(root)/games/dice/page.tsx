@@ -115,7 +115,7 @@ const Page = () => {
       }
     } catch (e: any) {
       console.log(e)
-      if (e.message) setErrorToastMessage(e.message)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
       else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
@@ -198,7 +198,7 @@ const Page = () => {
       }
     } catch (e: any) {
       console.log(e)
-      if (e.message) setErrorToastMessage(e.message)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
       else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)

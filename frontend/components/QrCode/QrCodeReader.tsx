@@ -73,8 +73,10 @@ const QrCodeReader: React.FC = () => {
     try {
       const redirectData = data.split(URL)[1]
       router.push(`${redirectData}`)
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     }
   }
 

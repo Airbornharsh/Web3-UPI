@@ -75,9 +75,11 @@ const PayPage = () => {
       if (responseData.user) {
         setUpiDetails(responseData.user)
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
       setUpiDetails(null)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
     }
@@ -162,8 +164,10 @@ const PayPage = () => {
       } else {
         setErrorToastMessage('Transaction failed')
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
       updateBalance()

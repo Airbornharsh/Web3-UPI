@@ -104,7 +104,7 @@ export const CustomWalletProvider: React.FC<
       if (response.data.solana.usd) {
         setSolPrice(response.data.solana.usd)
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
     }
   }

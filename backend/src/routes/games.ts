@@ -87,7 +87,7 @@ gamesRouter.post('/dice', authMiddleware, async (req, res) => {
         data: {
           userId: user.id,
           gameType: 'DICE',
-          multiplier: multiplier.toString(),  
+          multiplier: multiplier.toString(),
           betAmount: betAmount.toString(),
           winAmount: winAmount.toString(),
           winChance: winChance.toString(),

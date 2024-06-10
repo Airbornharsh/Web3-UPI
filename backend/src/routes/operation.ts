@@ -20,6 +20,7 @@ import {
   sendAndConfirmTransaction,
 } from '@solana/web3.js'
 import { $Enums } from '@prisma/client'
+import bcrypt from 'bcrypt'
 
 const operationRouter = Router()
 
@@ -406,7 +407,7 @@ operationRouter.post('/iswithdraw', authMiddleware, async (req, res) => {
 
 operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
   try {
-    const { lamports } = req.body
+    const { lamports, pin } = req.body
     const senderUser = res.locals.user
 
     if (!lamports) {
@@ -432,6 +433,15 @@ operationRouter.post('/withdraw', authMiddleware, async (req, res) => {
     if (!withdrawer) {
       return res.status(404).json({
         message: 'User not found',
+        status: false,
+      })
+    }
+
+    const valid = bcrypt.compareSync(pin || '0', withdrawer.pin)
+
+    if (!valid) {
+      return res.status(400).json({
+        message: 'Invalid Pin',
         status: false,
       })
     }

@@ -167,8 +167,10 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
         setIsAuthenticated(false)
         setUser(null)
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
       setUser(null)
       setIsAuthenticated(false)
     } finally {
@@ -249,8 +251,10 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       } else {
         return false
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
       return false
     } finally {
       setIsLoading(false)
@@ -272,8 +276,10 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       const token = response.data.token
       localStorage.setItem('token', token)
       setToken(token)
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
     }
@@ -322,9 +328,10 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       } else {
         setErrorToastMessage('Error')
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
-      setErrorToastMessage('Error')
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
     }
@@ -337,6 +344,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
         `${BACKEND_URL}/v1/operation/withdraw`,
         {
           lamports,
+          pin,
         },
         {
           headers: {
@@ -352,9 +360,10 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       } else {
         setErrorToastMessage('Error')
       }
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
-      setErrorToastMessage('Error')
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
     }
@@ -395,8 +404,10 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
           },
         }
       })
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
     }
@@ -426,8 +437,10 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
           },
         }
       })
-    } catch (e) {
+    } catch (e: any) {
       console.log(e)
+      if (e.response.data.message) setErrorToastMessage(e.response.data.message)
+      else setErrorToastMessage('Something went wrong')
     } finally {
       setIsLoading(false)
     }
