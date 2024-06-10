@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { useCustomWallet } from '@/context/CustomWalletContext'
-import { DICE_MULTIPLIER } from '@/utils/config'
+import { BASE_LAMPORTS, DICE_MULTIPLIER } from '@/utils/config'
 import solIcon from '@/assets/sol.png'
 import Image from 'next/image'
 
@@ -22,8 +22,8 @@ const Page = () => {
     multiplier: 1.98,
     rollUnder: 50,
     winChance: 50,
-    betAmount: 0.0,
-    profitOnWin: 0.0,
+    betAmount: 0,
+    profitOnWin: 0,
   })
 
   const onSliderChange = (value: number) => {
@@ -36,7 +36,7 @@ const Page = () => {
     setConfig((prev) => ({
       ...prev,
       multiplier: parseFloat((DICE_MULTIPLIER / (100 - value)).toFixed(4)),
-      profitOnWin: parseFloat((prev.betAmount * prev.multiplier).toFixed(9)),
+      profitOnWin: Math.ceil(prev.betAmount * prev.multiplier),
       rollUnder: value,
       winChance: 100 - value,
     }))
@@ -53,8 +53,8 @@ const Page = () => {
                 </Label>
                 <Label className="text-xs">
                   $
-                  {solPrice * config.betAmount
-                    ? (solPrice * config.betAmount).toFixed(2)
+                  {solPrice * (config.betAmount / BASE_LAMPORTS)
+                    ? (solPrice * (config.betAmount / BASE_LAMPORTS)).toFixed(2)
                     : (0).toFixed(2)}
                 </Label>
               </div>
@@ -62,19 +62,19 @@ const Page = () => {
                 type="number"
                 placeholder="Bet Amount"
                 className="bg-background h-8 max-w-full border-0 pr-8 text-sm text-white"
-                value={config.betAmount.toString()}
+                value={(config.betAmount / BASE_LAMPORTS).toString()}
                 onChange={(e) => {
                   if (parseFloat(e.target.value) < 0) {
                     e.target.value = '0'
                   }
                   setConfig((prev) => ({
                     ...prev,
-                    profitOnWin: parseFloat(
-                      (parseFloat(e.target.value) * config.multiplier).toFixed(
-                        9,
-                      ),
+                    profitOnWin: Math.ceil(
+                      parseInt(e.target.value) *
+                        BASE_LAMPORTS *
+                        config.multiplier,
                     ),
-                    betAmount: parseFloat(e.target.value),
+                    betAmount: parseFloat(e.target.value) * BASE_LAMPORTS,
                   }))
                 }}
               />
@@ -93,8 +93,10 @@ const Page = () => {
                 </Label>
                 <Label className="text-xs">
                   $
-                  {solPrice * config.profitOnWin
-                    ? (solPrice * config.profitOnWin).toFixed(2)
+                  {(solPrice * config.profitOnWin) / BASE_LAMPORTS
+                    ? ((solPrice * config.profitOnWin) / BASE_LAMPORTS).toFixed(
+                        2,
+                      )
                     : (0).toFixed(2)}
                 </Label>
               </div>
@@ -103,7 +105,7 @@ const Page = () => {
                 placeholder="Profit on Win"
                 disabled={true}
                 className="bg-background h-8 max-w-full border-0 pr-8 text-sm text-white"
-                value={config.profitOnWin.toString()}
+                value={(config.profitOnWin / BASE_LAMPORTS).toString()}
               />
               <Image
                 src={solIcon}
@@ -164,6 +166,9 @@ const Page = () => {
                             DICE_MULTIPLIER / parseFloat(e.target.value)
                           ).toFixed(2),
                         ),
+                        profitOnWin: Math.ceil(
+                          prev.betAmount * parseFloat(e.target.value),
+                        ),
                       }))
                     }}
                   />
@@ -194,6 +199,15 @@ const Page = () => {
                             (100 - parseFloat(e.target.value))
                           ).toFixed(4),
                         ),
+                        profitOnWin: Math.ceil(
+                          prev.betAmount *
+                            parseFloat(
+                              (
+                                DICE_MULTIPLIER /
+                                (100 - parseFloat(e.target.value))
+                              ).toFixed(4),
+                            ),
+                        ),
                       }))
                     }}
                   />
@@ -222,6 +236,14 @@ const Page = () => {
                           (
                             DICE_MULTIPLIER / parseFloat(e.target.value)
                           ).toFixed(4),
+                        ),
+                        profitOnWin: Math.ceil(
+                          prev.betAmount *
+                            parseFloat(
+                              (
+                                DICE_MULTIPLIER / parseFloat(e.target.value)
+                              ).toFixed(4),
+                            ),
                         ),
                       }))
                     }}
