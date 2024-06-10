@@ -64,10 +64,11 @@ const Operation = () => {
     )
 
     // Page numbers
+    let duration = 5
     for (
-      let i = operations.page.first;
-      i <= operations.page.last && i <= operations.page.total;
-      i++
+      let i = operations.page.current - 2 > 0 ? operations.page.current - 2 : 1;
+      i <= operations.page.last && i <= operations.page.total && duration > 0;
+      i++, duration--
     ) {
       paginationItems.push(
         <PaginationItem key={i}>
@@ -276,10 +277,10 @@ const Operation = () => {
                 </TableRow>
               ))}
             </TableBody>
-            <Pagination className="mt-6 text-white">
-              <PaginationContent>{renderPaginationItems()}</PaginationContent>
-            </Pagination>
           </Table>
+          <Pagination className="mt-6 text-white">
+            <PaginationContent>{renderPaginationItems()}</PaginationContent>
+          </Pagination>
         </CardContent>
       </Card>
     </TabsContent>

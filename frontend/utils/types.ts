@@ -67,3 +67,11 @@ export interface PageType {
   first: number
   last: number
 }
+
+export interface DiceGame {
+  id: number
+  betAmount: string
+  winAmount: string
+  win: boolean
+  createdAt: Date
+}
