@@ -11,13 +11,15 @@ import { WalletType } from '@/utils/enum'
 import PrivateAuthModal from '../ui/modals/PrivateAuthModal'
 import { useLoader } from '@/context/LoaderContext'
 import Link from 'next/link'
+import { BASE_LAMPORTS } from '@/utils/config'
+import { Card } from '../ui/card'
 
 export const Appbar = () => {
   const { setIsLoading } = useLoader()
   const { disconnect } = useWallet()
   const { publicKey, encodedPrivateKey, walletType, disconnectPrivatWallet } =
     useCustomWallet()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const [openModal, setOpenModal] = useState(false)
   const [hasPrivateKey, setHasPrivateKey] = useState(false)
 
@@ -71,6 +73,13 @@ export const Appbar = () => {
             >
               <GitHubIcon className="text-color3 cursor-pointer opacity-50 hover:opacity-100" />
             </Link>
+            {isAuthenticated && (
+              <div className="flex items-center gap-1">
+                <Card className="text-color3 text-sm p-2 text-gray-500">
+                  {(parseInt(user?.walletBalance!) / BASE_LAMPORTS).toFixed(4)} SOL
+                </Card>
+              </div>
+            )}
             <SmallScreenMenu />
           </div>
         }

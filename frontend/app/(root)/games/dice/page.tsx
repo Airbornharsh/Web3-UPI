@@ -6,12 +6,18 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
 import { useCustomWallet } from '@/context/CustomWalletContext'
-import { BASE_LAMPORTS, DICE_MULTIPLIER } from '@/utils/config'
+import { BACKEND_URL, BASE_LAMPORTS, DICE_MULTIPLIER } from '@/utils/config'
 import solIcon from '@/assets/sol.png'
 import Image from 'next/image'
+import { useLoader } from '@/context/LoaderContext'
+import axios from 'axios'
+import { useAuth } from '@/context/AuthContext'
+import { User } from '@/utils/types'
 
 const Page = () => {
+  const { setIsLoading, setErrorToastMessage, setToastMessage } = useLoader()
   const { balance, solPrice } = useCustomWallet()
+  const { token, isAuthenticated, setUser, user } = useAuth()
   const [config, setConfig] = React.useState<{
     multiplier: number
     rollUnder: number
@@ -40,6 +46,56 @@ const Page = () => {
       rollUnder: value,
       winChance: 100 - value,
     }))
+  }
+
+  const bet = async () => {
+    try {
+      setIsLoading(true)
+      if (!isAuthenticated) {
+        setErrorToastMessage('Please login to place bet')
+        setIsLoading(false)
+        return
+      }
+      if (config.betAmount < 0.0001) {
+        setErrorToastMessage('Bet Amount must be greater than 0.0001')
+        setIsLoading(false)
+        return
+      }
+      if (parseInt(user?.walletBalance!) < config.betAmount) {
+        setErrorToastMessage('Insufficient Balance')
+        setIsLoading(false)
+        return
+      }
+      const response = await axios.post(
+        `${BACKEND_URL}/v1/games/dice`,
+        {
+          betAmount: config.betAmount,
+          rollUnder: config.rollUnder,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      const responseData = response.data
+      if (responseData.status) {
+        if (responseData.game.win) {
+          setToastMessage('You win')
+        } else {
+          setErrorToastMessage('You lose')
+        }
+        setUser({ ...user, walletBalance: responseData.user.walletBalance } as User)
+      } else {
+        setErrorToastMessage(responseData.message)
+      }
+    } catch (e: any) {
+      console.log(e)
+      if (e.message) setErrorToastMessage(e.message)
+      else setErrorToastMessage('Something went wrong')
+    } finally {
+      setIsLoading(false)
+    }
   }
   return (
     <main className="flex flex-col items-center">
@@ -115,7 +171,9 @@ const Page = () => {
                 className="absolute bottom-[0.2rem] right-[0.2rem]"
               />
             </div>
-            <Button className="w-full">BET</Button>
+            <Button className="w-full" onClick={bet}>
+              BET
+            </Button>
           </CardContent>
         </Card>
         <Card className="h-[16rem] w-[92vw] md:min-h-[40rem] md:max-w-[calc(100%-20rem)]">

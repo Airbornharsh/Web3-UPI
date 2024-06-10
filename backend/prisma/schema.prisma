@@ -24,6 +24,7 @@ model User {
   ClaimedSol               ClaimedSol[]
   userOperationTransaction OperationTransaction[] @relation("user")
   toOperationTransaction   OperationTransaction[] @relation("to")
+  Game                     Game[]
 }
 
 model OperationTransaction {
@@ -65,6 +66,25 @@ model ClaimedSol {
   createdAt     DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model Game {
+  id         Int      @id @default(autoincrement())
+  gameType   GameType
+  userId     Int
+  betAmount  String
+  multiplier String
+  winAmount  String
+  winChance  String
+  rollUnder  String
+  win        Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+enum GameType {
+  DICE
 }
 
 enum WalletType {
