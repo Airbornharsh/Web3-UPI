@@ -17,5 +17,8 @@ export const VAULT_WALLET = (): {
   const wallet = web3.Keypair.fromSecretKey(base58.decode(VAULT_PRIVATE_KEY))
   return wallet
 }
+export const DICE_MULTIPLIER = process.env.DICE_MULTIPLIER
+  ? parseInt(process.env.DICE_MULTIPLIER)
+  : 98
 
 export const connection = new web3.Connection(RPC_URL)

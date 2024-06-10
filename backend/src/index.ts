@@ -6,6 +6,7 @@ import txnRouter from './routes/txn'
 import bodyParser from 'body-parser'
 import solRouter from './routes/sol'
 import operationRouter from './routes/operation'
+import gamesRouter from './routes/games'
 
 config()
 
@@ -22,6 +23,7 @@ app.use('/v1/claim', solRouter)
 app.use('/v1/user/', userRouter)
 app.use('/v1/txn/', txnRouter)
 app.use('/v1/operation/', operationRouter)
+app.use('/v1/games/', gamesRouter)
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err)

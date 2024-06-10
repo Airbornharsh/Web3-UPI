@@ -21,9 +21,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import axios from 'axios'
-import PinModal from './PinModal'
 import { Label } from '../label'
-import { calculateTransactionFee } from '@/utils/connection'
 
 const OperationModal = () => {
   const { operationOpen, setOperationOpen } = useLoader()
