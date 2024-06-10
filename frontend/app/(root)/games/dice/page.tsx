@@ -11,6 +11,23 @@ import solIcon from '@/assets/sol.png'
 import Image from 'next/image'
 import { useLoader } from '@/context/LoaderContext'
 import axios from 'axios'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
 import { useAuth } from '@/context/AuthContext'
 import { User } from '@/utils/types'
 
@@ -62,9 +79,9 @@ const Page = () => {
         return
       }
       if (parseInt(user?.walletBalance!) < config.betAmount) {
-        setErrorToastMessage('Insufficient Balance')
         setIsLoading(false)
         return
+        setErrorToastMessage('Insufficient Balance')
       }
       const response = await axios.post(
         `${BACKEND_URL}/v1/games/dice`,
@@ -85,7 +102,10 @@ const Page = () => {
         } else {
           setErrorToastMessage('You lose')
         }
-        setUser({ ...user, walletBalance: responseData.user.walletBalance } as User)
+        setUser({
+          ...user,
+          walletBalance: responseData.user.walletBalance,
+        } as User)
       } else {
         setErrorToastMessage(responseData.message)
       }
@@ -96,6 +116,85 @@ const Page = () => {
     } finally {
       setIsLoading(false)
     }
+  }
+  const renderPaginationItems = () => {
+    const paginationItems = []
+
+    // Previous Button
+    paginationItems.push(
+      <PaginationItem key="prev">
+        <PaginationPrevious
+          onClick={() => {
+            if (operations.page.current === 1) return
+            const temp = {
+              ...operations,
+              query: {
+                ...operations.query,
+                page: operations.page.current - 1,
+              },
+            }
+            setOperations(temp)
+          }}
+        />
+      </PaginationItem>,
+    )
+
+    // Page numbers
+    for (
+      let i = operations.page.first;
+      i <= operations.page.last && i <= operations.page.total;
+      i++
+    ) {
+      paginationItems.push(
+        <PaginationItem key={i}>
+          <PaginationLink
+            onClick={() => {
+              const temp = {
+                ...operations,
+                query: {
+                  ...operations.query,
+                  page: i,
+                },
+              }
+              setOperations(temp)
+            }}
+            isActive={i === operations.page.current}
+          >
+            {i}
+          </PaginationLink>
+        </PaginationItem>,
+      )
+    }
+
+    // Ellipsis
+    if (operations.page.last < operations.page.total) {
+      paginationItems.push(
+        <PaginationItem key="ellipsis">
+          <PaginationEllipsis />
+        </PaginationItem>,
+      )
+    }
+
+    // Next Button
+    paginationItems.push(
+      <PaginationItem key="next">
+        <PaginationNext
+          onClick={() => {
+            if (operations.page.current === operations.page.total) return
+            const temp = {
+              ...operations,
+              query: {
+                ...operations.query,
+                page: operations.page.current + 1,
+              },
+            }
+            setOperations(temp)
+          }}
+        />
+      </PaginationItem>,
+    )
+
+    return paginationItems
   }
   return (
     <main className="flex flex-col items-center">
@@ -311,6 +410,50 @@ const Page = () => {
             </Card>
           </CardContent>
         </Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {/* <TableHead className="w-[100px]">Operation Id</TableHead> */}
+              <TableHead className="w-[100px]">Signature</TableHead>
+              <TableHead>Operation</TableHead>
+              <TableHead>To</TableHead>
+              <TableHead>Amount(SOL)</TableHead>
+              <TableHead>Fee(SOL)</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Created At</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {operations.data?.map((operation) => (
+              <TableRow key={operation.id}>
+                {/* <TableCell>{operation.id}</TableCell> */}
+                <TableCell>
+                  {operation.signature
+                    ? operation.signature.slice(0, 12) +
+                      '...' +
+                      operation.signature.slice(-12)
+                    : ''}
+                </TableCell>
+                <TableCell>{operation.operation}</TableCell>
+                <TableCell>
+                  {operation.to ? operation.to.upiId : operation.toId}
+                </TableCell>
+                <TableCell>
+                  {parseInt(operation.amount) / BASE_LAMPORTS}
+                </TableCell>
+                <TableCell>{parseInt(operation.fee) / BASE_LAMPORTS}</TableCell>
+                <TableCell>{operation.status}</TableCell>
+                <TableCell>
+                  {new Date(operation.createdAt).toLocaleDateString()}{' '}
+                  {new Date(operation.createdAt).toLocaleTimeString()}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <Pagination className="mt-6 text-white">
+            <PaginationContent>{renderPaginationItems()}</PaginationContent>
+          </Pagination>
+        </Table>
       </div>
     </main>
   )
