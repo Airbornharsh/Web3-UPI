@@ -11,6 +11,7 @@ import gamesRouter from './routes/games'
 config()
 
 const app = express()
+app.set('trust proxy', 1);
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
