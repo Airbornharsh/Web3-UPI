@@ -5,10 +5,11 @@ import { authMiddleware } from '../middleware'
 import prisma from '../prisma'
 import { PublicKey } from '@solana/web3.js'
 import nacl from 'tweetnacl'
+import { authLimit, preAuthLimit } from '../utils/rateLimit'
 
 const userRouter = Router()
 
-userRouter.post('/wallet-check', async (req, res) => {
+userRouter.post('/wallet-check', preAuthLimit, async (req, res) => {
   try {
     const { walletAddress } = req.body
 
@@ -36,13 +37,14 @@ userRouter.post('/wallet-check', async (req, res) => {
   }
 })
 
-userRouter.post('/upi-check', async (req, res) => {
+userRouter.post('/upi-check', preAuthLimit, async (req, res) => {
   try {
     const { walletAddress, upiId } = req.body
 
     const user = await prisma.user.findFirst({
       where: {
         upiId,
+        walletAddress,
       },
     })
 
@@ -60,7 +62,7 @@ userRouter.post('/upi-check', async (req, res) => {
   }
 })
 
-userRouter.post('/create-user', async (req, res) => {
+userRouter.post('/create-user', authLimit, async (req, res) => {
   try {
     const { name, walletAddress, upiId, pin, signature, walletType } = req.body
 
@@ -128,7 +130,7 @@ userRouter.post('/create-user', async (req, res) => {
   }
 })
 
-userRouter.post('/sign-in', async (req, res) => {
+userRouter.post('/sign-in', preAuthLimit, async (req, res) => {
   try {
     const { walletAddress, pin, signature, walletType } = req.body
 
@@ -192,29 +194,34 @@ userRouter.post('/sign-in', async (req, res) => {
   }
 })
 
-userRouter.get('/check-auth', authMiddleware, async (req, res) => {
-  try {
-    const user = res.locals.user
+userRouter.get(
+  '/check-auth',
+  preAuthLimit,
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const user = res.locals.user
 
-    if (!user) {
-      return res.status(401).json({ message: 'Unauthorized' })
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' })
+      }
+
+      return res.json({
+        message: 'Valid User',
+        userValid: true,
+        user: {
+          walletAddress: user.walletAddress,
+          upiId: user.upiId,
+          name: user.name,
+          walletBalance: user.walletBalance,
+        },
+      })
+    } catch (e) {
+      console.log(e)
+      return res.status(401).json({ message: 'Unauthorized', userValid: false })
     }
-
-    return res.json({
-      message: 'Valid User',
-      userValid: true,
-      user: {
-        walletAddress: user.walletAddress,
-        upiId: user.upiId,
-        name: user.name,
-        walletBalance: user.walletBalance,
-      },
-    })
-  } catch (e) {
-    console.log(e)
-    return res.status(401).json({ message: 'Unauthorized', userValid: false })
-  }
-})
+  },
+)
 
 userRouter.get('/:upiId', async (req, res) => {
   try {
