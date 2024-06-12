@@ -18,7 +18,7 @@ interface AuthModalProps {
 
 const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
   const { setErrorToastMessage } = useLoader()
-  const { publicKey } = useCustomWallet()
+  const { publicKey, disconnectPrivatWallet } = useCustomWallet()
   const { signIn, signUp } = useAuth()
   const [formData, setFormData] = useState<AuthFormData>({
     name: '',
@@ -151,6 +151,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
             upiId: '',
             pin: '',
           })
+          disconnectPrivatWallet()
           setOpenModal(false)
         }}
       >
@@ -200,6 +201,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
             upiId: '',
             pin: '',
           })
+          disconnectPrivatWallet()
           setOpenModal(false)
         }}
       >
@@ -241,6 +243,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
             upiId: '',
             pin: '',
           })
+          disconnectPrivatWallet()
           setOpenModal(false)
         }}
       >
@@ -288,6 +291,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ setOpenModal }) => {
             upiId: '',
             pin: '',
           })
+          disconnectPrivatWallet()
           setOpenModal(false)
         }}
       >
