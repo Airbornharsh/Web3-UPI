@@ -60,12 +60,14 @@ export const Appbar = () => {
   // }, [openModal])
 
   return (
-    <div className="bg-secondary flex h-16 w-screen justify-center border-b">
-      <div className="relative flex w-[98vw] max-w-[80rem] items-center justify-between pb-2 pt-2">
-        <div className="text-color3 flex items-end justify-center pl-4 pt-3 text-2xl">
-          <span>WPI </span>
-          <span className="pb-1 text-sm">({NETWORK})</span>
-        </div>
+    <div className="bg-secondary sticky top-0 z-50 flex h-16 w-screen justify-center border-b">
+      <div className="bg-secondary relative flex w-[98vw] max-w-[80rem] items-center justify-between pb-2 pt-2">
+        <Link href="/">
+          <div className="text-color3 flex items-end justify-center pl-4 pt-3 text-2xl">
+            <span>WPI </span>
+            <span className="pb-1 text-sm">({NETWORK})</span>
+          </div>
+        </Link>
         {
           <div className="flex items-center gap-1">
             {/* <BigScreenMenu /> */}

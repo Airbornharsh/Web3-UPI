@@ -14,3 +14,4 @@
 * Next Js, TailwindCSS, Shadcn, MUI
 * Express Js, Node Js, PostgreSQL
 * Nginx, Solana
+ 

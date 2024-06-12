@@ -316,7 +316,7 @@ const Page = () => {
     return paginationItems
   }
   return (
-    <main className="flex flex-col items-center gap-10 pb-10">
+    <main className="flex flex-col items-center gap-10 pb-10 ">
       <div className="mt-2 flex w-[96%] flex-col-reverse gap-2 md:flex-row">
         <Card className="w-[92vw] min-w-[16rem] max-w-[20rem]">
           <CardContent className="flex w-full flex-col gap-3 p-3">

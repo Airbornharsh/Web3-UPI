@@ -4,6 +4,7 @@ import PrivateAuthModal from '../ui/modals/PrivateAuthModal'
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { useWallet } from '@solana/wallet-adapter-react'
+import Link from 'next/link'
 
 const CustomWalletMultiButton = () => {
   const [openModal, setOpenModal] = useState(false)
@@ -29,6 +30,9 @@ const CustomWalletMultiButton = () => {
       <Button onClick={() => setOpenModal(true)} className="w-full">
         Private Auth
       </Button>
+      <Link href="/games" className="w-full">
+        <Button className="w-full">Explore Games</Button>
+      </Link>
       <Modal
         open={openModal}
         onClose={() => {
