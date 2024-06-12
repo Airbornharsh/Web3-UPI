@@ -20,6 +20,8 @@ import {
   CustomWalletProvider,
   useCustomWallet,
 } from '@/context/CustomWalletContext'
+import Intro from '@/components/Intro'
+import { usePathname } from 'next/navigation'
 
 // Default styles that can be overridden by your app
 require('@solana/wallet-adapter-react-ui/styles.css')
@@ -67,9 +69,21 @@ const Children: React.FC<{
   children: React.ReactNode
 }> = ({ children }) => {
   const { publicKey } = useCustomWallet()
+  const pathName = usePathname()
   return (
-    <div className=" h-[calc(100vh-4rem)] w-[98vw] max-w-[80rem]">
-      {publicKey ? children : <ConnectWalletFirst />}
+    <div className=" h-[calc(100vh-4rem)] w-[98vw] max-w-[80rem] overflow-x-hidden">
+      {publicKey
+        ? children
+        : {
+            '/': <Intro />,
+            '/games': children,
+            '/games/dice': (
+              <>
+                <ConnectWalletFirst />
+                {children}
+              </>
+            ),
+          }[pathName] ?? <Intro />}
     </div>
   )
 }

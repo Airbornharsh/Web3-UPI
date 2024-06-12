@@ -13,6 +13,7 @@ import { useLoader } from '@/context/LoaderContext'
 import Link from 'next/link'
 import { BASE_LAMPORTS, NETWORK } from '@/utils/config'
 import { Card } from '../ui/card'
+import { SportsEsports } from '@mui/icons-material'
 
 export const Appbar = () => {
   const { setIsLoading } = useLoader()
@@ -73,6 +74,9 @@ export const Appbar = () => {
               target="_blank"
             >
               <GitHubIcon className="text-color3 cursor-pointer opacity-50 hover:opacity-100" />
+            </Link>
+            <Link href="/games">
+              <SportsEsports className="text-color3 h-8 w-8 cursor-pointer opacity-50 hover:opacity-100" />
             </Link>
             {isAuthenticated && (
               <div className="flex items-center gap-1">
