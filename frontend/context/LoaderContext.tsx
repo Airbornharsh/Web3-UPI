@@ -60,14 +60,14 @@ export const LoaderProvider: React.FC<LoaderContextProviderProps> = ({
   const setToastMessage = (message: string) => {
     toast.success(message, {
       position: 'top-right',
-      autoClose: 2000,
+      autoClose: 1000,
     })
   }
 
   const setErrorToastMessage = (message: string) => {
     toast.error(message, {
       position: 'top-right',
-      autoClose: 2000,
+      autoClose: 1000,
     })
   }
 

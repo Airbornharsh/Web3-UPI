@@ -44,6 +44,9 @@ const Page = () => {
   const { setIsLoading, setErrorToastMessage, setToastMessage } = useLoader()
   const { balance, solPrice } = useCustomWallet()
   const { token, isAuthenticated, setUser, user } = useAuth()
+  const [botCount, setBotCount] = React.useState<number>(0)
+  const botCountRef = React.useRef<number>(0)
+  const [botRunning, setBotRunning] = React.useState<boolean>(false)
   const [games, setGames] = React.useState<{
     page: {
       total: number
@@ -77,19 +80,18 @@ const Page = () => {
     multiplier: number
     rollUnder: number
     winChance: number
-    betAmount: number
+    betAmount: string
     profitOnWin: number
   }>({
     multiplier: 1.98,
     rollUnder: 50,
     winChance: 50,
-    betAmount: 0,
+    betAmount: '0',
     profitOnWin: 0,
   })
 
   const getGamesData = async () => {
     try {
-      setIsLoading(true)
       const response = await axios.get(`${BACKEND_URL}/v1/games/dice`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -118,7 +120,6 @@ const Page = () => {
       if (e.response.data.message) setErrorToastMessage(e.response.data.message)
       else setErrorToastMessage('Something went wrong')
     } finally {
-      setIsLoading(false)
     }
   }
 
@@ -143,7 +144,9 @@ const Page = () => {
     setConfig((prev) => ({
       ...prev,
       multiplier: parseFloat((DICE_MULTIPLIER / (100 - value)).toFixed(4)),
-      profitOnWin: Math.ceil(prev.betAmount * prev.multiplier),
+      profitOnWin: parseFloat(
+        (parseFloat(prev.betAmount) * prev.multiplier).toFixed(9),
+      ),
       rollUnder: value,
       winChance: 100 - value,
     }))
@@ -151,26 +154,22 @@ const Page = () => {
 
   const bet = async () => {
     try {
-      setIsLoading(true)
       if (!isAuthenticated) {
         setErrorToastMessage('Please login to place bet')
-        setIsLoading(false)
-        return
+        return false
       }
-      if (config.betAmount < 0.0001) {
+      if (parseFloat(config.betAmount) < 0.0001) {
         setErrorToastMessage('Bet Amount must be greater than 0.0001')
-        setIsLoading(false)
-        return
+        return false
       }
-      if (parseInt(user?.walletBalance!) < config.betAmount) {
+      if (parseInt(user?.walletBalance!) < parseFloat(config.betAmount)) {
         setErrorToastMessage('Insufficient Balance')
-        setIsLoading(false)
-        return
+        return false
       }
       const response = await axios.post(
         `${BACKEND_URL}/v1/games/dice`,
         {
-          betAmount: config.betAmount,
+          betAmount: parseFloat(config.betAmount) * BASE_LAMPORTS,
           rollUnder: config.rollUnder,
         },
         {
@@ -183,26 +182,57 @@ const Page = () => {
       if (responseData.status) {
         if (responseData.game.win) {
           setToastMessage('You win')
-          if (games.query.page === 1 && games.query.order === 'desc') {
-            getGamesData()
-          }
         } else {
           setErrorToastMessage('You lose')
+        }
+        if (games.query.page === 1 && games.query.order === 'desc') {
+          getGamesData()
         }
         setUser({
           ...user,
           walletBalance: responseData.user.walletBalance,
         } as User)
+        return true
       } else {
         setErrorToastMessage(responseData.message)
+        return false
       }
     } catch (e: any) {
       console.log(e)
       if (e.response.data.message) setErrorToastMessage(e.response.data.message)
       else setErrorToastMessage('Something went wrong')
+      return false
     } finally {
-      setIsLoading(false)
     }
+  }
+
+  const startBot = async () => {
+    try {
+      setBotRunning(true)
+      setToastMessage('Started Bot 🤖')
+      await new Promise((resolve) => setTimeout(resolve, 200))
+      while (botCount > 0 && botCountRef.current > 0) {
+        const res = await bet()
+        if (!res) {
+          break
+        }
+        setBotCount((prev) => prev - 1)
+        botCountRef.current = botCountRef.current - 1
+      }
+      await getGamesData()
+      await new Promise((resolve) => setTimeout(resolve, 200))
+      setBotCount(0)
+      setToastMessage('Bot Stopped 🛑')
+      setBotRunning(false)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const stopBot = () => {
+    setBotCount(0)
+    botCountRef.current = 0
+    setBotRunning(false)
   }
 
   const renderPaginationItems = () => {
@@ -297,8 +327,8 @@ const Page = () => {
                 </Label>
                 <Label className="text-xs">
                   $
-                  {solPrice * (config.betAmount / BASE_LAMPORTS)
-                    ? (solPrice * (config.betAmount / BASE_LAMPORTS)).toFixed(2)
+                  {solPrice * parseFloat(config.betAmount)
+                    ? (solPrice * parseFloat(config.betAmount)).toFixed(2)
                     : (0).toFixed(2)}
                 </Label>
               </div>
@@ -306,19 +336,19 @@ const Page = () => {
                 type="number"
                 placeholder="Bet Amount"
                 className="bg-background h-8 max-w-full border-0 pr-8 text-sm text-white"
-                value={(config.betAmount / BASE_LAMPORTS).toString()}
+                value={config.betAmount.toString()}
                 onChange={(e) => {
-                  if (parseFloat(e.target.value) < 0) {
-                    e.target.value = '0'
-                  }
+                  // if (parseFloat(e.target.value) < 0) {
+                  //   e.target.value = '0'
+                  // }
                   setConfig((prev) => ({
                     ...prev,
-                    profitOnWin: Math.ceil(
-                      parseInt(e.target.value) *
-                        BASE_LAMPORTS *
-                        config.multiplier,
+                    profitOnWin: parseFloat(
+                      (parseFloat(e.target.value) * config.multiplier).toFixed(
+                        4,
+                      ),
                     ),
-                    betAmount: parseFloat(e.target.value) * BASE_LAMPORTS,
+                    betAmount: e.target.value,
                   }))
                 }}
               />
@@ -337,10 +367,8 @@ const Page = () => {
                 </Label>
                 <Label className="text-xs">
                   $
-                  {(solPrice * config.profitOnWin) / BASE_LAMPORTS
-                    ? ((solPrice * config.profitOnWin) / BASE_LAMPORTS).toFixed(
-                        2,
-                      )
+                  {solPrice * config.profitOnWin
+                    ? (solPrice * config.profitOnWin).toFixed(2)
                     : (0).toFixed(2)}
                 </Label>
               </div>
@@ -349,7 +377,7 @@ const Page = () => {
                 placeholder="Profit on Win"
                 disabled={true}
                 className="bg-background h-8 max-w-full border-0 pr-8 text-sm text-white"
-                value={(config.profitOnWin / BASE_LAMPORTS).toString()}
+                value={config.profitOnWin.toString()}
               />
               <Image
                 src={solIcon}
@@ -361,6 +389,24 @@ const Page = () => {
             </div>
             <Button className="w-full" onClick={bet}>
               BET
+            </Button>
+            <Label className="text-xs font-bold md:text-sm">Bot Count</Label>
+            <Input
+              type="number"
+              placeholder="COUNT"
+              className="bg-background h-8 max-w-full border-0 pr-8 text-sm text-white"
+              value={botCount.toString()}
+              disabled={botRunning}
+              onChange={(e) => {
+                setBotCount(parseInt(e.target.value))
+                botCountRef.current = parseInt(e.target.value)
+              }}
+            />
+            <Button
+              className="w-full"
+              onClick={botRunning ? stopBot : startBot}
+            >
+              {botRunning ? 'STOP BOT' : 'START BOT'}
             </Button>
           </CardContent>
         </Card>
@@ -412,8 +458,11 @@ const Page = () => {
                             DICE_MULTIPLIER / parseFloat(e.target.value)
                           ).toFixed(2),
                         ),
-                        profitOnWin: Math.ceil(
-                          prev.betAmount * parseFloat(e.target.value),
+                        profitOnWin: parseFloat(
+                          (
+                            parseFloat(prev.betAmount) *
+                            parseFloat(e.target.value)
+                          ).toFixed(4),
                         ),
                       }))
                     }}
@@ -445,15 +494,14 @@ const Page = () => {
                             (100 - parseFloat(e.target.value))
                           ).toFixed(4),
                         ),
-                        profitOnWin: Math.ceil(
-                          prev.betAmount *
-                            parseFloat(
-                              (
-                                DICE_MULTIPLIER /
-                                (100 - parseFloat(e.target.value))
-                              ).toFixed(4),
-                            ),
-                        ),
+                        profitOnWin:
+                          parseFloat(prev.betAmount) *
+                          parseFloat(
+                            (
+                              DICE_MULTIPLIER /
+                              (100 - parseFloat(e.target.value))
+                            ).toFixed(4),
+                          ),
                       }))
                     }}
                   />
@@ -483,14 +531,13 @@ const Page = () => {
                             DICE_MULTIPLIER / parseFloat(e.target.value)
                           ).toFixed(4),
                         ),
-                        profitOnWin: Math.ceil(
-                          prev.betAmount *
-                            parseFloat(
-                              (
-                                DICE_MULTIPLIER / parseFloat(e.target.value)
-                              ).toFixed(4),
-                            ),
-                        ),
+                        profitOnWin:
+                          parseFloat(prev.betAmount) *
+                          parseFloat(
+                            (
+                              DICE_MULTIPLIER / parseFloat(e.target.value)
+                            ).toFixed(4),
+                          ),
                       }))
                     }}
                   />

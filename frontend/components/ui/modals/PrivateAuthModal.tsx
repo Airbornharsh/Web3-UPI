@@ -27,11 +27,11 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
     getPublicKeyFromPrivateKey,
     disconnectPrivatWallet,
   } = useCustomWallet()
-  const { signIn, signUp } = useAuth()
+  const { signIn, signUp, user } = useAuth()
   const [formData, setFormData] = useState<AuthFormData>({
-    name: '',
-    walletAddress: '',
-    upiId: '',
+    name: user?.name ?? '',
+    walletAddress: user?.walletAddress ?? '',
+    upiId: user?.upiId ?? '',
     pin: '',
     privateKey: '',
   })

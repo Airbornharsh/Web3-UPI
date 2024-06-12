@@ -161,10 +161,12 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       const responseData = response.data
       if (responseData.userValid) {
         setUser(responseData.user)
+        localStorage.setItem('user', JSON.stringify(responseData.user))
         setIsAuthenticated(true)
       } else {
         localStorage.removeItem('token')
         setIsAuthenticated(false)
+        localStorage.removeItem('user')
         setUser(null)
       }
     } catch (e: any) {
@@ -172,11 +174,20 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       if (e.response.data.message) setErrorToastMessage(e.response.data.message)
       else setErrorToastMessage('Something went wrong')
       setUser(null)
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
       setIsAuthenticated(false)
     } finally {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    const user = localStorage.getItem('user')
+    if (user) {
+      setUser(JSON.parse(user))
+    }
+  }, [])
 
   useEffect(() => {
     if (token) {
@@ -323,6 +334,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       const responseData = response.data
       if (responseData.status) {
         setUser(responseData.user)
+        localStorage.setItem('user', JSON.stringify(responseData.user))
         updateBalance()
         setToastMessage('Deposited')
       } else {
@@ -355,6 +367,7 @@ export const AuthProvider: React.FC<AuthContextProviderProps> = ({
       const responseData = response.data
       if (responseData.status) {
         setUser(responseData.user)
+        localStorage.setItem('user', JSON.stringify(responseData.user))
         updateBalance()
         setToastMessage('Withdrawed')
       } else {
