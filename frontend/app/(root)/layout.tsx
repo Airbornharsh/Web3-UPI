@@ -71,19 +71,21 @@ const Children: React.FC<{
   const { publicKey } = useCustomWallet()
   const pathName = usePathname()
   return (
-    <div className=" h-[calc(100vh-4rem)] w-[98vw] max-w-[80rem] overflow-x-hidden">
-      {publicKey
-        ? children
-        : {
-            '/': <Intro />,
-            '/games': children,
-            '/games/dice': (
-              <>
-                <ConnectWalletFirst />
-                {children}
-              </>
-            ),
-          }[pathName] ?? <Intro />}
+    <div className="h-[calc(100vh-4rem)]">
+      <div className="w-[98vw] max-w-[80rem] overflow-x-hidden">
+        {publicKey
+          ? children
+          : {
+              '/': <Intro />,
+              '/games': children,
+              '/games/dice': (
+                <>
+                  <ConnectWalletFirst />
+                  {children}
+                </>
+              ),
+            }[pathName] ?? <Intro />}
+      </div>
     </div>
   )
 }
