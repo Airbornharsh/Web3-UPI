@@ -25,6 +25,7 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
     encodedPrivateKey,
     decodePrivateKey,
     getPublicKeyFromPrivateKey,
+    disconnectPrivatWallet,
   } = useCustomWallet()
   const { signIn, signUp } = useAuth()
   const [formData, setFormData] = useState<AuthFormData>({
@@ -191,6 +192,23 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
       >
         Submit
       </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
+          setFormData({
+            name: '',
+            walletAddress: '',
+            upiId: '',
+            pin: '',
+            privateKey: '',
+          })
+          disconnectPrivatWallet()
+          setOpenModal(false)
+        }}
+      >
+        Close
+      </Button>
     </div>
   )
 
@@ -222,6 +240,23 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
         type="submit"
       >
         Submit
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
+          setFormData({
+            name: '',
+            walletAddress: '',
+            upiId: '',
+            pin: '',
+            privateKey: '',
+          })
+          disconnectPrivatWallet()
+          setOpenModal(false)
+        }}
+      >
+        Close
       </Button>
     </div>
   )
@@ -271,6 +306,23 @@ const PrivateAuthModal: React.FC<PrivateAuthModalProps> = ({
         type="submit"
       >
         Submit
+      </Button>
+      <Button
+        variant={'outline'}
+        onClick={(e) => {
+          e.preventDefault()
+          setFormData({
+            name: '',
+            walletAddress: '',
+            upiId: '',
+            pin: '',
+            privateKey: '',
+          })
+          disconnectPrivatWallet()
+          setOpenModal(false)
+        }}
+      >
+        Close
       </Button>
     </div>
   )
