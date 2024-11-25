@@ -20,6 +20,7 @@ import {
   getTransactionWithRetry,
 } from '../utils/connection'
 import { $Enums } from '@prisma/client'
+import WebSocketManager from '../ws/WebsocketManager'
 
 const txnRouter = Router()
 
@@ -187,6 +188,16 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
         status: 'COMPLETED',
       },
     })
+
+    const webSocketInstance = WebSocketManager.getInstance()
+
+    webSocketInstance.broadcastTo(
+      {
+        type: 'message',
+        data: `Transaction of ${lamports} lamports sent to ${receiver.upiId}`,
+      },
+      receiver.walletAddress,
+    )
 
     return res.json({ message: 'Transaction successful', status: true })
   } catch (e) {
