@@ -191,12 +191,12 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
 
     const webSocketInstance = WebSocketManager.getInstance()
 
-    webSocketInstance.broadcastTo(
+    await webSocketInstance.broadcastTo(
       {
         type: 'message',
-        data: `Transaction of ${lamports} lamports sent to ${receiver.upiId}`,
+        data: `Received ${lamports} lamports from ${senderUser.upiId}`,
       },
-      receiver.walletAddress,
+      receiver.walletAddress.toString(),
     )
 
     return res.json({ message: 'Transaction successful', status: true })
@@ -477,6 +477,16 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
         walletAddress: senderUser.walletAddress,
       },
     })
+
+    const webSocketInstance = WebSocketManager.getInstance()
+
+    await webSocketInstance.broadcastTo(
+      {
+        type: 'message',
+        data: `Received ${lamports} lamports from ${senderUser.upiId}`,
+      },
+      receiver.walletAddress.toString(),
+    )
 
     return res.status(200).json({
       message: 'Transaction successful',

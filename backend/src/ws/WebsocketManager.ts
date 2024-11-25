@@ -82,14 +82,15 @@ class WebSocketManager {
     })
   }
 
-  public broadcastTo(
+  public async broadcastTo(
     data: {
       type: string
       data: any
     },
     walletAddress: string,
-  ): void {
+  ): Promise<void> {
     const parsedData = parseWsObjectToString(data)
+    console.log('Broadcasting to', walletAddress, parsedData)
     const ws = this.walletConnections.get(walletAddress)
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(parsedData)
