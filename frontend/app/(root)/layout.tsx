@@ -22,6 +22,7 @@ import {
 } from '@/context/CustomWalletContext'
 import Intro from '@/components/Intro'
 import { usePathname } from 'next/navigation'
+import { WebSocketProvider } from '@/context/WebsocketContext'
 
 // Default styles that can be overridden by your app
 require('@solana/wallet-adapter-react-ui/styles.css')
@@ -54,8 +55,10 @@ export default function RootLayout({
           <WalletModalProvider>
             <CustomWalletProvider>
               <AuthProvider>
-                <Appbar />
-                <Children>{children}</Children>
+                <WebSocketProvider>
+                  <Appbar />
+                  <Children>{children}</Children>
+                </WebSocketProvider>
               </AuthProvider>
             </CustomWalletProvider>
           </WalletModalProvider>
