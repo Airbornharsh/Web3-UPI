@@ -5,27 +5,27 @@ import { Modal } from '@mui/material'
 
 const QrScanModal = () => {
   const { qrCodeScanOpen, setQrCodeScanOpen } = useLoader()
+  
   return (
     <Modal
       open={qrCodeScanOpen}
-      onClose={() => {}}
+      onClose={() => setQrCodeScanOpen(false)}
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <div>
+      <div className="relative">
         <QrCodeReader />
         <CloseRounded
-          onClick={() => {
-            setQrCodeScanOpen(false)
-          }}
+          onClick={() => setQrCodeScanOpen(false)}
           style={{
             position: 'absolute',
             top: '10px',
             right: '10px',
             cursor: 'pointer',
+            color: 'white',
           }}
         />
       </div>
