@@ -21,11 +21,12 @@ const QrCodeScanner: React.FC = () => {
       video: {
         facingMode: 'environment',
         width: { ideal: 1280 },
-        height: { ideal: 720 }
-      }
+        height: { ideal: 720 },
+      },
     }
 
-    navigator.mediaDevices.getUserMedia(constraints)
+    navigator.mediaDevices
+      .getUserMedia(constraints)
       .then((stream) => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream
@@ -51,15 +52,19 @@ const QrCodeScanner: React.FC = () => {
 
   const startScanning = () => {
     if (videoRef.current && codeReaderRef.current && scanning) {
-      codeReaderRef.current.decodeFromVideoDevice(null, videoRef.current, (result, error) => {
-        if (result) {
-          setScanning(false)
-          setQrCodeData(result.getText())
-        }
-        if (error) {
-          console.error('Error scanning QR code', error)
-        }
-      })
+      codeReaderRef.current.decodeFromVideoDevice(
+        null,
+        videoRef.current,
+        (result, error) => {
+          if (result) {
+            setScanning(false)
+            setQrCodeData(result.getText())
+          }
+          if (error) {
+            console.error('Error scanning QR code', error)
+          }
+        },
+      )
     }
   }
 
@@ -92,33 +97,33 @@ const QrCodeScanner: React.FC = () => {
   }
 
   return (
-    <div className="relative h-screen w-screen flex items-center justify-center bg-black">
+    <div className="relative flex h-screen w-screen items-center justify-center bg-black">
       {/* Video Stream */}
       <video
         ref={videoRef}
-        className="absolute top-0 left-0 w-full h-full object-cover"
+        className="absolute left-0 top-0 h-full w-full object-cover"
       />
 
       {/* Scanning Frame */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-4/5 max-w-md aspect-square relative">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative aspect-square w-4/5 max-w-md">
           {/* Corner Markers */}
-          <div className="absolute top-0 left-0 w-16 h-16 border-t-4 border-l-4 border-white"></div>
-          <div className="absolute top-0 right-0 w-16 h-16 border-t-4 border-r-4 border-white"></div>
-          <div className="absolute bottom-0 left-0 w-16 h-16 border-b-4 border-l-4 border-white"></div>
-          <div className="absolute bottom-0 right-0 w-16 h-16 border-b-4 border-r-4 border-white"></div>
+          <div className="absolute left-0 top-0 h-16 w-16 border-l-4 border-t-4 border-white"></div>
+          <div className="absolute right-0 top-0 h-16 w-16 border-r-4 border-t-4 border-white"></div>
+          <div className="absolute bottom-0 left-0 h-16 w-16 border-b-4 border-l-4 border-white"></div>
+          <div className="absolute bottom-0 right-0 h-16 w-16 border-b-4 border-r-4 border-white"></div>
 
           {/* Scan Area Overlay */}
-          <div className="absolute inset-0 border-4 border-white/50 rounded-xl"></div>
+          <div className="absolute inset-0 rounded-xl border-4 border-white/50"></div>
         </div>
       </div>
 
       {/* Result or Retry Area */}
       {!scanning && (
         <div className="absolute bottom-10 left-0 right-0 flex justify-center">
-          <button 
+          <button
             onClick={resetScanner}
-            className="bg-white/80 text-black px-6 py-3 rounded-lg shadow-md hover:bg-white transition-colors"
+            className="rounded-lg bg-white/80 px-6 py-3 text-black shadow-md transition-colors hover:bg-white"
           >
             Scan Another QR Code
           </button>

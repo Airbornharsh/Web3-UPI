@@ -5,7 +5,7 @@ import { Modal } from '@mui/material'
 
 const QrScanModal = () => {
   const { qrCodeScanOpen, setQrCodeScanOpen } = useLoader()
-  
+
   return (
     <Modal
       open={qrCodeScanOpen}

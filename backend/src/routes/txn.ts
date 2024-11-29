@@ -194,7 +194,7 @@ txnRouter.post('/send/wallet-1', authMiddleware, async (req, res) => {
     await webSocketInstance.broadcastTo(
       {
         type: 'message',
-        data: `Received ${lamports} lamports from ${senderUser.upiId}@wpi`,
+        data: `Received ${(lamports / 1000000000).toFixed(4)} lamports from ${senderUser.upiId}@wpi`,
       },
       receiver.walletAddress.toString(),
     )
@@ -483,7 +483,7 @@ txnRouter.post('/send/wallet-2', authMiddleware, async (req, res) => {
     await webSocketInstance.broadcastTo(
       {
         type: 'message',
-        data: `Received ${lamports} lamports from ${senderUser.upiId}@wpi`,
+        data: `Received ${(lamports / 1000000000).toFixed(4)} lamports from ${senderUser.upiId}@wpi`,
       },
       receiver.walletAddress.toString(),
     )
