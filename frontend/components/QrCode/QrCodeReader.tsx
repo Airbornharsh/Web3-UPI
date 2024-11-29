@@ -20,8 +20,8 @@ const QrCodeScanner: React.FC = () => {
     const constraints = {
       video: {
         facingMode: 'environment',
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
+        width: { ideal: 1920 },
+        height: { ideal: 1080 },
       },
     }
 
